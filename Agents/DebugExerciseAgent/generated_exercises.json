@@ -1,0 +1,64 @@
+{
+  "exercises": [
+    {
+      "id": "exercise_1",
+      "title": "Incorrect Shortest Path in Dijkstra's Algorithm Implementation",
+      "description": "You are maintaining a Python module which implements Dijkstra's algorithm for finding the shortest path in a directed weighted graph. The client reports that in some cases, paths returned are not the shortest path. The bug seems to appear when there are multiple paths between nodes with different weights.",
+      "technology": "Python 3.10",
+      "difficulty": "Hard",
+      "code": "import heapq\n\ndef dijkstra(graph, start):\n    distances = {node: float('inf') for node in graph}\n    distances[start] = 0\n    visited = set()\n    heap = [(0, start)]\n    while heap:\n        current_distance, node = heapq.heappop(heap)\n        visited.add(node)\n        for neighbor, weight in graph[node]:\n            if neighbor not in visited:\n                distance = current_distance + weight\n                if distance < distances[neighbor]:\n                    distances[neighbor] = distance\n                    heapq.heappush(heap, (distance, neighbor))\n    return distances\n\n# Example usage:\ngraph = {\n    'A': [('B', 1), ('C', 4)],\n    'B': [('C', 2), ('D', 5)],\n    'C': [('D', 1)],\n    'D': []\n}\nprint(dijkstra(graph, 'A'))  # Bug present: sometimes doesn't return the actual shortest path",
+      "expectedBehavior": "The function should properly return the shortest distances from the source to all other nodes using Dijkstra's algorithm.",
+      "currentBehavior": "For certain graphs, the returned distances for some nodes are not the shortest possible. The algorithm skips updating previously visited nodes, leading to incorrect results in cases with multiple alternative paths.",
+      "hints": {
+        "level1": "Review how 'visited' nodes are tracked and updated.",
+        "level2": "Check whether visiting a node should be permanent or reconsidered if a shorter path is found.",
+        "level3": "Dijkstra's algorithm should mark a node as visited only when its shortest known distance is confirmed, not just when it's popped from the heap."
+      },
+      "solution": "import heapq\n\ndef dijkstra(graph, start):\n    distances = {node: float('inf') for node in graph}\n    distances[start] = 0\n    heap = [(0, start)]\n    while heap:\n        current_distance, node = heapq.heappop(heap)\n        if current_distance > distances[node]:\n            continue\n        for neighbor, weight in graph[node]:\n            distance = current_distance + weight\n            if distance < distances[neighbor]:\n                distances[neighbor] = distance\n                heapq.heappush(heap, (distance, neighbor))\n    return distances\n",
+      "explanation": "The original buggy code adds each node to the 'visited' set as soon as it is popped from the heap, preventing future distance updates for those nodes. In Dijkstra's algorithm, a node can be pushed into the heap multiple times as shorter paths are discovered, and only when the node is popped with its shortest distance should further exploration happen. Marking nodes as permanently visited too early means shorter paths found later are ignored. In the corrected code, we process a node only if its distance is the most up to date.",
+      "learningObjectives": [
+        "Implementing correct graph traversal algorithms",
+        "Understanding Dijkstra's algorithm invariants",
+        "Diagnosing subtle bugs in shortest path logic"
+      ],
+      "tags": [
+        "python",
+        "graphs",
+        "dijkstra",
+        "algorithm",
+        "shortest-path"
+      ],
+      "estimatedTime": 20
+    },
+    {
+      "id": "exercise_2",
+      "title": "Performance Bottleneck in Depth-First Search with Large Graphs",
+      "description": "You are tasked with analyzing a performance issue in a Python Depth-First Search (DFS) function used for traversing large, sparse graphs. For certain inputs, the search becomes significantly slow and consumes excessive memory. The team suspects the code creates unnecessary recursion and duplicate work.",
+      "technology": "Python 3.10",
+      "difficulty": "Hard",
+      "code": "def dfs(graph, start, visited=None):\n    if visited is None:\n        visited = set()\n    visited.add(start)\n    for neighbor in graph.get(start, []):\n        if neighbor not in visited:\n            dfs(graph, neighbor)\n    return visited\n\n# Example usage:\ngraph = {i: [j for j in range(i+1, i+3)] for i in range(10000)}\nvisited = dfs(graph, 0)\nprint(len(visited))  # Bug present: program runs slowly and uses much memory",
+      "expectedBehavior": "The DFS should efficiently visit each node once without redundant recursion or excessive memory usage.",
+      "currentBehavior": "DFS is inefficient for large graphs, possibly due to deep recursion and local variable copies resulting in high memory usage and slower runtime. Some paths are traversed redundantly, and 'visited' isn't correctly shared between recursion calls.",
+      "hints": {
+        "level1": "Check how the 'visited' set is passed during recursive calls.",
+        "level2": "Local defaults for mutable arguments can cause unexpected behavior.",
+        "level3": "Ensure 'visited' is consistently passed as an argument throughout recursion to avoid redundant set creation."
+      },
+      "solution": "def dfs(graph, start, visited=None):\n    if visited is None:\n        visited = set()\n    visited.add(start)\n    for neighbor in graph.get(start, []):\n        if neighbor not in visited:\n            dfs(graph, neighbor, visited)\n    return visited\n",
+      "explanation": "The buggy code omits passing 'visited' into recursive DFS calls. As a result, a new 'visited' set is created in each recursion, dramatically increasing memory usage, losing track of already visited nodes, and causing redundant traversal. By explicitly passing the 'visited' set into each recursion, we ensure a single set is used throughout the search, making DFS efficient.",
+      "learningObjectives": [
+        "Understanding Python variable scope in recursion",
+        "Debugging performance bottlenecks in recursive graph traversal",
+        "Correct use of mutable default arguments in Python functions"
+      ],
+      "tags": [
+        "python",
+        "graph",
+        "dfs",
+        "performance",
+        "recursion"
+      ],
+      "estimatedTime": 19
+    }
+  ]
+}

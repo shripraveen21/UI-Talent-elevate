@@ -1,0 +1,25 @@
+<div class="dashboard-container">
+  <div *ngIf="loading" class="loading">Loading...</div>
+  <div *ngIf="error" class="error">{{ error }}</div>
+
+  <div *ngIf="!loading && !error">
+    <h2>Welcome, {{ userName }}!</h2>
+    <p *ngIf="userRole">Role: {{ userRole }}</p>
+
+    <h3>Your Assigned Tests</h3>
+    <ul *ngIf="assignedTests.length > 0; else noTests">
+      <li *ngFor="let test of assignedTests" class="test-item">
+        <strong>{{ test.test_name }}</strong> - Duration: {{ test.test_duration }} min
+        <ng-container *ngIf="!test.attempted; else showResults">
+          <button (click)="startTest(test.test_id)">Start Test</button>
+        </ng-container>
+        <ng-template #showResults>
+          <button (click)="viewResults(test.test_id)">Results</button>
+        </ng-template>
+      </li>
+    </ul>
+    <ng-template #noTests>
+      <p>No tests assigned at this time.</p>
+    </ng-template>
+  </div>
+</div>

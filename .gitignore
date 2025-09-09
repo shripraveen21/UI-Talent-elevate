@@ -1,0 +1,5 @@
+.env
+.venv/
+
+essentials.txt
+__pycache__/

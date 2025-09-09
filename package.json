@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13"
+  },
+  "dependencies": {
+    "ngrok": "^5.0.0-beta.2"
+  }
+}

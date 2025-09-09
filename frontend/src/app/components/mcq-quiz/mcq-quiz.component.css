@@ -1,0 +1,49 @@
+.mcq-quiz {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+}
+
+.loading {
+  color: #1976d2;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.error {
+  color: #c62828;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.review-controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+  align-items: center;
+}
+
+.review-controls button {
+  padding: 6px 14px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.review-controls button:hover {
+  background: #1565c0;
+}
+
+.review-controls input[type="text"] {
+  padding: 6px;
+  border-radius: 4px;
+  border: 1px solid #bdbdbd;
+  width: 220px;
+}

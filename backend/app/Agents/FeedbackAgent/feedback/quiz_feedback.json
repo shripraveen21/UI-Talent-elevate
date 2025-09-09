@@ -1,0 +1,74 @@
+{
+  "quiz_result": {
+    "total_questions": 5,
+    "correct_answers": 4,
+    "score_percentage": 80
+  },
+  "analysis": {
+    "strengths": [
+      {
+        "topic": "MongoDB",
+        "concepts_mastered": [
+          "insertOne",
+          "insert",
+          "document",
+          "recommended",
+          "find",
+          "query",
+          "retrieve",
+          "$eq",
+          "comparison",
+          "equality",
+          "updateMany",
+          "update",
+          "modify"
+        ],
+        "remarks": "Excellent grasp of MongoDB document handling, querying, and update operations."
+      },
+      {
+        "topic": "CRUD",
+        "concepts_mastered": [
+          "insertOne",
+          "insert",
+          "document",
+          "recommended",
+          "find",
+          "query",
+          "retrieve",
+          "updateMany",
+          "update",
+          "modify"
+        ],
+        "remarks": "Shows strong understanding of CRUD operations in MongoDB, especially with create, read, and update methods."
+      },
+      {
+        "topic": "Operators",
+        "concepts_mastered": [
+          "$eq",
+          "comparison",
+          "query",
+          "equality"
+        ],
+        "remarks": "Demonstrates solid knowledge of query operator usage for filtering and matching documents."
+      }
+    ],
+    "weaknesses": [
+      {
+        "topic": "MongoDB",
+        "concepts_weak": [
+          "deleteMany",
+          "delete"
+        ],
+        "areas_of_improvement": "Review recommended deletion commands (such as deleteMany); practice scenarios requiring removal of multiple documents using correct methods."
+      },
+      {
+        "topic": "CRUD",
+        "concepts_weak": [
+          "deleteMany",
+          "delete"
+        ],
+        "areas_of_improvement": "Strengthen understanding of proper deletion operations within CRUD; compare differences and use cases for deleteMany and related methods."
+      }
+    ]
+  }
+}

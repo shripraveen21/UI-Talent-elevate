@@ -1,0 +1,135 @@
+CREATE TYPE user_role AS ENUM ('ProductManager', 'Employee', 'CapabilityLeader','DeliveryManager','DeliveryLeader');
+CREATE TYPE difficulty_level AS ENUM ('beginner', 'intermediate', 'advanced');
+CREATE TYPE status_type AS ENUM ('assigned', 'in_progress', 'completed', 'canceled', 'not_completed');
+CREATE TYPE band_type AS ENUM ('B2','B3H','B3L','B4H','B4L','B5H','B5L','B6H','B6L','B7','B8');
+CREATE TYPE mail_status AS ENUM ('Sent','Failed','Not_sent');
+CREATE TYPE skill_level AS ENUM ('TRAINED', 'BASIC', 'INTERMEDIATE', 'ADVANCED', 'GURU');
+
+CREATE TABLE employees (
+    user_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    hashed_password VARCHAR(128) NOT NULL,
+    role user_role NOT NULL,
+    band band_type NOT NULL,
+    tech_stack JSON,          
+    bench_start DATE,
+    bench_end DATE,
+    manager_id INTEGER REFERENCES employees(user_id) 
+);
+
+
+CREATE TABLE tech_stack (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL UNIQUE,
+    created_by INTEGER REFERENCES employees(user_id), 
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE TABLE topics (
+    topic_id SERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
+    difficulty difficulty_level NOT NULL,
+    tech_stack_id INTEGER NOT NULL REFERENCES tech_stack(id) ON DELETE CASCADE,
+    CONSTRAINT uniq_topic_per_stack UNIQUE (name, tech_stack_id, difficulty)
+);
+
+
+CREATE TABLE quizzes (
+    id SERIAL PRIMARY KEY,
+    tech_stack_id INTEGER NOT NULL REFERENCES tech_stack(id) ON DELETE CASCADE,
+    topic_ids INTEGER[] NOT NULL, 
+    num_questions INTEGER NOT NULL,
+    duration INTEGER NOT NULL,    
+    questions JSON NOT NULL,      
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE TABLE debug_exercises (
+    id SERIAL PRIMARY KEY,
+    tech_stack_id INTEGER NOT NULL REFERENCES tech_stack(id) ON DELETE CASCADE,
+    topic_ids INTEGER[] NOT NULL, 
+    num_questions INTEGER NOT NULL,
+    duration INTEGER NOT NULL,    
+    exercises JSON NOT NULL,      
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE TABLE tests (
+    id SERIAL PRIMARY KEY,
+    test_name VARCHAR(200) UNIQUE NOT NULL, 
+    description TEXT,
+    duration INTEGER, 
+    created_at TIMESTAMP DEFAULT NOW(),
+    created_by INT NOT NULL REFERENCES employees(user_id),
+    quiz_id INTEGER REFERENCES quizzes(id) ON DELETE SET NULL,
+    debug_test_id INTEGER REFERENCES debug_exercises(id) ON DELETE SET NULL,
+    CONSTRAINT chk_single_test_type CHECK (
+        (CASE WHEN quiz_id IS NOT NULL THEN 1 ELSE 0 END +
+         CASE WHEN debug_test_id IS NOT NULL THEN 1 ELSE 0 END) = 1
+    )
+);
+
+CREATE TABLE test_assign (
+    assign_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES employees(user_id) ON DELETE CASCADE,
+    test_id INTEGER NOT NULL REFERENCES tests(id) ON DELETE CASCADE,
+    status status_type NOT NULL,
+    assigned_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_date TIMESTAMP,
+    due_date TIMESTAMP,
+    mail_sent mail_status NOT NULL
+);
+
+CREATE TABLE quiz_results (
+    result_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES employees(user_id) ON DELETE CASCADE,
+    quiz_id INTEGER NOT NULL REFERENCES quizzes(id) ON DELETE CASCADE,
+    score INTEGER NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    submitted_at TIMESTAMP DEFAULT NOW(),
+    answers JSON NOT NULL,
+    feedback_data JSON
+);
+
+
+CREATE TABLE debug_results (
+    result_id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES employees(user_id) ON DELETE CASCADE,
+    debug_id INTEGER NOT NULL REFERENCES debug_exercises(id) ON DELETE CASCADE,
+    score INTEGER NOT NULL,
+    answers JSON NOT NULL, 
+    start_time TIMESTAMP NOT NULL,
+    submitted_at TIMESTAMP DEFAULT NOW(),
+);
+
+CREATE TABLE band_level_rules (
+    id SERIAL PRIMARY KEY,
+    band band_type NOT NULL,
+    allowed_level skill_level NOT NULL,
+    UNIQUE(band, allowed_level)
+);
+
+CREATE TABLE employee_skills (
+    id SERIAL PRIMARY KEY,
+    employee_id INT NOT NULL REFERENCES employees(user_id) ON DELETE CASCADE,
+    tech_stack_id INT NOT NULL REFERENCES tech_stack(id) ON DELETE CASCADE,
+    current_level skill_level DEFAULT 'TRAINED',
+    UNIQUE(employee_id, tech_stack_id)
+);
+
+CREATE TABLE skill_upgrades (
+    id SERIAL PRIMARY KEY,
+    employee_id INT NOT NULL REFERENCES employees(user_id) ON DELETE CASCADE,
+    tech_stack_id INT NOT NULL REFERENCES tech_stack(id) ON DELETE CASCADE,
+    target_level skill_level NOT NULL,
+    status status_type NOT NULL,
+    assigned_test_id INT REFERENCES tests(id) ON DELETE SET NULL,
+    start_time TIMESTAMP NOT NULL,
+    completed_at TIMESTAMP,
+    UNIQUE(employee_id, tech_stack_id, target_level)
+);
+

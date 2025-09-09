@@ -1,0 +1,33 @@
+<div>
+  <h2>Tech Stack Topic Generation</h2>
+  <label>
+    Name:
+    <input [(ngModel)]="params.name" />
+  </label>
+  <br />
+  <br />
+  <button (click)="connect()" [disabled]="wsConnected">Connect & Start</button>
+  <button (click)="closeWs()" [disabled]="!wsConnected">Close</button>
+</div>
+
+<hr />
+
+<div>
+  <strong>Topics:</strong>
+  <pre>{{ formattedTopicsJson }}</pre>
+</div>
+
+<div *ngIf="showControls">
+  <button (click)="sendDecision('APPROVE')">Approve</button>
+  <button (click)="sendDecision('REJECT')">Reject</button>
+  <button (click)="sendDecision('REFINE')">Refine</button>
+  <input #feedbackInput type="text" placeholder="Feedback..." />
+  <button (click)="sendDecision('FEEDBACK', feedbackInput.value)">Send Feedback</button>
+</div>
+
+<hr />
+
+<div>
+  <h3>Log</h3>
+  <pre>{{log.join('\n')}}</pre>
+</div>

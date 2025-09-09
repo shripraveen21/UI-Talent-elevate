@@ -1,0 +1,4 @@
+/* Home component styles - using Tailwind CSS */
+:host {
+  display: block;
+}

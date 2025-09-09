@@ -1,0 +1,12 @@
+/* All styles are now handled by Tailwind CSS classes in the HTML */
+/* This file is kept for potential future custom styles that can't be achieved with Tailwind */
+
+/* Custom animations that might be needed */
+
+/* Any styles that need to be scoped to this component and can't be handled by Tailwind */
+
+/* Keep any styles that might be referenced by TypeScript code */
+.status.connected, .status.disconnected, .message, .message.system, .message.user, .message.assistant, .message.yoda {
+  /* These classes are kept in case they're referenced in the TypeScript code */
+  /* Their styling is now handled by Tailwind classes in the HTML */
+}

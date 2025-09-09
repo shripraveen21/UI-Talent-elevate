@@ -1,0 +1,222 @@
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+}
+
+/* Theme Tokens (trimmed to only what is used) */
+:root,
+:host {
+  --surface: #ffffff;
+  --gradient-start: #fafafa;
+  --gradient-mid: #f6f1d5;
+  --gradient-end: #f9e27a;
+  --border-color: #d9d9d6;
+  --border-strong: #c8c8c5;
+  --text-primary: #1b1d21;
+  --text-secondary: #555f6b;
+  --radius-xl: 46px;
+  --accent: #f6cd25;
+  --shadow-shell: 0 20px 45px -15px rgba(27, 29, 33, 0.35),
+    0 4px 10px -2px rgba(27, 29, 33, 0.08);
+  --shadow-focus: 0 0 0 4px #f6cd2533;
+  --font-stack: "Inter", system-ui, Arial, sans-serif;
+}
+
+body,
+.auth-page-bg {
+  font-family: var(--font-stack);
+}
+
+.auth-page-bg {
+  min-height: 100vh;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
+.login-shell {
+  width: min(900px, 100%);
+  min-height: 400px;
+  background: linear-gradient(
+    135deg,
+    var(--gradient-start),
+    var(--gradient-mid) 48%,
+    var(--gradient-end)
+  );
+  border-radius: var(--radius-xl);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-shell);
+  border: 1px solid #ecebe6;
+}
+
+.form-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form-inner {
+  padding: clamp(2.5rem, 3.2vw, 3.6rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+.form-header h1 {
+  margin: 0 0 0.35rem;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.2px;
+}
+.subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  letter-spacing: 0.25px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+.field label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--text-secondary);
+}
+.field input {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  padding: 0.9rem 1.15rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--text-primary);
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.3s;
+}
+.field input:hover {
+  border-color: var(--border-strong);
+}
+.field input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-focus);
+}
+.field input::placeholder {
+  color: #9ba1a6;
+  font-weight: 400;
+}
+
+.primary-btn {
+  margin-top: 0.3rem;
+  background: var(--accent);
+  color: #222;
+  border: none;
+  padding: 0.95rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 999px;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 14px -3px rgba(246, 205, 37, 0.55),
+    0 1px 3px rgba(0, 0, 0, 0.15);
+  transition: filter 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+.primary-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -5px rgba(246, 205, 37, 0.6),
+    0 2px 6px -1px rgba(0, 0, 0, 0.18);
+}
+.primary-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #d93030;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.35px;
+}
+.error.global {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+/* Media Column */
+.media-column {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+}
+.media-image {
+  position: fit-content;
+  inset: 0;
+  /* overflow: hidden; */
+  display: grid;
+  place-items: center;
+}
+.media-image img {
+  width: 100%;
+  height: 90%;
+  transform: scale(var(--media-scale));
+  object-fit: cover;
+  object-position: 100% 80%;
+  transition: object-position 0.4s, object-fit 0.4s;
+  image-rendering: -webkit-optimize-contrast;
+  border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+}
+
+@media (max-width: 1100px) {
+  .login-shell {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 900px) {
+  .login-shell {
+    grid-template-columns: 1fr;
+    border-radius: 34px;
+  }
+  .media-column {
+    display: none;
+  }
+  .form-inner {
+    padding: 2.5rem 2rem 3rem;
+  }
+}
+@media (max-width: 500px) {
+  .form-inner {
+    padding: 2rem 1.4rem 2.4rem;
+  }
+  .providers {
+    flex-direction: column;
+  }
+  .form-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .terms {
+    margin-left: 0;
+  }
+}

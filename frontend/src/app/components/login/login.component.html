@@ -1,0 +1,40 @@
+<div class="auth-page-bg">
+    <div class="login-shell">
+        <div class="form-column">
+            <div class="form-inner">
+                <header class="form-header">
+                    <h1>Sign in</h1>
+                    <p class="subtitle">Access your dashboard and keep work moving.</p>
+                </header>
+
+                <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="login-form" autocomplete="off">
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" type="email" formControlName="email" placeholder="name@example.com" />
+                        <small class="error" *ngIf="form.get('email')?.touched && form.get('email')?.invalid">
+                            {{ form.get('email')?.errors?.['required'] ? 'Email is required' : 'Invalid email' }}
+                        </small>
+                    </div>
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input id="password" type="password" formControlName="password" placeholder="••••••••" />
+                        <small class="error" *ngIf="form.get('password')?.touched && form.get('password')?.invalid">
+                            {{ form.get('password')?.errors?.['required'] ? 'Password is required' : 'Min length 4' }}
+                        </small>
+                    </div>
+                    <button class="primary-btn" type="submit" [disabled]="loading() || form.invalid">
+                        {{ loading() ? 'Signing in...' : 'Submit' }}
+                    </button>
+                    <p class="error global" *ngIf="error()">{{ error() }}</p>
+                </form>
+
+            </div>
+        </div>
+            <div class="media-column">
+                <div class="media-image" role="img" aria-label="Team collaborating">
+                    <img src="login3.png" alt="" loading="lazy"  />
+                </div>
+            
+        </div>
+    </div>
+</div>

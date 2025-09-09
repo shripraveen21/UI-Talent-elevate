@@ -1,0 +1,107 @@
+{
+  "question1": {
+    "question": "Which *recommended* method inserts a single document into a MongoDB collection?",
+    "options": {
+      "A": "db.collection.insert()",
+      "B": "db.collection.insertOne()",
+      "C": "db.collection.add()",
+      "D": "db.collection.save()"
+    },
+    "correctAnswer": "B",
+    "explanation": "The `db.collection.insertOne()` method is the recommended way to add a single document to a collection. While the `db.collection.insert()` method can also be used for single documents, `insertOne()` provides better control and error handling.",
+    "topics": [
+      "MongoDB",
+      "CRUD"
+    ],
+    "concepts": [
+      "insertOne",
+      "insert",
+      "document",
+      "recommended"
+    ]
+  },
+  "question2": {
+    "question": "What is the purpose of the `find()` method in MongoDB?",
+    "options": {
+      "A": "To modify documents",
+      "B": "To delete documents",
+      "C": "To retrieve documents",
+      "D": "To create a new collection"
+    },
+    "correctAnswer": "C",
+    "explanation": "The `find()` method retrieves documents from a MongoDB collection based on a specified query. It allows you to search for documents matching certain criteria.",
+    "topics": [
+      "MongoDB",
+      "CRUD"
+    ],
+    "concepts": [
+      "find",
+      "query",
+      "document",
+      "retrieve"
+    ]
+  },
+  "question3": {
+    "question": "Which operator is used to filter documents where a field is equal to a specific value?",
+    "options": {
+      "A": "$gt",
+      "B": "$lt",
+      "C": "$eq",
+      "D": "$ne"
+    },
+    "correctAnswer": "C",
+    "explanation": "The `$eq` operator matches documents where the value of a field is equal to the specified value. For example, `db.users.find({ age: { $eq: 30 } })` will find all users whose age is 30.",
+    "topics": [
+      "MongoDB",
+      "Operators"
+    ],
+    "concepts": [
+      "$eq",
+      "comparison",
+      "query",
+      "equality"
+    ]
+  },
+  "question4": {
+    "question": "Which *recommended* command is used to remove multiple documents matching a certain criteria from a collection?",
+    "options": {
+      "A": "db.collection.remove()",
+      "B": "db.collection.deleteMany()",
+      "C": "db.collection.drop()",
+      "D": "db.collection.erase()"
+    },
+    "correctAnswer": "B",
+    "explanation": "The `db.collection.deleteMany()` method removes all documents that match the specified filter. While `db.collection.remove()` can also be used, `deleteMany()` is the recommended approach for removing multiple documents matching a filter.",
+    "topics": [
+      "MongoDB",
+      "CRUD"
+    ],
+    "concepts": [
+      "deleteMany",
+      "delete",
+      "document",
+      "recommended"
+    ]
+  },
+  "question5": {
+    "question": "What method modifies existing documents in a MongoDB collection?",
+    "options": {
+      "A": "db.collection.insert()",
+      "B": "db.collection.updateMany()",
+      "C": "db.collection.find()",
+      "D": "db.collection.delete()"
+    },
+    "correctAnswer": "B",
+    "explanation": "The `db.collection.updateMany()` method is used to modify multiple documents that match a specified filter. It allows for updating multiple documents at once based on a query.",
+    "topics": [
+      "MongoDB",
+      "CRUD"
+    ],
+    "concepts": [
+      "updateMany",
+      "update",
+      "document",
+      "modify"
+    ]
+  }
+}

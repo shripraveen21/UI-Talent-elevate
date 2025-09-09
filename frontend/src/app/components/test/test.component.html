@@ -1,0 +1,33 @@
+<div *ngIf="loading">Loading test...</div>
+
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="!loading && !error && testDetails">
+  <h2>{{ testDetails.test_name }}</h2>
+  <div>Time Remaining: {{ formatTimer(timer) }}</div>
+  <form (ngSubmit)="submit()">
+    <div *ngFor="let question of testDetails.questions">
+      <div>
+        <strong>{{ question.text }}</strong>
+      </div>
+      <div *ngIf="question.type === 'multiple_choice'">
+        <div *ngFor="let option of question.options">
+          <label>
+            <input type="radio"
+                   [attr.name]="question.id"
+                   [value]="option.key"
+                   (change)="handleAnswer(question.id, option.key)">
+            {{ option.key }}: {{ option.value }}
+          </label>
+        </div>
+      </div>
+      <div *ngIf="question.type === 'text'">
+        <input type="text"
+               [attr.name]="question.id"
+               #textInput
+               (input)="handleAnswer(question.id, textInput.value)">
+      </div>
+    </div>
+    <button type="submit" [disabled]="submitted">Submit</button>
+  </form>
+</div>
