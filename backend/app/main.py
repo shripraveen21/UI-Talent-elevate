@@ -27,7 +27,7 @@ app = FastAPI()
 # CORS configuration to allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],  # Angular default dev server
+    allow_origins=["http://localhost:4200", "*"],  # Allow Angular dev server and all origins (including ngrok)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

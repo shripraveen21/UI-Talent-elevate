@@ -105,11 +105,30 @@ async def mcq_review(websocket: WebSocket):
                 refined_quiz = await quiz_system.refine_quiz(quiz, feedback)
                 iteration = 0
             elif user_decision == "REFINE":
-                additional_feedback = await quiz_system.get_feedback(refined_quiz)
-                refined_quiz = await quiz_system.refine_quiz(refined_quiz, additional_feedback)
+                if user_feedback and "Question ID:" in user_feedback:
+                    # Individual question regeneration without feedback
+                    question_id = user_feedback.split("Question ID:")[1].strip()
+                    specific_feedback = f"Please regenerate only {question_id} while keeping all other questions unchanged."
+                    refined_quiz = await quiz_system.refine_quiz(refined_quiz, specific_feedback)
+                else:
+                    # Regenerate entire assessment
+                    additional_feedback = await quiz_system.get_feedback(refined_quiz)
+                    refined_quiz = await quiz_system.refine_quiz(refined_quiz, additional_feedback)
             elif user_decision.startswith("FEEDBACK"):
                 specific_feedback = user_feedback or user_decision.replace("FEEDBACK:", "").strip()
-                refined_quiz = await quiz_system.refine_quiz(refined_quiz, specific_feedback)
+                if "Question ID:" in specific_feedback:
+                    # Individual question regeneration with feedback
+                    parts = specific_feedback.split(" | Feedback: ")
+                    if len(parts) == 2:
+                        question_id = parts[0].replace("Question ID:", "").strip()
+                        feedback_text = parts[1].strip()
+                        enhanced_feedback = f"Please regenerate only {question_id} based on this feedback: {feedback_text}. Keep all other questions unchanged."
+                        refined_quiz = await quiz_system.refine_quiz(refined_quiz, enhanced_feedback)
+                    else:
+                        refined_quiz = await quiz_system.refine_quiz(refined_quiz, specific_feedback)
+                else:
+                    # General feedback for entire assessment
+                    refined_quiz = await quiz_system.refine_quiz(refined_quiz, specific_feedback)
             else:
                 await websocket.send_json({
                     "type": "error",
