@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { McqFormComponent } from '../mcq-form/mcq-form.component';
 import { McqQuestionComponent, MCQQuestion } from '../mcq-question/mcq-question.component';
 import { McqAgentService, QuizParams, AgentMessage } from '../../services/mcq-agent/mcq-agent.service';
@@ -10,7 +11,7 @@ import { TechStackAgentService } from '../../services/techstack-agent/techstack-
   templateUrl: './mcq-quiz.component.html',
   styleUrls: ['./mcq-quiz.component.css'],
   standalone: true,
-  imports: [CommonModule, McqFormComponent, McqQuestionComponent]
+  imports: [CommonModule, FormsModule, McqFormComponent, McqQuestionComponent]
 })
 export class McqQuizComponent  {
   quizParams?: QuizParams;
@@ -20,10 +21,19 @@ export class McqQuizComponent  {
   reviewIteration: number = 0;
   showAnswers: boolean = false;
   reviewMode: boolean = false;
+  feedback: string = '';
+  showRegenerateModal: boolean = false;
+  regenerateModalTitle: string = '';
+  regenerateComment: string = '';
+  currentRegenerateTarget: string | number | null = null;
 
   constructor(
     private mcqAgentService: McqAgentService,
   ) {}
+
+  getOptionKeys(options: { [key: string]: string }): string[] {
+    return Object.keys(options);
+  }
 
   onSubmitParams(params: QuizParams) {
     this.quizParams = params;
@@ -72,6 +82,7 @@ export class McqQuizComponent  {
   }
 
   sendDecision(decision: string, feedback?: string) {
+    const feedbackToSend = feedback || this.feedback;
     if (decision === "APPROVE" && this.quizParams && this.quizQuestions.length > 0) {
       this.loading = true;
       console.log(this.quizParams,this.quizQuestions)
@@ -86,11 +97,55 @@ export class McqQuizComponent  {
         }
       });
     }
-    this.mcqAgentService.sendDecision(decision, feedback);
+    this.mcqAgentService.sendDecision(decision, feedbackToSend);
+    this.feedback = ''; // Clear feedback after sending
     this.loading = true;
   }
 
   showAllAnswers() {
     this.showAnswers = true;
+  }
+
+  regenerateQuestion(index: number) {
+    this.currentRegenerateTarget = index;
+    this.regenerateModalTitle = `Regenerate Question ${index + 1}`;
+    this.showRegenerateModal = true;
+  }
+
+  regenerateEntireAssessment() {
+    this.currentRegenerateTarget = 'Entire Assessment';
+    this.regenerateModalTitle = 'Regenerate Entire Assessment';
+    this.showRegenerateModal = true;
+  }
+
+  closeRegenerateModal() {
+    this.showRegenerateModal = false;
+    this.regenerateComment = '';
+    this.currentRegenerateTarget = null;
+  }
+
+  confirmRegenerate() {
+    const comment = this.regenerateComment;
+    console.log(`Regenerating: ${this.currentRegenerateTarget}`);
+    console.log(`With comment: ${comment || 'No comment provided'}`);
+    
+    if (this.currentRegenerateTarget === 'Entire Assessment') {
+      // Regenerate all questions
+      this.sendDecision('REFINE', comment);
+    } else if (typeof this.currentRegenerateTarget === 'number') {
+      // Regenerate individual question
+      const questionIndex = this.currentRegenerateTarget;
+      const questionId = `question${questionIndex + 1}`; // Generate question ID based on index
+      
+      if (comment && comment.trim()) {
+        // Send question ID and feedback for individual question regeneration
+        this.sendDecision('FEEDBACK', `Question ID: ${questionId} | Feedback: ${comment}`);
+      } else {
+        // Send only question ID for regeneration without feedback
+        this.sendDecision('REFINE', `Question ID: ${questionId}`);
+      }
+    }
+    
+    this.closeRegenerateModal();
   }
 }

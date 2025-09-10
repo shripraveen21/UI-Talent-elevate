@@ -1,195 +1,247 @@
-<div class="card p-8">
-  <div class="text-center mb-8">
-    <div class="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-2xl mb-4">
-      <svg class="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-      </svg>
-    </div>
-    <h2 class="text-2xl font-bold text-gray-900 mb-2">Create Your Quiz</h2>
-    <p class="text-gray-600">Configure your quiz parameters to get started</p>
-  </div>
-
-  <form (ngSubmit)="onSubmit()" class="space-y-8">
-    <!-- Tech Stack Selection -->
-    <div class="space-y-3">
-      <label class="label">
-        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-6">
+  <div class="max-w-4xl mx-auto">
+    <!-- Header Section -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl mb-6 shadow-lg">
+        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
         </svg>
-        Tech Stack
-      </label>
-      
-      <!-- Selected Tags -->
-      <div class="flex flex-wrap gap-2 mb-3" *ngIf="params.tech_stack.length > 0">
-<span
-  class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800"
-  *ngFor="let stack of params.tech_stack"
->
-  {{stack.name}}
-  <button 
-    type="button" 
-    class="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-primary-200 transition-colors"
-    (click)="removeTechStack(stack)"
-  >
-    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-    </svg>
-  </button>
-</span>
       </div>
-
-      <!-- Dropdown -->
-<div class="relative">
-  <button 
-    type="button"
-    class="w-full flex items-center justify-between px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-primary-500 focus:outline-none"
-    (click)="showTechStackDropdown = !showTechStackDropdown"
-  >
-    <span>Select Tech Stacks</span>
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-    </svg>
-  </button>
-  <div class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm" *ngIf="showTechStackDropdown">
-    <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100" *ngFor="let stack of techStackOptions"
-      [class.bg-primary-50]="isTechStackSelected(stack)" (click)="toggleTechStack(stack); showTechStackDropdown = false;">
-      <span class="block truncate" [class.font-medium]="isTechStackSelected(stack)">{{stack.name}}</span>
-      <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600" *ngIf="isTechStackSelected(stack)">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-        </svg>
-      </span>
-    </div>
-  </div>
-</div>
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-3">
+        MCQ Quiz Generator
+      </h1>
+      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+        Create customized multiple-choice quizzes with advanced configuration options
+      </p>
     </div>
 
-    <!-- Concepts Selection -->
-    <div class="space-y-3">
-      <label class="label">
-        <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        Concepts
-      </label>
-      
-      <div *ngIf="params.tech_stack.length === 0" class="bg-gray-50 border border-gray-200 rounded-xl p-4">
-        <div class="flex items-center">
-          <svg class="w-5 h-5 text-gray-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+    <!-- Main Form Card -->
+    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+      <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-6">
+        <h2 class="text-2xl font-bold text-white flex items-center">
+          <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
           </svg>
-          <span class="text-gray-600 font-medium">Select at least one tech stack to choose concepts</span>
-        </div>
+          Quiz Configuration
+        </h2>
+        <p class="text-indigo-100 mt-2">Set up your quiz parameters and select topics</p>
       </div>
 
-      <div *ngIf="params.tech_stack.length > 0">
-        <!-- Selected Concept Tags -->
-        <div class="flex flex-wrap gap-2 mb-3" *ngIf="params.concepts.length > 0">
-          <span
-            class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary-100 text-secondary-800"
-            *ngFor="let concept of params.concepts"
-          >
-            {{concept.name}} ({{concept.level}})
-            <button 
-              type="button" 
-              class="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-secondary-200 transition-colors"
-              (click)="removeConcept(concept)"
+      <form (ngSubmit)="onSubmit()" class="p-8 space-y-8">
+        <!-- Tech Stack Selection Card -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+          <div class="flex items-center mb-4">
+            <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center mr-3">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Technology Stack</h3>
+              <p class="text-sm text-gray-600">Choose the technologies for your quiz</p>
+            </div>
+          </div>
+          
+          <!-- Selected Tech Stack Tags -->
+          <div class="flex flex-wrap gap-3 mb-4" *ngIf="params.tech_stack.length > 0">
+            <span
+              class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
+              *ngFor="let stack of params.tech_stack"
             >
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              {{stack.name}}
+              <button 
+                type="button" 
+                class="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors"
+                (click)="removeTechStack(stack)"
+              >
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+            </span>
+          </div>
+
+          <!-- Tech Stack Dropdown -->
+          <div class="relative">
+            <button 
+              type="button"
+              class="w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-sm text-gray-700 hover:border-blue-300 hover:bg-blue-50 focus:ring-4 focus:ring-blue-100 focus:border-blue-400 focus:outline-none transition-all duration-200"
+              (click)="showTechStackDropdown = !showTechStackDropdown"
+            >
+              <span class="font-medium">Select Technology Stacks</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="showTechStackDropdown" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
-          </span>
-        </div>
-
-        <!-- Concept Dropdown -->
-        <div class="relative">
-          <button 
-            type="button"
-            class="w-full flex items-center justify-between px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-sm text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-secondary-500 focus:outline-none"
-            (click)="showConceptDropdown = !showConceptDropdown"
-          >
-            <span>Select Concepts</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
-          <div class="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm" *ngIf="showConceptDropdown">
-            <ng-container *ngFor="let level of levels">
-              <div class="px-3 py-1.5 text-xs font-semibold text-gray-500 bg-gray-50 uppercase tracking-wider">
-                {{level | titlecase}}
-              </div>
-              <div class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-100"
-                *ngFor="let concept of availableConceptsByLevel(level)"
-                [class.bg-secondary-50]="isConceptSelected(concept)"
-                (click)="toggleConcept(concept, !isConceptSelected(concept)); showConceptDropdown = false;">
-                <div class="flex items-center">
-                  <span class="block truncate" [class.font-medium]="isConceptSelected(concept)">{{concept.name}}</span>
-<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">{{concept.difficulty}}</span>
-                </div>
-                <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-secondary-600" *ngIf="isConceptSelected(concept)">
+            <div class="absolute z-20 mt-2 w-full bg-white shadow-2xl max-h-64 rounded-xl py-2 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none border border-gray-100" *ngIf="showTechStackDropdown">
+              <div class="cursor-pointer select-none relative py-3 pl-4 pr-10 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-150" *ngFor="let stack of techStackOptions"
+                [class.bg-gradient-to-r]="isTechStackSelected(stack)"
+                [class.from-blue-100]="isTechStackSelected(stack)"
+                [class.to-indigo-100]="isTechStackSelected(stack)"
+                (click)="toggleTechStack(stack); showTechStackDropdown = false;">
+                <span class="block truncate font-medium" [class.text-blue-700]="isTechStackSelected(stack)">{{stack.name}}</span>
+                <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-blue-600" *ngIf="isTechStackSelected(stack)">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </span>
               </div>
-            </ng-container>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Quiz Configuration -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="space-y-2">
-        <label for="num_questions" class="label">
-          <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-          </svg>
-          Number of Questions
-        </label>
-        <input 
-          id="num_questions" 
-          type="number" 
-          [(ngModel)]="params.num_questions" 
-          name="num_questions" 
-          min="1" 
-          required 
-          class="input-field"
-        />
-      </div>
+        <!-- Concepts Selection Card -->
+        <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100">
+          <div class="flex items-center mb-4">
+            <div class="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center mr-3">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Concepts & Topics</h3>
+              <p class="text-sm text-gray-600">Select specific concepts to focus on</p>
+            </div>
+          </div>
+          
+          <div *ngIf="params.tech_stack.length === 0" class="bg-white border-2 border-dashed border-gray-300 rounded-xl p-6">
+            <div class="flex items-center justify-center">
+              <svg class="w-8 h-8 text-gray-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="text-gray-600 font-medium text-center">Please select at least one technology stack to choose concepts</span>
+            </div>
+          </div>
 
-      <div class="space-y-2">
-        <label for="duration" class="label">
-          <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-          </svg>
-          Duration (minutes)
-        </label>
-        <input 
-          id="duration" 
-          type="number" 
-          [(ngModel)]="params.duration" 
-          name="duration" 
-          min="1" 
-          required 
-          class="input-field"
-        />
-      </div>
-    </div>
+          <div *ngIf="params.tech_stack.length > 0">
+            <!-- Selected Concept Tags -->
+            <div class="flex flex-wrap gap-3 mb-4" *ngIf="params.concepts.length > 0">
+              <span
+                class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                *ngFor="let concept of params.concepts"
+              >
+                {{concept.name}} 
+                <span class="ml-1 px-2 py-0.5 bg-white bg-opacity-20 rounded-full text-xs">{{concept.level}}</span>
+                <button 
+                  type="button" 
+                  class="ml-2 inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors"
+                  (click)="removeConcept(concept)"
+                >
+                  <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                  </svg>
+                </button>
+              </span>
+            </div>
 
-    <!-- Submit Button -->
-    <div class="pt-4">
-      <button 
-        type="submit" 
-        class="btn-primary w-full flex items-center justify-center"
-        [disabled]="params.tech_stack.length === 0 || params.concepts.length === 0"
-      >
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-        </svg>
-        Generate Quiz
-      </button>
+            <!-- Concept Dropdown -->
+            <div class="relative">
+              <button 
+                type="button"
+                class="w-full flex items-center justify-between px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-sm text-gray-700 hover:border-purple-300 hover:bg-purple-50 focus:ring-4 focus:ring-purple-100 focus:border-purple-400 focus:outline-none transition-all duration-200"
+                (click)="showConceptDropdown = !showConceptDropdown"
+              >
+                <span class="font-medium">Select Concepts</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 transition-transform duration-200" [class.rotate-180]="showConceptDropdown" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+              <div class="absolute z-20 mt-2 w-full bg-white shadow-2xl max-h-64 rounded-xl py-2 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none border border-gray-100" *ngIf="showConceptDropdown">
+                <ng-container *ngFor="let level of levels">
+                  <div class="px-4 py-2 text-xs font-bold text-purple-600 bg-gradient-to-r from-purple-50 to-pink-50 uppercase tracking-wider border-b border-purple-100">
+                    {{level | titlecase}} Level
+                  </div>
+                  <div class="cursor-pointer select-none relative py-3 pl-4 pr-10 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all duration-150"
+                    *ngFor="let concept of availableConceptsByLevel(level)"
+                    [class.bg-gradient-to-r]="isConceptSelected(concept)"
+                    [class.from-purple-100]="isConceptSelected(concept)"
+                    [class.to-pink-100]="isConceptSelected(concept)"
+                    (click)="toggleConcept(concept, !isConceptSelected(concept)); showConceptDropdown = false;">
+                    <div class="flex items-center justify-between">
+                      <span class="block truncate font-medium" [class.text-purple-700]="isConceptSelected(concept)">{{concept.name}}</span>
+                      <span class="ml-2 inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">{{concept.difficulty}}</span>
+                    </div>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-4 text-purple-600" *ngIf="isConceptSelected(concept)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
+                    </span>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quiz Configuration Card -->
+        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
+          <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mr-3">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">Quiz Settings</h3>
+              <p class="text-sm text-gray-600">Configure your quiz parameters</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label for="num_questions" class="flex items-center text-sm font-semibold text-gray-700">
+                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                Number of Questions
+              </label>
+              <input 
+                id="num_questions" 
+                type="number" 
+                [(ngModel)]="params.num_questions" 
+                name="num_questions" 
+                min="1" 
+                required 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-green-100 focus:border-green-400 focus:outline-none transition-all duration-200"
+                placeholder="Enter number of questions"
+              />
+            </div>
+
+            <div class="space-y-2">
+              <label for="duration" class="flex items-center text-sm font-semibold text-gray-700">
+                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                </svg>
+                Duration (minutes)
+              </label>
+              <input 
+                id="duration" 
+                type="number" 
+                [(ngModel)]="params.duration" 
+                name="duration" 
+                min="1" 
+                required 
+                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-green-100 focus:border-green-400 focus:outline-none transition-all duration-200"
+                placeholder="Enter duration in minutes"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-6">
+          <button 
+            type="submit" 
+            class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+            [disabled]="params.tech_stack.length === 0 || params.concepts.length === 0"
+          >
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            Generate Quiz
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>

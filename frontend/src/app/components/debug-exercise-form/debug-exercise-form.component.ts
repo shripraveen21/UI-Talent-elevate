@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DebugExerciseAgentService } from '../../services/debug-exercise-agent/debug-exercise-agent.service';
 
@@ -8,7 +8,7 @@ import { DebugExerciseAgentService } from '../../services/debug-exercise-agent/d
   templateUrl: './debug-exercise-form.component.html',
   styleUrls: ['./debug-exercise-form.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule]
 })
 export class DebugExerciseFormComponent implements OnInit {
   debugForm: FormGroup;
@@ -33,17 +33,28 @@ export class DebugExerciseFormComponent implements OnInit {
   tech_stack: string[] = [];
   concepts: { name: string; level: 'beginner' | 'intermediate' | 'advanced' }[] = [];
 
+  // Split-screen functionality
+  currentExerciseIndex = 0;
+  userCode = '';
+  codeOutput = '';
+
   constructor(
     private fb: FormBuilder,
     private debugService: DebugExerciseAgentService
   ) {
     this.debugForm = this.fb.group({
-      tech_stack: [[], Validators.required],
-      concepts: [[], Validators.required],
+      tech_stack: [[], [Validators.required, this.arrayNotEmptyValidator]],
+      concepts: [[], [Validators.required, this.arrayNotEmptyValidator]],
       num_questions: [1, [Validators.required, Validators.min(1)]],
       duration: [15, [Validators.required, Validators.min(1)]],
       difficulty: ['medium']
     });
+  }
+
+  // Custom validator to check if array is not empty
+  arrayNotEmptyValidator(control: any) {
+    const value = control.value;
+    return (value && Array.isArray(value) && value.length > 0) ? null : { arrayEmpty: true };
   }
 
   ngOnInit() {
@@ -262,6 +273,50 @@ export class DebugExerciseFormComponent implements OnInit {
       this.loading = false;
       this.error = err.message || 'Failed to store debug exercise';
     }
+  }
+
+  // Split-screen functionality methods
+  nextExercise() {
+    if (this.currentExerciseIndex < this.data.length - 1) {
+      this.currentExerciseIndex++;
+      this.userCode = ''; // Reset code when switching exercises
+      this.codeOutput = '';
+    }
+  }
+
+  previousExercise() {
+    if (this.currentExerciseIndex > 0) {
+      this.currentExerciseIndex--;
+      this.userCode = ''; // Reset code when switching exercises
+      this.codeOutput = '';
+    }
+  }
+
+  copyToEditor(code: string) {
+    this.userCode = code;
+  }
+
+  runCode() {
+    if (!this.userCode.trim()) {
+      this.codeOutput = 'Error: No code to execute';
+      return;
+    }
+    
+    // Simulate code execution (replace with actual execution logic)
+    this.codeOutput = `Executing code...\n\n${this.userCode}\n\n✓ Code executed successfully!\nOutput: [Simulated execution result]`;
+  }
+
+  resetCode() {
+    this.userCode = '';
+    this.codeOutput = '';
+  }
+
+  clearOutput() {
+    this.codeOutput = '';
+  }
+
+  getLineCount(): number {
+    return this.userCode ? this.userCode.split('\n').length : 0;
   }
 
   /**

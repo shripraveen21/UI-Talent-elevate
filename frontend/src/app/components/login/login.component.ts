@@ -8,11 +8,12 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login/login.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, NgClass],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
@@ -44,16 +45,49 @@ export class LoginComponent implements OnInit {
         // store token (future: use a proper storage / state management)
         sessionStorage.setItem('auth_token', res.token);
         sessionStorage.setItem('user', JSON.stringify(res.user));
-        alert("loggin succ")
-        this.router.navigate(['/mcq-quiz']);
+        
+        // Redirect based on user role
+        const userRole = res.roles && res.roles.length > 0 ? res.roles[0] : null;
+        this.redirectBasedOnRole(userRole);
       },
       error: () => {
-        alert("failed login")
-        
-        this.error.set('Login failed (dummy).');
+        this.error.set('Login failed. Please check your credentials and try again.');
         this.loading.set(false);
       },
       complete: () => this.loading.set(false),
     });
+  }
+
+  quickLogin(email: string): void {
+    this.form.patchValue({
+      email: email,
+      password: '123456'
+    });
+    this.submit();
+  }
+
+  private redirectBasedOnRole(userRole: string | null): void {
+    switch (userRole) {
+      case 'Employee':
+      case 'employee':
+        this.router.navigate(['/employee-dashboard']);
+        break;
+      case 'CapabilityLeader':
+      case 'capability_leader':
+        this.router.navigate(['/capability-leader-dashboard']);
+        break;
+      case 'DeliveryManager':
+      case 'delivery_manager':
+        this.router.navigate(['/delivery-manager-dashboard']);
+        break;
+      case 'ProductManager':
+      case 'product_manager':
+        this.router.navigate(['/directory']);
+        break;
+      default:
+        // Fallback to employee dashboard for unknown roles
+        this.router.navigate(['/employee-dashboard']);
+        break;
+    }
   }
 }

@@ -69,7 +69,10 @@ export class DebugExerciseAgentService {
     return from(
       fetch(url, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
+        }
       }).then(response => {
 
         if (!response.ok) {
@@ -86,7 +89,10 @@ export class DebugExerciseAgentService {
     return from(
       fetch(url, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
+        }
       }).then(response => {
         if (!response.ok) {
           throw new Error(`Failed to fetch concepts for ${techStackName}`);

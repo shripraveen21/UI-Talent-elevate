@@ -75,4 +75,8 @@ export class TechStackFormComponent {
     }
     return JSON.stringify(grouped, null, 2);
   }
+
+  getTopicsByLevel(level: string): Topic[] {
+    return this.topics.filter(topic => topic.level === level);
+  }
 }

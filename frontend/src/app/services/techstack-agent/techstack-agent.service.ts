@@ -29,11 +29,15 @@ export class TechStackAgentService {
 
   getTechStacks(): Observable<any> {
     console.log("called in service")
-    return this.http.get(environment.apiUrl + '/tech-stacks');
+    return this.http.get(environment.apiUrl + '/tech-stacks', {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
   }
 
   getTopics(techStackName : string): Observable<any> {
-    return this.http.get(environment.apiUrl + '/topics/'+techStackName);
+    return this.http.get(environment.apiUrl + '/topics/'+techStackName, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
   }
 
   connect(params: TechStackParams): Observable<AgentMessage> {

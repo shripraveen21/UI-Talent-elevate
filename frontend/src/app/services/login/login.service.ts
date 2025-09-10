@@ -45,6 +45,7 @@ export class LoginService {
         // Fetch user info from /getCurrentUser endpoint
         const headers = new HttpHeaders({
           Authorization: `Bearer ${token}`,
+          'ngrok-skip-browser-warning': 'true', // Add header to bypass ngrok warning page
         });
         return this.http.get<any>(`${environment.apiUrl}/getCurrentUser`, { headers }).pipe(
           map(user => {

@@ -6,6 +6,9 @@ import { ResultsComponent } from './components/results/results.component';
 import { AgentChatComponent } from './components/epic-creation/agent-chat.component';
 import { HomeComponent } from './components/home/home.component';
 import { ManagerDashboardComponent } from './components/manager_dashboard/manager-dashboard/manager-dashboard.component';
+import { EmployeeDashboardComponent } from './components/dashboards/employee-dashboard.component';
+import { CapabilityLeaderDashboardComponent } from './components/dashboards/capability-leader-dashboard.component';
+import { DeliveryManagerDashboardComponent } from './components/dashboards/delivery-manager-dashboard.component';
 import { authGuard } from './guards/auth.guard';
 
 
@@ -18,6 +21,9 @@ export const routes: Routes = [
   { path: 'test/:id', component: TestComponent },
   { path: 'results/:id', component: ResultsComponent },
 {path:'directory',component:ManagerDashboardComponent,canActivate:[authGuard],data:{roles:['CapabilityLeader','ProductManager']}},
+  { path: 'employee-dashboard', component: EmployeeDashboardComponent, canActivate: [authGuard], data: { roles: ['Employee'] } },
+  { path: 'capability-leader-dashboard', component: CapabilityLeaderDashboardComponent, canActivate: [authGuard], data: { roles: ['CapabilityLeader'] } },
+  { path: 'delivery-manager-dashboard', component: DeliveryManagerDashboardComponent, canActivate: [authGuard], data: { roles: ['DeliveryManager'] } },
   {
     path: 'mcq-quiz',
     loadComponent: () => import('./components/mcq-quiz/mcq-quiz.component').then(m => m.McqQuizComponent)
