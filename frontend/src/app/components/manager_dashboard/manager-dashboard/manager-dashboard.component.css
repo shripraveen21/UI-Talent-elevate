@@ -1,0 +1,191 @@
+.manager-dashboard-container {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 32px 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 24px 32px;
+  margin-bottom: 32px;
+}
+
+.filters-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  background: #fff;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.08);
+  border-left: 1px solid #e0e0e0;
+  z-index: 100;
+  min-width: 320px;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 24px;
+}
+
+.assignment-controls {
+  justify-content: flex-end;
+  gap: 24px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.employee-list {
+  margin-bottom: 32px;
+  overflow-x: auto;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+  padding: 8px;
+}
+
+.assignment-result {
+  margin-top: 18px;
+  background: #e8f5e9;
+  border: 1px solid #43a047;
+  color: #256029;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.assignment-error {
+  margin-top: 18px;
+  background: #ffebee;
+  border: 1px solid #e53935;
+  color: #b71c1c;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #2d3a4b;
+}
+
+.test-filters,
+.employee-filters,
+.assignment-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+  color: #34495e;
+  min-width: 180px;
+}
+
+input[type="text"],
+input[type="date"],
+select {
+  margin-top: 6px;
+  padding: 7px 10px;
+  border: 1px solid #cfd8dc;
+  border-radius: 5px;
+  font-size: 15px;
+  background: #f7fafc;
+  transition: border 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+select:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+.employee-list {
+  margin-bottom: 28px;
+  overflow-x: auto;
+}
+
+.employee-list table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #f9f9f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.employee-list th,
+.employee-list td {
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.employee-list th {
+  background: #1976d2;
+  color: #fff;
+  font-weight: 600;
+}
+
+.employee-list tr:nth-child(even) {
+  background: #f1f6fb;
+}
+
+.employee-list tr:hover {
+  background: #e3f2fd;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #1976d2;
+}
+
+.assignment-controls {
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.assignment-controls button {
+  padding: 8px 22px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.assignment-controls button:hover {
+  background: #125ea2;
+}
+
+.assignment-result {
+  margin-top: 18px;
+  background: #e8f5e9;
+  border: 1px solid #43a047;
+  color: #256029;
+  padding: 12px 18px;
+  border-radius: 6px;
+}
+
+.assignment-error {
+  margin-top: 18px;
+  background: #ffebee;
+  border: 1px solid #e53935;
+  color: #b71c1c;
+  padding: 12px 18px;
+  border-radius: 6px;
+}

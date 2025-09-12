@@ -1,0 +1,10 @@
+h2, h3 {
+  color: #1e293b;
+}
+ul {
+  margin: 0 0 0.5em 1.25em;
+}
+pre {
+  font-size: 0.94em;
+  padding: 0.75em;
+}

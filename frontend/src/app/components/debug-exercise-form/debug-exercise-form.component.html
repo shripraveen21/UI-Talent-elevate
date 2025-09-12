@@ -1,0 +1,153 @@
+<!-- Main Content -->
+<main class="container mx-auto px-6 py-8">
+  <!-- Page Title -->
+  <h1 class="text-3xl font-bold text-gray-800">Debug Exercise Assessment</h1>
+  <p class="mt-2 text-gray-600">Welcome back Here's what's happening today.</p>
+ 
+  <!-- Configuration Panel (shown when no data) -->
+  <div class="mt-8 bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-6">
+    <h2 class="text-xl font-bold text-slate-800 mb-4">Exercise Configuration</h2>
+   
+    <form [formGroup]="debugForm" (ngSubmit)="startDebugExercise()" class="space-y-6">
+
+ 
+
+ 
+        <!-- Form Controls Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Questions</label>
+            <input type="number" formControlName="num_questions" min="1" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Duration (min)</label>
+            <input type="number" formControlName="duration" min="1" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Difficulty</label>
+            <select formControlName="difficulty" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white">
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+        </div>
+ 
+        <!-- Generate Button -->
+        <div class="flex justify-center" *ngIf="!data">
+          <button
+            type="submit"
+            [disabled]="loading || !debugForm.valid "
+            class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 px-8 rounded-xl hover:from-emerald-600 hover:to-emerald-700 disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-medium">
+            <span *ngIf="!loading" class="flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+              Generate Exercises
+            </span>
+            <span *ngIf="loading || data" class="flex items-center">
+              <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Generating...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+ 
+  <!-- Loading State
+  <div *ngIf="loading" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-center justify-center">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mr-3"></div>
+      <p class="text-gray-600 font-medium">Generating debug exercises...</p>
+    </div>
+  </div> -->
+ 
+  <!-- Error State -->
+  <div *ngIf="error" class="mt-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+    <div class="flex items-center">
+      <svg class="h-6 w-6 text-red-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <p class="text-red-700 font-medium">{{ error }}</p>
+    </div>
+  </div>
+ 
+   <!-- Assessment Progress Section -->
+  <!--<div *ngIf="data && data.length > 0" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex justify-between items-center">
+      <div>
+        <h2 class="text-lg font-bold text-gray-800">Debug Exercise Assessment</h2>
+        <p class="text-sm text-gray-500">Find and fix bugs in the provided code</p>
+      </div>
+    </div>
+    <div class="mt-4 flex items-center space-x-4">
+      <div class="w-full bg-gray-200 rounded-full h-2.5">
+        <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="((currentExerciseIndex + 1) / data.length) * 100"></div>
+      </div>
+      <span class="text-sm font-medium text-gray-600">Exercise {{ currentExerciseIndex + 1 }} of {{ data.length }}</span>
+    </div>
+  </div> -->
+ 
+  <!-- Debug Exercise Review (Human-in-the-Loop) -->
+  <div *ngIf="data && data.length > 0" class="mt-6">
+    <div *ngFor="let exercise of data; let idx = index" class="bg-white p-6 rounded-lg border border-gray-200 mb-6">
+      <div class="flex justify-between items-start">
+        <div class="flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-800">{{ exercise?.title || 'Debug Challenge' }}</h3>
+        </div>
+        <span class="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full"
+          [ngClass]="{
+            'bg-green-100 text-green-800': exercise?.difficulty === 'easy',
+            'bg-yellow-100 text-yellow-800': exercise?.difficulty === 'medium',
+            'bg-red-100 text-red-800': exercise?.difficulty === 'hard'
+          }">
+          {{ exercise?.difficulty || 'Easy' | titlecase }}
+        </span>
+      </div>
+      <p class="mt-4 text-gray-600 text-sm">{{ exercise?.description || 'The function below should return the sum of all numbers in an array, but it has a bug. Fix the code to make it work correctly.' }}</p>
+      <div class="mt-6">
+        <h4 class="text-md font-semibold text-gray-700 mb-2">Buggy Code:</h4>
+        <pre class="bg-gray-100 p-4 rounded-lg font-mono text-sm text-gray-800 whitespace-pre-wrap">{{ exercise?.code }}</pre>
+      </div>
+      <div class="mt-auto pt-6">
+        <div class="bg-purple-100 text-purple-800 p-4 rounded-lg">
+          <p class="font-semibold text-sm">Hint:</p>
+          <p class="text-sm">{{ exercise?.hints?.level1 }}</p>
+        </div>
+      </div>
+    </div>
+    <!-- Human-in-the-loop decision buttons -->
+    <div class="flex justify-center space-x-4 mt-4">
+      <button
+        (click)="sendDecision('REJECT')"
+        class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        Reject Exercise
+      </button>
+      <button
+        (click)="sendDecision('APPROVE')"
+        class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Approve Exercise
+      </button>
+      <button
+        (click)="sendDecision('REGENERATE')"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+        </svg>
+        Regenerate
+      </button>
+    </div>
+  </div>
+</main>

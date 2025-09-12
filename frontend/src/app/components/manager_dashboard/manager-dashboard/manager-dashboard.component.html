@@ -1,0 +1,493 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Header Section -->
+  <header class="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
+    <div class="container mx-auto px-6 py-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-4xl font-bold mb-2">Manager Dashboard</h1>
+          <p class="text-blue-100 text-lg">Employee Test Assignment Portal</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <div class="text-2xl font-bold">{{ totalEmployees }}</div>
+            <div class="text-sm text-blue-100">Total Employees</div>
+          </div>
+          <button 
+            class="bg-white/20 hover:bg-white/30 text-white font-medium px-6 py-3 rounded-xl transition-all duration-200 backdrop-blur-sm border border-white/20 relative"
+            (click)="toggleFiltersPanel()">
+            <i class="fas fa-filter mr-2"></i>
+            {{ showFiltersPanel ? 'Hide Filters' : 'Show Filters' }}
+            <!-- Active filters indicator -->
+            <span *ngIf="hasActiveFilters() && !showFiltersPanel" 
+                  class="absolute -top-2 -right-2 w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+              {{ getActiveFiltersCount() }}
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content with Dynamic Layout -->
+  <main class="container mx-auto px-6 py-8" [class.pr-80]="showFiltersPanel">
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Selected Employees</p>
+            <p class="text-3xl font-bold text-blue-600">{{ selectedEmployeeIds.length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-users text-blue-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Available Tests</p>
+            <p class="text-3xl font-bold text-green-600">{{ tests.length }}</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-clipboard-list text-green-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Active Filters</p>
+            <p class="text-3xl font-bold text-purple-600">{{ getActiveFiltersCount() }}</p>
+          </div>
+          <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+            <i class="fas fa-filter text-purple-600 text-xl"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium text-gray-600 mb-1">Ready to Assign</p>
+            <p class="text-3xl font-bold" [class]="isReadyToAssign() ? 'text-green-600' : 'text-gray-400'">
+              {{ isReadyToAssign() ? 'Yes' : 'No' }}
+            </p>
+          </div>
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center" 
+               [class]="isReadyToAssign() ? 'bg-green-100' : 'bg-gray-100'">
+            <i class="fas fa-check-circle text-xl" 
+               [class]="isReadyToAssign() ? 'text-green-600' : 'text-gray-400'"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Filters Display (when filters are applied but panel is closed) -->
+    <div *ngIf="hasActiveFilters() && !showFiltersPanel" class="mb-6">
+      <div class="card p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-filter text-purple-600"></i>
+            <span class="text-sm font-medium text-gray-700">Active Filters:</span>
+            <div class="flex flex-wrap gap-2">
+              <span *ngIf="selectedBand" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                Band: {{ selectedBand }}
+                <button (click)="selectedBand = ''; onEmployeeFilterChange()" class="ml-2 hover:text-blue-600">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>
+              <span *ngIf="selectedRole" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                Role: {{ selectedRole }}
+                <button (click)="selectedRole = ''; onEmployeeFilterChange()" class="ml-2 hover:text-green-600">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>
+              <span *ngIf="selectedSkillLevel" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                Skill: {{ selectedSkillLevel }}
+                <button (click)="selectedSkillLevel = ''; onEmployeeFilterChange()" class="ml-2 hover:text-purple-600">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>
+              <span *ngIf="search" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                Search: "{{ search }}"
+                <button (click)="search = ''; onEmployeeFilterChange()" class="ml-2 hover:text-orange-600">
+                  <i class="fas fa-times"></i>
+                </button>
+              </span>
+            </div>
+          </div>
+          <button 
+            class="text-sm text-gray-600 hover:text-gray-800 font-medium"
+            (click)="clearAllFilters()">
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Cards -->
+    <div class="space-y-8">
+      <!-- Test Selection Card -->
+      <div class="card-elevated">
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-clipboard-list text-blue-600"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">Select Test</h3>
+              <p class="text-sm text-gray-600">Choose a test to assign to employees</p>
+            </div>
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="max-w-md space-y-2">
+            <label class="label">Test Selection</label>
+            <select class="input-field" [(ngModel)]="selectedTestId" (change)="onTestSelected()">
+              <option [ngValue]="null">-- Select Test --</option>
+              <option *ngFor="let test of tests" [ngValue]="test.id">
+                {{ test.test_name && test.test_name.trim().length > 0 ? test.test_name : 'Test #' + test.id }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employee List Card -->
+      <div class="card-elevated">
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-users text-green-600"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-semibold text-gray-900">Employee List</h3>
+                <p class="text-sm text-gray-600">{{ totalEmployees }} employees found</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-600">{{ selectedEmployeeIds.length }} selected</span>
+                <div class="w-2 h-2 bg-blue-500 rounded-full" *ngIf="selectedEmployeeIds.length > 0"></div>
+              </div>
+              <button 
+                class="btn-secondary"
+                (click)="toggleFiltersPanel()">
+                <i class="fas fa-filter mr-2"></i>
+                Filters
+                <span *ngIf="hasActiveFilters()" 
+                      class="ml-2 w-5 h-5 bg-purple-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {{ getActiveFiltersCount() }}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="overflow-hidden">
+          <ng-container *ngIf="employees && employees.length; else noEmployees">
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th class="px-6 py-4 text-left">
+                      <div class="flex items-center">
+                        <input 
+                          type="checkbox"
+                          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                          [checked]="isAllSelected()"
+                          (change)="toggleSelectAll($event)" />
+                        <label class="ml-2 text-sm font-medium text-gray-700">Select All</label>
+                      </div>
+                    </th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Name</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Email</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Role</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Band</th>
+                    <th class="px-6 py-4 text-left text-sm font-semibold text-gray-900">Skill Level</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr *ngFor="let emp of employees; let i = index" 
+                      class="hover:bg-gray-50 transition-colors duration-150"
+                      [class.bg-blue-50]="selectedEmployeeIds.includes(emp.user_id)">
+                    <td class="px-6 py-4">
+                      <input 
+                        type="checkbox"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                        [checked]="selectedEmployeeIds.includes(emp.user_id)"
+                        (change)="onEmployeeCheckboxChange(emp.user_id, $event)" />
+                    </td>
+                    <td class="px-6 py-4">
+                      <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                          {{ emp.name?.charAt(0)?.toUpperCase() || 'U' }}
+                        </div>
+                        <div class="ml-3">
+                          <div class="text-sm font-medium text-gray-900">{{ emp.name }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600">{{ emp.email }}</td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        {{ emp.role }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ emp.band }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {{ emp.skill_level }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+          
+          <ng-template #noEmployees>
+            <div class="text-center py-12">
+              <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-users text-gray-400 text-2xl"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No employees found</h3>
+              <p class="text-gray-600">Try adjusting your filters or check back later.</p>
+              <button 
+                class="btn-primary mt-4"
+                (click)="toggleFiltersPanel()">
+                <i class="fas fa-filter mr-2"></i>
+                Open Filters
+              </button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Assignment Controls Card -->
+      <div class="card-elevated">
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <i class="fas fa-paper-plane text-orange-600"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-900">Assign Test</h3>
+              <p class="text-sm text-gray-600">Set due date and assign test to selected employees</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="space-y-2">
+              <label class="label">Due Date</label>
+              <input 
+                type="date" 
+                class="input-field" 
+                [(ngModel)]="dueDate"
+                [min]="getCurrentDate()" />
+            </div>
+            <div class="space-y-2">
+              <label class="label">Assignment Summary</label>
+              <div class="bg-gray-50 rounded-xl p-4">
+                <div class="text-sm text-gray-600 space-y-1">
+                  <div>Selected Test: <span class="font-medium">{{ getSelectedTestName() || 'None' }}</span></div>
+                  <div>Employees: <span class="font-medium">{{ selectedEmployeeIds.length }}</span></div>
+                  <div>Due Date: <span class="font-medium">{{ dueDate || 'Not set' }}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-end">
+            <button 
+              class="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              (click)="assignTest()"
+              [disabled]="!isReadyToAssign() || isAssigning">
+              <i class="fas fa-spinner fa-spin mr-2" *ngIf="isAssigning"></i>
+              <i class="fas fa-paper-plane mr-2" *ngIf="!isAssigning"></i>
+              {{ isAssigning ? 'Assigning...' : 'Assign Test to ' + selectedEmployeeIds.length + ' Employee' + (selectedEmployeeIds.length !== 1 ? 's' : '') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div *ngIf="assignmentResult" class="bg-green-50 border border-green-200 rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-check-circle text-green-600 text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="text-lg font-semibold text-green-900 mb-2">Assignment Successful!</h4>
+            <div class="bg-white rounded-lg p-4 border border-green-200">
+              <div class="text-sm text-green-800 space-y-2">
+                <div><strong>Message:</strong> {{ assignmentResult.message }}</div>
+                <div><strong>Employees Assigned:</strong> {{ assignmentResult.assigned }}</div>
+                <div><strong>Test ID:</strong> {{ assignmentResult.test_id }}</div>
+                <div><strong>Due Date:</strong> {{ assignmentResult.due_date }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-2xl p-6">
+        <div class="flex items-start gap-4">
+          <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="text-lg font-semibold text-red-900 mb-2">Assignment Failed</h4>
+            <p class="text-red-800">{{ error }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Fixed Filters Panel (Right Side) -->
+  <div *ngIf="showFiltersPanel" 
+       class="fixed top-0 right-0 w-80 h-full bg-white shadow-2xl z-50 border-l border-gray-200 flex flex-col">
+    
+    <!-- Panel Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+          <i class="fas fa-filter text-purple-600"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-semibold text-gray-900">Filter Employees</h3>
+          <p class="text-sm text-gray-600">Refine your search criteria</p>
+        </div>
+      </div>
+      <button 
+        class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+        (click)="toggleFiltersPanel()">
+        <i class="fas fa-times text-gray-600"></i>
+      </button>
+    </div>
+
+    <!-- Panel Content -->
+    <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      <!-- Search -->
+      <div class="space-y-2">
+        <label class="label">
+          <i class="fas fa-search mr-2"></i>Search Employee
+        </label>
+        <div class="relative">
+          <input 
+            type="text" 
+            class="input-field pl-10" 
+            [(ngModel)]="search" 
+            (input)="onEmployeeFilterChange()" 
+            placeholder="Search by name or email..." />
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <i class="fas fa-search text-gray-400"></i>
+          </div>
+        </div>
+        <div *ngIf="search" class="text-xs text-gray-500">
+          <i class="fas fa-info-circle mr-1"></i>
+          Searching for: "{{ search }}"
+        </div>
+      </div>
+
+      <!-- Band Filter -->
+      <div class="space-y-2">
+        <label class="label">
+          <i class="fas fa-layer-group mr-2"></i>Band
+        </label>
+        <select class="input-field" [(ngModel)]="selectedBand" (change)="onEmployeeFilterChange()">
+          <option value="">All Bands</option>
+          <option *ngFor="let band of bands" [value]="band">{{ band }}</option>
+        </select>
+        <div *ngIf="selectedBand" class="text-xs text-gray-500">
+          <i class="fas fa-info-circle mr-1"></i>
+          Filtered by band: {{ selectedBand }}
+        </div>
+      </div>
+
+      <!-- Role Filter -->
+      <div class="space-y-2">
+        <label class="label">
+          <i class="fas fa-briefcase mr-2"></i>Role
+        </label>
+        <select class="input-field" [(ngModel)]="selectedRole" (change)="onEmployeeFilterChange()">
+          <option value="">All Roles</option>
+          <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+        </select>
+        <div *ngIf="selectedRole" class="text-xs text-gray-500">
+          <i class="fas fa-info-circle mr-1"></i>
+          Filtered by role: {{ selectedRole }}
+        </div>
+      </div>
+
+      <!-- Skill Level Filter -->
+      <div class="space-y-2">
+        <label class="label">
+          <i class="fas fa-star mr-2"></i>Skill Level
+        </label>
+        <select class="input-field" [(ngModel)]="selectedSkillLevel" (change)="onEmployeeFilterChange()">
+          <option value="">All Skill Levels</option>
+          <option *ngFor="let level of skillLevels" [value]="level">{{ level }}</option>
+        </select>
+        <div *ngIf="selectedSkillLevel" class="text-xs text-gray-500">
+          <i class="fas fa-info-circle mr-1"></i>
+          Filtered by skill: {{ selectedSkillLevel }}
+        </div>
+      </div>
+
+      <!-- Filter Results Summary -->
+      <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+        <div class="flex items-center gap-2 mb-2">
+          <i class="fas fa-chart-bar text-blue-600"></i>
+          <span class="font-medium text-blue-900">Filter Results</span>
+        </div>
+        <div class="text-sm text-blue-800 space-y-1">
+          <div>Total Employees: <span class="font-medium">{{ totalEmployees }}</span></div>
+          <div>Active Filters: <span class="font-medium">{{ getActiveFiltersCount() }}</span></div>
+        </div>
+      </div>
+
+      <!-- Clear Filters -->
+      <div class="pt-4 border-t border-gray-200">
+        <button 
+          class="btn-secondary w-full"
+          (click)="clearAllFilters()"
+          [disabled]="!hasActiveFilters()">
+          <i class="fas fa-times mr-2"></i>Clear All Filters
+        </button>
+      </div>
+    </div>
+
+    <!-- Panel Footer -->
+    <div class="p-6 bg-gray-50 border-t border-gray-200">
+      <div class="flex gap-3">
+        <button 
+          class="btn-secondary flex-1"
+          (click)="toggleFiltersPanel()">
+          Close
+        </button>
+        <button 
+          class="btn-primary flex-1"
+          (click)="toggleFiltersPanel()">
+          <i class="fas fa-check mr-2"></i>Apply
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Backdrop for filters panel -->
+  <div *ngIf="showFiltersPanel" 
+       class="fixed inset-0 bg-black bg-opacity-25 z-40"
+       (click)="toggleFiltersPanel()"></div>
+</div>

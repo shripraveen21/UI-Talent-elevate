@@ -1,0 +1,4 @@
+/* MCQ Question component styles - now using Tailwind CSS */
+:host {
+  display: block;
+}

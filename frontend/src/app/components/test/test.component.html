@@ -1,0 +1,61 @@
+<div class="max-w-3xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg">
+
+  <div *ngIf="loading" class="flex items-center justify-center py-8">
+    <span class="text-blue-600 font-semibold text-lg animate-pulse">Loading test...</span>
+  </div>
+
+  <div *ngIf="error" class="flex items-center justify-center py-8">
+    <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
+  </div>
+
+  <div *ngIf="!loading && !error && testDetails">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ testDetails.test_name }}</h2>
+    <div class="mb-6 text-gray-700">
+      <span class="font-semibold">Time Remaining:</span>
+      <span class="text-blue-600">{{ formatTimer(timer) }}</span>
+    </div>
+
+    <form (ngSubmit)="submit()" class="space-y-8">
+      <div *ngFor="let question of testDetails.questions" class="bg-gray-50 rounded-lg p-4 shadow mb-4">
+        <div class="mb-3">
+          <strong class="text-lg text-gray-800">{{ question.text }}</strong>
+        </div>
+
+        <div *ngIf="question.type === 'multiple_choice'" class="mb-2">
+          <div class="space-y-2">
+            <div *ngFor="let option of question.options">
+              <label class="flex items-center space-x-2 text-gray-700">
+                <input
+                  type="radio"
+                  [attr.name]="question.id"
+                  [value]="option.key"
+                  (change)="handleAnswer(question.id, option.key)"
+                  class="form-radio text-blue-600 focus:ring-blue-500"
+                >
+                <span>{{ option.key }}: {{ option.value }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="question.type === 'text'" class="mb-2">
+          <input
+            type="text"
+            [attr.name]="question.id"
+            #textInput
+            (input)="handleAnswer(question.id, textInput.value)"
+            class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
+          >
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="submitted"
+        class="px-6 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+      >
+        Submit
+      </button>
+    </form>
+  </div>
+</div>

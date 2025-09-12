@@ -1,0 +1,31 @@
+form {
+  margin: 1em 0;
+  padding: 1em;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+h3 {
+  margin-top: 1em;
+  color: #2d3748;
+}
+pre {
+  background: #f3f4f6;
+  padding: 0.5em;
+  border-radius: 5px;
+  overflow-x: auto;
+}
+textarea {
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  margin-top: 0.25em;
+  margin-bottom: 0.75em;
+  min-height: 100px;
+  font-size: 1em;
+}
+button[type="submit"] {
+  background: #2563eb;
+  color: white;
+  padding: 0.5em 1.25em;
+  border: none;
+  border-radius: 5px;
+}

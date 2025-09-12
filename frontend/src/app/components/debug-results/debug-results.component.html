@@ -1,0 +1,76 @@
+<div class="max-w-3xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg">
+
+  <div *ngIf="loading" class="flex items-center justify-center py-8">
+    <span class="text-blue-600 font-semibold text-lg animate-pulse">
+      Wait till we generate your result and feedback...
+    </span>
+  </div>
+
+  <div *ngIf="error" class="flex items-center justify-center py-8">
+    <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
+  </div>
+
+  <div *ngIf="!loading && result">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Debug Test Results</h2>
+    <div class="mb-6 text-gray-700">
+      <span class="font-semibold">Overall Score:</span> {{ result.overall_score }},
+      <span class="font-semibold">Grade:</span> {{ result.overall_grade }}
+    </div>
+
+    <div *ngFor="let res of result.results" class="mb-8 bg-gray-50 rounded-lg p-4 shadow">
+      <h3 class="text-xl font-semibold text-gray-700 mb-2">{{ res.title }}</h3>
+      <div class="mb-2 text-gray-600">
+        <span class="font-medium">Status:</span> {{ res.status }},
+        <span class="font-medium">Confidence:</span> {{ res.confidence }}
+      </div>
+      <div class="mb-2 text-gray-600">
+        <span class="font-medium">Score:</span> {{ res.score }},
+        <span class="font-medium">Grade:</span> {{ res.grade }}
+      </div>
+
+      <div class="mb-4">
+        <strong class="block text-gray-800 mb-2">Feedback:</strong>
+        <div *ngIf="res.feedback.strengths?.length" class="mb-2">
+          <span class="underline font-semibold text-green-700">Strengths:</span>
+          <ul class="list-disc list-inside ml-4 text-gray-700">
+            <li *ngFor="let s of res.feedback.strengths">{{ s }}</li>
+          </ul>
+        </div>
+        <div *ngIf="res.feedback.areas_for_improvement?.length" class="mb-2">
+          <span class="underline font-semibold text-yellow-700">Areas for Improvement:</span>
+          <ul class="list-disc list-inside ml-4 text-gray-700">
+            <li *ngFor="let a of res.feedback.areas_for_improvement">{{ a }}</li>
+          </ul>
+        </div>
+        <div *ngIf="res.feedback.Learning_Opportunities?.length" class="mb-2">
+          <span class="underline font-semibold text-blue-700">Learning Opportunities:</span>
+          <ul class="list-disc list-inside ml-4 text-gray-700">
+            <li *ngFor="let l of res.feedback.Learning_Opportunities">{{ l }}</li>
+          </ul>
+        </div>
+        <div *ngIf="res.feedback.next_steps?.length" class="mb-2">
+          <span class="underline font-semibold text-purple-700">Next Steps:</span>
+          <ul class="list-disc list-inside ml-4 text-gray-700">
+            <li *ngFor="let n of res.feedback.next_steps">{{ n }}</li>
+          </ul>
+        </div>
+        <div *ngIf="res.feedback.resources?.length" class="mb-2">
+          <span class="underline font-semibold text-indigo-700">Resources:</span>
+          <ul class="list-disc list-inside ml-4 text-gray-700">
+            <li *ngFor="let r of res.feedback.resources">{{ r }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <strong class="text-gray-800">Validation:</strong>
+        <pre class="bg-gray-100 rounded-md p-3 text-sm text-gray-700 overflow-x-auto">{{ res.validation }}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !result" class="text-center py-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-2">Thanks for submitting.</h2>
+    <p class="text-gray-600">Your responses have been stored. You will get feedback soon.</p>
+  </div>
+</div>

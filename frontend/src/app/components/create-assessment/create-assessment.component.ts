@@ -1,0 +1,239 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+
+import { McqAgentService } from '../../services/mcq-agent/mcq-agent.service';
+import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
+import { TestListingService } from '../../services/test-listing/test-listing.service';
+
+@Component({
+  selector: 'app-create-assessment',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './create-assessment.component.html',
+  styleUrl: './create-assessment.component.css'
+})
+export class CreateAssessmentComponent implements OnInit {
+
+  selectedComponents = {
+    mcq: false,
+    debug: false,
+    handsOn: false
+  };
+
+  techStacks: any[] = [];
+  topics: any[] = [];
+  selectedTechStack: any = null;
+  showTechStackDropdown: boolean = false;
+  showTopicConceptDropdown = false;
+  levels: ('beginner' | 'intermediate' | 'advanced')[] = ['beginner', 'intermediate', 'advanced'];
+  selectedConcepts: any[] = []; // { name, level, topic_id }
+  error: string = '';
+
+  testName: string = '';
+  testDescription: string = '';
+  testDuration: number = 60;
+  currentUserId: number = 1; // Replace with actual user ID from auth service
+
+  quiz_id?: number;
+  debug_id?: number;
+
+  constructor(
+    private router: Router,
+    private mcqAgentService: McqAgentService,
+    private techStackAgentService: TechStackAgentService,
+    private testListingService: TestListingService
+  ) {}
+
+  ngOnInit(): void {
+    // Restore test details and IDs from sessionStorage if present
+    const savedDetails = sessionStorage.getItem('assessmentDetails');
+    if (savedDetails) {
+      const details = JSON.parse(savedDetails);
+      this.selectedTechStack = details.selectedTechStack || null;
+      this.selectedConcepts = details.selectedConcepts || [];
+      this.testDescription = details.testDescription || '';
+      this.testName = details.testName || '';
+    }
+    const quizId = sessionStorage.getItem('quiz_id');
+    if (quizId) {
+      this.quiz_id = Number(quizId);
+    }
+    const debugId = sessionStorage.getItem('exercise_id');
+    if (debugId) {
+      this.debug_id = Number(debugId);
+    }
+    this.loadTechStacks();
+
+    // If a tech stack was restored, fetch its topics
+    if (this.selectedTechStack) {
+      this.fetchTopicsForSelectedTechStack();
+    }
+  }
+
+  loadTechStacks() {
+    this.techStackAgentService.getTechStacks().subscribe({
+      next: (stacks: any[]) => {
+        this.techStacks = stacks;
+      },
+      error: () => {
+        this.techStacks = [];
+      }
+    });
+  }
+
+  fetchTopicsForSelectedTechStack() {
+    if (!this.selectedTechStack) {
+      this.topics = [];
+      return;
+    }
+    // Use the tech stack's name to fetch topics
+    const techStackName = this.selectedTechStack.name;
+    this.techStackAgentService.getTopics(techStackName).subscribe({
+      next: (topicsData: any[]) => {
+        this.topics = topicsData.map((t: any) => ({
+          name: t.name,
+          level: t.difficulty,
+          tech_stack_id: t.tech_stack_id,
+          topic_id: t.topic_id
+        }));
+      },
+      error: () => {
+        this.topics = [];
+        this.error = `Failed to fetch topics for ${techStackName}`;
+      }
+    });
+  }
+
+  availableConceptsByLevel(level: 'beginner' | 'intermediate' | 'advanced') {
+    return this.topics.filter((c: any) => c.level === level);
+  }
+
+  isConceptSelected(concept: any) {
+    return this.selectedConcepts.some(c => c.topic_id === concept.topic_id);
+  }
+
+  toggleConcept(concept: any, checked: boolean) {
+    const idx = this.selectedConcepts.findIndex(c => c.topic_id === concept.topic_id);
+    if (checked && idx === -1) {
+      this.selectedConcepts.push({
+        name: concept.name,
+        level: concept.level,
+        topic_id: concept.topic_id
+      });
+    } else if (!checked && idx > -1) {
+      this.selectedConcepts.splice(idx, 1);
+    }
+    this.updateAssessmentDetailsStorage();
+  }
+
+  removeConcept(concept: any) {
+    const idx = this.selectedConcepts.findIndex(c => c.topic_id === concept.topic_id);
+    if (idx > -1) {
+      this.selectedConcepts.splice(idx, 1);
+      this.updateAssessmentDetailsStorage();
+    }
+  }
+
+  toggleComponent(type: 'mcq' | 'debug' | 'handsOn') {
+    this.selectedComponents[type] = !this.selectedComponents[type];
+    this.updateAssessmentDetailsStorage();
+  }
+
+  goToMcqQuiz(event: Event) {
+    event.stopPropagation();
+    this.updateAssessmentDetailsStorage();
+    this.router.navigate(['/mcq-quiz'], {
+      queryParams: {
+        techStack: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+        concepts: JSON.stringify(this.selectedConcepts)
+      }
+    });
+  }
+
+  goToDebugExercise(event: Event) {
+    event.stopPropagation();
+    this.updateAssessmentDetailsStorage();
+    this.router.navigate(['/debug-exercise'], {
+      queryParams: {
+        techStack: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+        concepts: JSON.stringify(this.selectedConcepts)
+      }
+    });
+  }
+
+  onTechStackChange(event: Event) {
+    const techStackId = Number((event.target as HTMLSelectElement).value);
+    this.selectedTechStack = this.techStacks.find(
+      stack => stack.id === techStackId || stack.tech_stack_id === techStackId
+    );
+    this.selectedConcepts = []; // Clear concepts when tech stack changes
+    this.updateAssessmentDetailsStorage();
+    this.fetchTopicsForSelectedTechStack(); // Fetch topics for the selected stack
+  }
+
+  selectTechStack(stack: any) {
+    this.selectedTechStack = stack;
+    this.showTechStackDropdown = false;
+    this.selectedConcepts = [];
+    this.updateAssessmentDetailsStorage();
+    this.fetchTopicsForSelectedTechStack();
+  }
+
+  clearTechStack() {
+    this.selectedTechStack = null;
+    this.selectedConcepts = [];
+    this.topics = [];
+    this.updateAssessmentDetailsStorage();
+  }
+
+  onTestNameChange(name: string) {
+    this.testName = name;
+    this.updateAssessmentDetailsStorage();
+  }
+
+  onTestDescriptionChange(desc: string) {
+    this.testDescription = desc;
+    this.updateAssessmentDetailsStorage();
+  }
+
+  updateAssessmentDetailsStorage() {
+    sessionStorage.setItem('assessmentDetails', JSON.stringify({
+      selectedTechStack: this.selectedTechStack,
+      selectedConcepts: this.selectedConcepts,
+      testName: this.testName,
+      testDescription: this.testDescription
+    }));
+  }
+
+  saveAssessment() {
+    const quizId = sessionStorage.getItem('quiz_id');
+    const debugId = sessionStorage.getItem('exercise_id');
+    const payload: any = {
+      test_name: this.testName,
+      description: this.testDescription,
+      duration: this.testDuration,
+      created_by: this.currentUserId,
+      quiz_id: quizId ? Number(quizId) : null,
+      debug_test_id: debugId ? Number(debugId) : null,
+      tech_stack: this.selectedTechStack,
+      concepts: this.selectedConcepts
+    };
+    console.log('Test creation payload:', payload);
+    Object.keys(payload).forEach(key => {
+      console.log(`${key}:`, payload[key], 'type:', typeof payload[key]);
+    });
+    this.testListingService.createTest(payload).subscribe({
+      next: (response) => {
+        console.log('Assessment stored successfully:', response);
+        sessionStorage.removeItem('assessmentDetails');
+        sessionStorage.removeItem('quiz_id');
+        sessionStorage.removeItem('exercise_id');
+      },
+      error: (err) => {
+        console.error('Error storing assessment:', err);
+        this.error = 'Failed to store assessment';
+      }
+    });
+  }
+}

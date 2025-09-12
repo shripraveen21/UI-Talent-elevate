@@ -1,0 +1,53 @@
+<div class="employee-filters">
+  <label>
+    Band:
+    <select [(ngModel)]="selectedBand" (change)="onFilterChange()">
+      <option value="">All</option>
+      <option *ngFor="let band of bands" [value]="band">{{ band }}</option>
+    </select>
+  </label>
+  <label>
+    Role:
+    <select [(ngModel)]="selectedRole" (change)="onFilterChange()">
+      <option value="">All</option>
+      <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+    </select>
+  </label>
+  <label>
+    Skill Level:
+    <select [(ngModel)]="selectedSkillLevel" (change)="onFilterChange()">
+      <option value="">All</option>
+      <option *ngFor="let level of skillLevels" [value]="level">{{ level }}</option>
+    </select>
+  </label>
+  <label>
+    Search:
+    <input type="text" [(ngModel)]="search" (input)="onSearchChange()" placeholder="Search employees..." />
+  </label>
+</div>
+
+<div class="employee-list">
+  <h3>Employees ({{ total }})</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Select</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Band</th>
+        <th>Skill Level</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let emp of employees">
+        <td><input type="checkbox" /></td>
+        <td>{{ emp.name }}</td>
+        <td>{{ emp.email }}</td>
+        <td>{{ emp.role }}</td>
+        <td>{{ emp.band }}</td>
+        <td>{{ emp.skill_level }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

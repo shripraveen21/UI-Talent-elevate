@@ -1,0 +1,7 @@
+.env
+.venv/
+
+essentials.txt
+__pycache__/
+
+mockdata.db

@@ -1,0 +1,86 @@
+{
+  "quiz_result": {
+    "total_questions": 5,
+    "correct_answers": 2,
+    "score_percentage": 40
+  },
+  "analysis": {
+    "strengths": [
+      {
+        "topic": "MongoDB",
+        "concepts_mastered": [
+          "insertOne",
+          "deleteMany",
+          "recommended",
+          "document",
+          "delete"
+        ],
+        "remarks": "Demonstrates good understanding of recommended MongoDB methods for inserting and deleting documents."
+      },
+      {
+        "topic": "CRUD",
+        "concepts_mastered": [
+          "insertOne",
+          "deleteMany",
+          "recommended",
+          "document",
+          "delete"
+        ],
+        "remarks": "Shows confidence in basic CRUD operations for adding and deleting data."
+      }
+    ],
+    "weaknesses": [
+      {
+        "topic": "MongoDB",
+        "concepts_weak": [
+          "find",
+          "query",
+          "retrieve",
+          "$eq",
+          "comparison",
+          "equality",
+          "updateMany",
+          "update",
+          "modify"
+        ],
+        "areas_of_improvement": "Review document retrieval with find(), filtering using comparison operators, and updating records using updateMany(). Practice with examples to strengthen these concepts."
+      },
+      {
+        "topic": "CRUD",
+        "concepts_weak": [
+          "find",
+          "query",
+          "retrieve",
+          "updateMany",
+          "update",
+          "modify"
+        ],
+        "areas_of_improvement": "Focus on how to retrieve and update documents in MongoDB. Work on hands-on CRUD tasks to gain practical experience."
+      },
+      {
+        "topic": "Operators",
+        "concepts_weak": [
+          "$eq",
+          "comparison",
+          "query",
+          "equality"
+        ],
+        "areas_of_improvement": "Learn about MongoDB query operators, particularly $eq and comparison logic, through targeted tutorials and example queries."
+      }
+    ]
+  },
+  "resources": [
+    {
+      "topic": "MongoDB",
+      "resource_url": "https://www.mongodb.com/docs/manual/tutorial/query-documents/"
+    },
+    {
+      "topic": "CRUD",
+      "resource_url": "https://www.mongodb.com/docs/manual/crud/"
+    },
+    {
+      "topic": "Operators",
+      "resource_url": "https://www.mongodb.com/docs/manual/reference/operator/query/"
+    }
+  ]
+}
