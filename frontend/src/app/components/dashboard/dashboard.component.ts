@@ -67,8 +67,21 @@ ngOnInit(): void {
     }
     this.router.navigate(['/debug-test', test.debug_test_id]);
   }
+  
   viewDebugResults(debugTestId: number): void {
     this.router.navigate(['/debug-results', debugTestId]);
   }
 
+  // Helper methods for stats cards
+  getCompletedTestsCount(): number {
+    return this.assignedTests.filter(test => test.attempted).length;
+  }
+
+  getPendingTestsCount(): number {
+    return this.assignedTests.filter(test => !test.attempted).length;
+  }
+
+  getDebugTestsCount(): number {
+    return this.assignedTests.filter(test => test.debug_test_id).length;
+  }
 }

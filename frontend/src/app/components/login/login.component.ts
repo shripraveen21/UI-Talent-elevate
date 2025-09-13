@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login/login.service';
+import { ToastService } from '../../services/toast/toast.service';
 import { NgClass } from '@angular/common';
 
 @Component({
@@ -21,7 +22,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   form!: FormGroup;
@@ -46,12 +48,17 @@ export class LoginComponent implements OnInit {
         sessionStorage.setItem('auth_token', res.token);
         sessionStorage.setItem('user', JSON.stringify(res.user));
         
+        // Show success toast
+        this.toastService.showLoginSuccess();
+        
         // Redirect based on user role
         const userRole = res.roles && res.roles.length > 0 ? res.roles[0] : null;
         this.redirectBasedOnRole(userRole);
       },
-      error: () => {
-        this.error.set('Login failed. Please check your credentials and try again.');
+      error: (error) => {
+        const errorMessage = error?.error?.message || 'Login failed. Please check your credentials and try again.';
+        this.error.set(errorMessage);
+        this.toastService.showLoginError(errorMessage);
         this.loading.set(false);
       },
       complete: () => this.loading.set(false),

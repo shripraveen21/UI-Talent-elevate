@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../../services/employee/employee.service';
 import { TestListingService } from '../../../services/test-listing/test-listing.service';
+import { ToastService } from '../../../services/toast/toast.service';
 
 @Component({
   selector: 'app-manager-dashboard',
@@ -40,7 +41,8 @@ export class ManagerDashboardComponent implements OnInit {
 
   constructor(
     private employeeService: EmployeeService,
-    private testListingService: TestListingService
+    private testListingService: TestListingService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -137,6 +139,7 @@ export class ManagerDashboardComponent implements OnInit {
       next: (result:any) => {
         this.assignmentResult = result;
         this.isAssigning = false;
+        this.toastService.showMailSent();
         // Optional: Clear selections after successful assignment
         // this.selectedEmployeeIds = [];
         // this.selectedTestId = null;
@@ -146,6 +149,7 @@ export class ManagerDashboardComponent implements OnInit {
       error: (error:any) => {
         this.isAssigning = false;
         this.handleError(error);
+        this.toastService.showMailNotSent('Failed to assign test and send notification email');
         console.error('Error assigning test:', error);
       }
     });

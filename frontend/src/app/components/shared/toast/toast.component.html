@@ -1,0 +1,32 @@
+<div 
+  [class]="getToastClasses()"
+  role="alert"
+  aria-live="polite"
+  [attr.aria-label]="toast.message">
+  
+  <div class="max-w-xs bg-white border border-gray-200 rounded-xl shadow-lg">
+    <div class="p-4 relative">
+      <!-- Close Button -->
+      <button
+        *ngIf="toast.dismissible !== false"
+        type="button"
+        class="absolute top-2 right-2 inline-flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-full transition-colors duration-200"
+        (click)="onDismiss()"
+        aria-label="Dismiss notification">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      
+      <!-- Title -->
+      <p class="font-bold text-gray-800 pr-6">
+        {{ toast.title || getDefaultTitle() }}
+      </p>
+      
+      <!-- Message -->
+      <p class="mt-1 text-sm text-gray-600 pr-6">
+        {{ toast.message }}
+      </p>
+    </div>
+  </div>
+</div>

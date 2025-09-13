@@ -5,6 +5,7 @@ import { McqFormComponent } from '../mcq-form/mcq-form.component';
 import { McqQuestionComponent, MCQQuestion } from '../mcq-question/mcq-question.component';
 import { McqAgentService, QuizParams, AgentMessage } from '../../services/mcq-agent/mcq-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
   selector: 'app-mcq-quiz',
@@ -29,6 +30,7 @@ export class McqQuizComponent  {
 
   constructor(
     private mcqAgentService: McqAgentService,
+    private toastService: ToastService
   ) {}
 
   getOptionKeys(options: { [key: string]: string }): string[] {
@@ -92,11 +94,14 @@ export class McqQuizComponent  {
           if (response && response.quiz_id) {
             sessionStorage.setItem('quiz_id', String(response.quiz_id));
           }
+          this.toastService.showQuizSaved();
           this.loading = false;
           this.reviewMode = false;
         },
         error: (err) => {
-          this.error = "Failed to store quiz: " + (err?.message || "Unknown error");
+          const errorMessage = "Failed to store quiz: " + (err?.message || "Unknown error");
+          this.error = errorMessage;
+          this.toastService.showError(errorMessage);
           this.loading = false;
         }
       });

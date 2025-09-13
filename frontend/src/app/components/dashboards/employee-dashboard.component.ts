@@ -1,26 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { DashboardComponent } from '../dashboard/dashboard.component';
 
 @Component({
   selector: 'app-employee-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DashboardComponent],
   templateUrl: './employee-dashboard.component.html',
   styleUrls: ['./employee-dashboard.component.css']
 })
 export class EmployeeDashboardComponent implements OnInit {
   userName: string = '';
-  assessments: any[] = [];
   progressData: any = {};
   recommendedSkills: any[] = [];
-  loading: boolean = false;
+  
+
 
   constructor(private router: Router) {}
 
   ngOnInit(): void {
     this.loadUserData();
-    this.loadAssessments();
     this.loadProgressData();
     this.loadRecommendedSkills();
   }
@@ -32,16 +32,6 @@ export class EmployeeDashboardComponent implements OnInit {
 
   navigateToDashboard(): void {
     this.router.navigate(['/dashboard']);
-  }
-
-  loadAssessments(): void {
-    // Placeholder for assessments data loading
-    this.loading = true;
-    // TODO: Connect to backend service
-    setTimeout(() => {
-      this.assessments = [];
-      this.loading = false;
-    }, 1000);
   }
 
   loadProgressData(): void {
@@ -56,10 +46,6 @@ export class EmployeeDashboardComponent implements OnInit {
     this.recommendedSkills = [];
   }
 
-  startAssessment(assessmentId: string): void {
-    this.router.navigate(['/test', assessmentId]);
-  }
-
   viewProgress(): void {
     // Navigate to detailed progress view
     console.log('View detailed progress');
@@ -69,4 +55,6 @@ export class EmployeeDashboardComponent implements OnInit {
     // Navigate to skill details or learning resources
     console.log('Explore skill:', skillId);
   }
+
+
 }

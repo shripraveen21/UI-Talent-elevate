@@ -93,13 +93,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
       case 'capability_leader':
         return 'indigo';
       case 'delivery_manager':
-        return 'purple';
+        return 'blue';
       case 'Employee':
         return 'green';
       case 'CapabilityLeader':
         return 'indigo';
       case 'DeliveryManager':
-        return 'purple';
+        return 'blue';
       case 'ProductManager':
         return 'orange';
       default:

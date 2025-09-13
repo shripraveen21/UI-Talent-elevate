@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { McqAgentService } from '../../services/mcq-agent/mcq-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { TestListingService } from '../../services/test-listing/test-listing.service';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
   selector: 'app-create-assessment',
@@ -42,7 +43,8 @@ export class CreateAssessmentComponent implements OnInit {
     private router: Router,
     private mcqAgentService: McqAgentService,
     private techStackAgentService: TechStackAgentService,
-    private testListingService: TestListingService
+    private testListingService: TestListingService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -226,13 +228,16 @@ export class CreateAssessmentComponent implements OnInit {
     this.testListingService.createTest(payload).subscribe({
       next: (response) => {
         console.log('Assessment stored successfully:', response);
+        this.toastService.showSuccess('Assessment created and stored successfully!');
         sessionStorage.removeItem('assessmentDetails');
         sessionStorage.removeItem('quiz_id');
         sessionStorage.removeItem('exercise_id');
       },
       error: (err) => {
         console.error('Error storing assessment:', err);
-        this.error = 'Failed to store assessment';
+        const errorMessage = err?.error?.message || 'Failed to store assessment';
+        this.error = errorMessage;
+        this.toastService.showError(errorMessage);
       }
     });
   }

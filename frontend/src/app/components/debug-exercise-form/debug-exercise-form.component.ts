@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { DebugExerciseAgentService } from '../../services/debug-exercise-agent/debug-exercise-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
+import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
   selector: 'app-debug-exercise-form',
@@ -44,7 +45,8 @@ export class DebugExerciseFormComponent implements OnInit {
     private fb: FormBuilder,
     private debugService: DebugExerciseAgentService,
     private techStackAgentService: TechStackAgentService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastService: ToastService
   ) {
     this.debugForm = this.fb.group({
       tech_stack: [[], [Validators.required, this.arrayNotEmptyValidator]],
@@ -322,11 +324,13 @@ export class DebugExerciseFormComponent implements OnInit {
       if (res && res.exercise_id) {
         sessionStorage.setItem('exercise_id', String(res.exercise_id));
       }
+      this.toastService.showDebugExerciseCreated();
       this.loading = false;
-      alert('Debug exercise stored successfully!');
     } catch (err: any) {
+      const errorMessage = err.message || 'Failed to store debug exercise';
+      this.error = errorMessage;
+      this.toastService.showError(errorMessage);
       this.loading = false;
-      this.error = err.message || 'Failed to store debug exercise';
     }
   }
 

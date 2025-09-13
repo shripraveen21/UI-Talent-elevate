@@ -18,7 +18,7 @@ module.exports = {
           light: 'hsl(217, 32%, 17%)',
         },
         accent: {
-          DEFAULT: 'hsl(260, 84%, 57%)',
+          DEFAULT: 'hsl(217, 91%, 60%)',
           foreground: 'hsl(0, 0%, 100%)',
         },
         success: {
@@ -81,7 +81,7 @@ module.exports = {
       backgroundImage: {
         'gradient-primary': 'linear-gradient(135deg, hsl(217, 91%, 60%), hsl(217, 100%, 70%))',
         'gradient-secondary': 'linear-gradient(135deg, hsl(217, 19%, 27%), hsl(217, 32%, 17%))',
-        'gradient-hero': 'linear-gradient(135deg, hsl(217, 91%, 60%), hsl(260, 84%, 57%))',
+        'gradient-hero': 'linear-gradient(135deg, hsl(217, 91%, 60%), hsl(217, 100%, 70%))',
       },
       boxShadow: {
         'soft': '0 1px 2px 0 hsl(217, 91%, 60% / 0.05)',

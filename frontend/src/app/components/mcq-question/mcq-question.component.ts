@@ -23,6 +23,10 @@ export class McqQuestionComponent {
   @Input() questionData!: MCQQuestion;
   @Input() showAnswer: boolean = false;
 
+  getOptionKeys(options: { [key: string]: string }): string[] {
+    return Object.keys(options);
+  }
+
   selectOption(optionKey: string) {
     this.questionData.selectedAnswer = optionKey;
   }

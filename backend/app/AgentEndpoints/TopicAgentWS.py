@@ -141,42 +141,11 @@ async def topic_generation_review(
             user_feedback = user_decision_msg.get("feedback", "")
 
             if user_decision == "APPROVE":
-                # 1. Check if tech stack already exists by name
-                db_tech_stack = db.query(TechStack).filter(TechStack.name == tech_stack_name).first()
-                if not db_tech_stack:
-                    # If not, create it
-                    db_tech_stack = TechStack(
-                        name=tech_stack_name,
-                        created_by=created_by
-                    )
-                    db.add(db_tech_stack)
-                    db.commit()
-                    db.refresh(db_tech_stack)
-
-                # 2. Add only new topics for this tech stack
-                added_topics = []
-                for topic in concepts:
-                    topic_name = topic.get("name")
-                    topic_difficulty = topic.get("level")
-                    # Check if topic already exists for this tech stack (by name and tech_stack_id)
-                    exists = db.query(Topic).filter(
-                        Topic.name == topic_name,
-                        Topic.tech_stack_id == db_tech_stack.id
-                    ).first()
-
-                    if not exists:
-                        db_topic = Topic(
-                            name=topic_name,
-                            difficulty=DifficultyLevel(topic_difficulty.lower()),
-                            tech_stack_id=db_tech_stack.id
-                        )
-                        db.add(db_topic)
-                        added_topics.append(topic_name)
-                db.commit()
-
+                # Don't automatically save topics here - let the frontend handle saving only selected topics
+                # Just send the final message with the generated concepts
                 await websocket.send_json({
                     "type": "final",
-                    "content": {"tech_stack_id": db_tech_stack.id, "topics": concepts}
+                    "content": {"topics": concepts}
                 })
                 await model_client.close()
                 await websocket.close()

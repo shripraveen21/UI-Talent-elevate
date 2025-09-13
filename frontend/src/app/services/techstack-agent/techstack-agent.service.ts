@@ -8,6 +8,7 @@ export interface TechStackParams {
 }
 
 export interface Topic {
+  id: string;
   name: string;
   level: string; // or 'difficulty'
 }
@@ -78,6 +79,12 @@ export class TechStackAgentService {
       this.ws.close();
       this.ws = undefined;
     }
+  }
+
+  saveSelectedTopics(topicsData: any): Observable<any> {
+    return this.http.post(environment.apiUrl + '/topics/save-selected', topicsData, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
   }
 
 }

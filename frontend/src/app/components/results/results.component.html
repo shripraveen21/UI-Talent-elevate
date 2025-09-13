@@ -62,7 +62,7 @@
     </div>
 
     <div *ngIf="feedback.critique" class="mb-6">
-      <h4 class="text-lg font-semibold text-purple-700 mb-2">Critique</h4>
+      <h4 class="text-lg font-semibold text-blue-700 mb-2">Critique</h4>
       <div class="text-gray-700 mb-1">Overall Score: {{ feedback.critique.overall_score }}/10</div>
       <div *ngIf="feedback.critique.strengths?.length" class="mb-1">
         <strong class="text-green-700">Strengths:</strong> {{ feedback.critique.strengths.join(', ') }}
