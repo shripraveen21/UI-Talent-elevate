@@ -1,104 +1,85 @@
-<div class="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-6">
-  <div class="max-w-4xl mx-auto">
-    <!-- Header Section -->
-    <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-3xl mb-6 shadow-lg">
-        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-        </svg>
-      </div>
-      <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent mb-3">
-        MCQ Quiz Generator
-      </h1>
-      <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-        Create customized multiple-choice quizzes with advanced configuration options
-      </p>
-    </div>
-
-    <!-- Main Form Card -->
-    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-      <div class="bg-gradient-to-r from-indigo-500 to-blue-600 p-6">
-        <h2 class="text-2xl font-bold text-white flex items-center">
-          <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>
-          </svg>
-          Quiz Configuration
-        </h2>
-        <p class="text-indigo-100 mt-2">Set up your quiz parameters and select topics</p>
-      </div>
-
-      <form (ngSubmit)="onSubmit()" class="p-8 space-y-8">
-        <!-- Quiz Configuration Card -->
-
-        <!-- Quiz Configuration Card -->
-        <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
-          <div class="flex items-center mb-6">
-            <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center mr-3">
-              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900">Quiz Settings</h3>
-              <p class="text-sm text-gray-600">Configure your quiz parameters</p>
-            </div>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-2">
-              <label for="num_questions" class="flex items-center text-sm font-semibold text-gray-700">
-                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                Number of Questions
-              </label>
-              <input 
-                id="num_questions" 
-                type="number" 
-                [(ngModel)]="params.num_questions" 
-                name="num_questions" 
-                min="1" 
-                required 
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-green-100 focus:border-green-400 focus:outline-none transition-all duration-200"
-                placeholder="Enter number of questions"
-              />
-            </div>
-
-            <div class="space-y-2">
-              <label for="duration" class="flex items-center text-sm font-semibold text-gray-700">
-                <svg class="w-5 h-5 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                </svg>
-                Duration (minutes)
-              </label>
-              <input 
-                id="duration" 
-                type="number" 
-                [(ngModel)]="params.duration" 
-                name="duration" 
-                min="1" 
-                required 
-                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-500 focus:ring-4 focus:ring-green-100 focus:border-green-400 focus:outline-none transition-all duration-200"
-                placeholder="Enter duration in minutes"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit Button -->
-        <div class="pt-6">
-          <button 
-            type="submit" 
-            class="w-full bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 flex items-center justify-center text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-            [disabled]="params.tech_stack.length === 0 || params.concepts.length === 0"
-          >
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-            </svg>
-            Generate Quiz
-          </button>
-        </div>
-      </form>
-    </div>
+<!-- MCQ Quiz Form Component -->
+<div class="bg-white p-8 rounded-lg border border-gray-200">
+  <div class="flex items-center space-x-3">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+    <h2 class="text-xl font-semibold">Quiz Configuration</h2>
   </div>
+  <p class="mt-1 text-sm text-gray-500">Configure your quiz parameters and settings.</p>
+
+  <form (ngSubmit)="onSubmit()" class="mt-6 space-y-6">
+    <!-- Quiz Settings Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Number of Questions -->
+      <div>
+        <label for="num_questions" class="block text-sm font-medium text-gray-700">Number of Questions *</label>
+        <input 
+          type="number" 
+          id="num_questions"
+          [(ngModel)]="params.num_questions" 
+          name="num_questions" 
+          min="1" 
+          required 
+          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Enter number of questions"
+        />
+      </div>
+
+      <!-- Duration -->
+      <div>
+        <label for="duration" class="block text-sm font-medium text-gray-700">Duration (minutes) *</label>
+        <input 
+          type="number" 
+          id="duration"
+          [(ngModel)]="params.duration" 
+          name="duration" 
+          min="1" 
+          required 
+          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          placeholder="Enter duration in minutes"
+        />
+      </div>
+    </div>
+
+    <!-- Tech Stack Display (Read-only) -->
+    <div *ngIf="params.tech_stack && params.tech_stack.length > 0">
+      <label class="block text-sm font-medium text-gray-700">Selected Tech Stack</label>
+      <div class="mt-1 flex flex-wrap gap-2">
+        <span 
+          *ngFor="let stack of params.tech_stack" 
+          class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+        >
+          {{ stack.name || 'Tech Stack' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Concepts Display (Read-only) -->
+    <div *ngIf="params.concepts && params.concepts.length > 0">
+      <label class="block text-sm font-medium text-gray-700">Selected Topics & Concepts</label>
+      <div class="mt-1 flex flex-wrap gap-2">
+        <span 
+          *ngFor="let concept of params.concepts" 
+          class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+        >
+          {{ concept.name }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="pt-4">
+      <button 
+        type="submit" 
+        class="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        [disabled]="params.tech_stack.length === 0 || params.concepts.length === 0"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        Generate Quiz
+      </button>
+    </div>
+  </form>
 </div>

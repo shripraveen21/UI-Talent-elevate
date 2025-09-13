@@ -122,4 +122,9 @@ export class DeliveryManagerDashboardComponent implements OnInit {
   navigateToDebugExercise(): void {
     this.router.navigate(['/debug-exercise']);
   }
+
+  navigateToDirectory(): void {
+    // Navigate to directory page for test assignment
+    this.router.navigate(['/directory']);
+  }
 }

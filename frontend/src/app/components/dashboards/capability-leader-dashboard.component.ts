@@ -118,4 +118,9 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
     // Navigate to topic details view
     console.log('View topic details:', topicId);
   }
+
+  navigateToDirectory(): void {
+    // Navigate to directory page for test assignment
+    this.router.navigate(['/directory']);
+  }
 }

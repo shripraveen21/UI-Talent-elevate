@@ -15,6 +15,9 @@ import { ToastService } from '../../../services/toast/toast.service';
 export class ManagerDashboardComponent implements OnInit {
   showFiltersPanel = false;
   isAssigning = false; // Loading state for assignment
+  
+  // Expose Math to template
+  Math = Math;
 
   // Employee data
   employees: any[] = [];
@@ -32,6 +35,8 @@ export class ManagerDashboardComponent implements OnInit {
 
   // Test data
   tests: any[] = [];
+  filteredTests: any[] = [];
+  testSearchQuery = '';
   selectedTestId: number | null = null;
 
   // Assignment controls
@@ -55,6 +60,13 @@ export class ManagerDashboardComponent implements OnInit {
   toggleFiltersPanel(): void {
     this.showFiltersPanel = !this.showFiltersPanel;
   }
+
+  // Select test method
+  selectTest(testId: number): void {
+    this.selectedTestId = testId;
+    this.onTestSelected();
+  }
+
 
   // Load filter options
   loadFilters(): void {
@@ -100,12 +112,28 @@ export class ManagerDashboardComponent implements OnInit {
     this.testListingService.getTests().subscribe({
       next: (data: any) => {
         this.tests = data.tests || [];
+        this.filteredTests = [...this.tests];
       },
       error: (error) => {
         console.error('Error loading tests:', error);
         this.handleError(error);
       }
     });
+  }
+
+  // Test search functionality
+  onTestSearchChange(): void {
+    if (!this.testSearchQuery.trim()) {
+      this.filteredTests = [...this.tests];
+    } else {
+      const query = this.testSearchQuery.toLowerCase();
+      this.filteredTests = this.tests.filter(test => 
+        test.test_name?.toLowerCase().includes(query) ||
+        test.description?.toLowerCase().includes(query) ||
+        test.test_type?.toLowerCase().includes(query) ||
+        test.difficulty?.toLowerCase().includes(query)
+      );
+    }
   }
 
   // Filter change handler
@@ -172,8 +200,19 @@ export class ManagerDashboardComponent implements OnInit {
       this.employees.every(emp => this.selectedEmployeeIds.includes(emp.user_id));
   }
 
-  toggleSelectAll(event: any): void {
-    if (event.target.checked) {
+  toggleSelectAll(event?: any): void {
+    // If called from button click, toggle based on current state
+    if (!event || event.type === 'click') {
+      if (this.isAllSelected()) {
+        // Deselect all employees on current page
+        const ids = this.employees.map(emp => emp.user_id);
+        this.selectedEmployeeIds = this.selectedEmployeeIds.filter(id => !ids.includes(id));
+      } else {
+        // Select all employees on current page
+        const ids = this.employees.map(emp => emp.user_id);
+        this.selectedEmployeeIds = Array.from(new Set([...this.selectedEmployeeIds, ...ids]));
+      }
+    } else if (event.target.checked) {
       // Select all employees on current page
       const ids = this.employees.map(emp => emp.user_id);
       this.selectedEmployeeIds = Array.from(new Set([...this.selectedEmployeeIds, ...ids]));

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { McqFormComponent } from '../mcq-form/mcq-form.component';
@@ -6,15 +6,16 @@ import { McqQuestionComponent, MCQQuestion } from '../mcq-question/mcq-question.
 import { McqAgentService, QuizParams, AgentMessage } from '../../services/mcq-agent/mcq-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
+import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-mcq-quiz',
   templateUrl: './mcq-quiz.component.html',
   styleUrls: ['./mcq-quiz.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, McqFormComponent]
+  imports: [CommonModule, FormsModule, McqFormComponent, McqQuestionComponent]
 })
-export class McqQuizComponent  {
+export class McqQuizComponent implements OnInit, OnDestroy {
   quizParams?: QuizParams;
   quizQuestions: MCQQuestion[] = [];
   loading: boolean = false;
@@ -27,14 +28,119 @@ export class McqQuizComponent  {
   regenerateModalTitle: string = '';
   regenerateComment: string = '';
   currentRegenerateTarget: string | number | null = null;
+  regeneratingQuestionIndex: number | null = null;
+  
+  // Dynamic properties for quiz display
+  quizTitle: string = 'MCQ Assessment';
+  quizDescription: string = 'Multiple Choice Questions Assessment';
+  timeRemaining: number = 0; // in seconds
+  timeDisplay: string = '00:00';
+  private timerInterval?: number;
+  
+  // User information
+  currentUserName: string = '';
 
   constructor(
     private mcqAgentService: McqAgentService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private loginService: LoginService
   ) {}
+
+  ngOnInit() {
+    // Initialize timer display
+    this.updateTimeDisplay();
+    
+    // Get current user's name
+    this.getCurrentUserName();
+  }
+
+  ngOnDestroy() {
+    // Clean up timer when component is destroyed
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  }
 
   getOptionKeys(options: { [key: string]: string }): string[] {
     return Object.keys(options);
+  }
+
+  // Check if current user is an employee
+  isEmployee(): boolean {
+    return this.loginService.getUserRole() === 'Employee';
+  }
+
+  // Get current user's name
+  getCurrentUserName(): void {
+    const user = this.loginService.getCurrentUser();
+    if (user && user.name) {
+      this.currentUserName = user.name;
+    } else {
+      this.currentUserName = 'User'; // Fallback if name is not available
+    }
+  }
+
+  // Timer functionality
+  startTimer(durationInMinutes: number) {
+    this.timeRemaining = durationInMinutes * 60; // Convert to seconds
+    this.updateTimeDisplay();
+    
+    this.timerInterval = window.setInterval(() => {
+      this.timeRemaining--;
+      this.updateTimeDisplay();
+      
+      if (this.timeRemaining <= 0) {
+        this.stopTimer();
+        // Optionally handle time up event
+        this.onTimeUp();
+      }
+    }, 1000);
+  }
+
+  stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = undefined;
+    }
+  }
+
+  updateTimeDisplay() {
+    const minutes = Math.floor(this.timeRemaining / 60);
+    const seconds = this.timeRemaining % 60;
+    this.timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  onTimeUp() {
+    // Handle when time runs out
+    this.toastService.showError('Time is up! Please submit your assessment.');
+    // Optionally auto-submit or show warning
+  }
+
+  // Generate dynamic title and description based on quiz params
+  generateQuizTitle(): string {
+    if (!this.quizParams) return 'MCQ Assessment';
+    
+    const techStackNames = this.quizParams.tech_stack.map(ts => ts.name).join(' & ');
+    const topicNames = this.quizParams.topics.map(t => t.name).join(', ');
+    
+    if (techStackNames && topicNames) {
+      return `${techStackNames} - ${topicNames}`;
+    } else if (techStackNames) {
+      return `${techStackNames} Assessment`;
+    } else if (topicNames) {
+      return `${topicNames} Assessment`;
+    }
+    
+    return 'MCQ Assessment';
+  }
+
+  generateQuizDescription(): string {
+    if (!this.quizParams) return 'Multiple Choice Questions Assessment';
+    
+    const levels = [...new Set(this.quizParams.topics.map(t => t.level))];
+    const levelText = levels.length > 1 ? 'Mixed Level' : levels[0]?.charAt(0).toUpperCase() + levels[0]?.slice(1) || '';
+    
+    return `${levelText} Multiple Choice Questions Assessment`;
   }
 
   onSubmitParams(params: QuizParams) {
@@ -43,6 +149,16 @@ export class McqQuizComponent  {
     this.error = '';
     this.showAnswers = false;
     this.reviewMode = true;
+    
+    // Set dynamic title and description
+    this.quizTitle = this.generateQuizTitle();
+    this.quizDescription = this.generateQuizDescription();
+    
+    // Start timer if duration is provided
+    if (params.duration && params.duration > 0) {
+      this.startTimer(params.duration);
+    }
+    
     console.log(params,"params")
     this.mcqAgentService.connect(params).subscribe({
       next: (msg: AgentMessage) => {
@@ -116,6 +232,7 @@ export class McqQuizComponent  {
   }
 
   regenerateQuestion(index: number) {
+    this.regeneratingQuestionIndex = index;
     this.currentRegenerateTarget = index;
     this.regenerateModalTitle = `Regenerate Question ${index + 1}`;
     this.showRegenerateModal = true;
@@ -131,6 +248,7 @@ export class McqQuizComponent  {
     this.showRegenerateModal = false;
     this.regenerateComment = '';
     this.currentRegenerateTarget = null;
+    this.regeneratingQuestionIndex = null;
   }
 
   confirmRegenerate() {
@@ -156,5 +274,6 @@ export class McqQuizComponent  {
     }
     
     this.closeRegenerateModal();
+    this.regeneratingQuestionIndex = null;
   }
 }

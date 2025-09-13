@@ -57,3 +57,6 @@ app.include_router(topic_agent_router)
 app.include_router(employee_router)
 app.include_router(test_assign_router)
 app.include_router(skill_upgrade_router)
+
+from .controllers.feedback_pdf_controller import router as feedback_pdf_router
+app.include_router(feedback_pdf_router)

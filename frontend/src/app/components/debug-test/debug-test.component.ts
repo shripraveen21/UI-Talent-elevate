@@ -21,6 +21,7 @@ export class DebugTestComponent implements OnInit, OnDestroy {
   loading = true;   // <-- loading flag for UI state
   error = '';
   startTime: Date = new Date();
+  currentExerciseIndex = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -119,5 +120,33 @@ export class DebugTestComponent implements OnInit, OnDestroy {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  get progressPercentage(): number {
+    if (this.exercises.length === 0) return 0;
+    return (this.currentExerciseIndex / (this.exercises.length - 1)) * 100;
+  }
+
+  getSolvedCount(): number {
+    return Object.keys(this.answers).filter(id => this.answers[id] && this.answers[id].trim() !== '').length;
+  }
+
+  runTest(exerciseId: string, code: string): void {
+    // This method can be implemented to run the code and show results
+    // For now, it's a placeholder that could integrate with a code execution service
+    console.log('Running test for exercise:', exerciseId, 'with code:', code);
+    // You can add actual code execution logic here
+  }
+
+  goToPrevious(): void {
+    if (this.currentExerciseIndex > 0) {
+      this.currentExerciseIndex--;
+    }
+  }
+
+  goToNext(): void {
+    if (this.currentExerciseIndex < this.exercises.length - 1) {
+      this.currentExerciseIndex++;
+    }
   }
 }

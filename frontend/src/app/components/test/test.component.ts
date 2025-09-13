@@ -1,8 +1,10 @@
-import { Component, NgModule, OnInit } from '@angular/core';
+import { Component, NgModule, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardService } from '../../services/testAttempt/dashboard.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../services/toast/toast.service';
+import { LoginService } from '../../services/login/login.service';
 
 @Component({
   selector: 'app-test',
@@ -11,7 +13,7 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule]
 })
 
-export class TestComponent implements OnInit {
+export class TestComponent implements OnInit, OnDestroy {
   testId!: number;
   testDetails: any;
   answers: any = {};
@@ -21,16 +23,33 @@ export class TestComponent implements OnInit {
   timer: number = 0;
   interval: any;
   startTime: Date = new Date();
+  
+  // Dynamic properties for test display (matching MCQ quiz)
+  testTitle: string = 'Test Assessment';
+  testDescription: string = 'Multiple Choice Questions Assessment';
+  timeRemaining: number = 0; // in seconds
+  timeDisplay: string = '00:00';
+  private timerInterval?: number;
+  
+  // User information
+  currentUserName: string = '';
+  warningShown: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private dashboardService: DashboardService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService,
+    private loginService: LoginService
   ) {}
 
   ngOnInit(): void {
     this.testId = Number(this.route.snapshot.paramMap.get('id'));
     this.startTime = new Date();
+    
+    // Get current user's name
+    this.getCurrentUserName();
+    
     // Redirect to results page if auto-submitted on refresh
     if (localStorage.getItem('testAutoSubmitted') === 'true') {
       localStorage.removeItem('testAutoSubmitted');
@@ -68,7 +87,13 @@ export class TestComponent implements OnInit {
                   };
                 })
               };
+              
+              // Set dynamic title and description
+              this.testTitle = data.test_name || 'Test Assessment';
+              this.testDescription = 'Multiple Choice Questions Assessment';
+              
               this.loading = false;
+              
               // Calculate remaining time using started_at from backend
               const startedAt = data.started_at ? new Date(data.started_at) : new Date();
               const now = new Date();
@@ -82,7 +107,9 @@ export class TestComponent implements OnInit {
               const durationSeconds = parseDuration(data.test_duration);
               const remaining = Math.max(durationSeconds - elapsed, 0);
               this.timer = remaining;
-              this.startTimer();
+              this.timeRemaining = remaining;
+              this.updateTimeDisplay();
+              this.startNewTimer();
             },
             error: (err) => {
               this.error = 'Failed to load test details';
@@ -100,6 +127,60 @@ export class TestComponent implements OnInit {
   ngOnDestroy(): void {
     window.removeEventListener('beforeunload', this.handleBeforeUnload);
     clearInterval(this.interval);
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  }
+
+  // Get current user's name
+  getCurrentUserName(): void {
+    const user = this.loginService.getCurrentUser();
+    if (user && user.name) {
+      this.currentUserName = user.name;
+    } else {
+      this.currentUserName = 'User'; // Fallback if name is not available
+    }
+  }
+
+  // New timer functionality matching MCQ quiz
+  startNewTimer() {
+    this.updateTimeDisplay();
+    
+    this.timerInterval = window.setInterval(() => {
+      this.timeRemaining--;
+      this.timer = this.timeRemaining; // Keep old timer for compatibility
+      this.updateTimeDisplay();
+      
+      // Show warning at 1 minute remaining
+      if (this.timeRemaining === 60 && !this.warningShown) {
+        this.toastService.showWarning('⚠️ 1 minute left, please finish your test!');
+        this.warningShown = true;
+      }
+      
+      if (this.timeRemaining <= 0) {
+        this.stopNewTimer();
+        this.onTimeUp();
+      }
+    }, 1000);
+  }
+
+  stopNewTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = undefined;
+    }
+  }
+
+  updateTimeDisplay() {
+    const minutes = Math.floor(this.timeRemaining / 60);
+    const seconds = this.timeRemaining % 60;
+    this.timeDisplay = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  onTimeUp() {
+    // Handle when time runs out
+    this.toastService.showError('Time is up! Auto-submitting your test...');
+    this.submit();
   }
 
   handleBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -130,6 +211,7 @@ export class TestComponent implements OnInit {
   submit() {
     if (this.submitted) return; // Prevent double submission
     clearInterval(this.interval);
+    this.stopNewTimer(); // Stop the new timer
     this.submitted = true;
     const token = localStorage.getItem('token');
     // Send start_time in ISO format
@@ -152,5 +234,20 @@ export class TestComponent implements OnInit {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  // Helper method to get answered questions count
+  getAnsweredQuestionsCount(): number {
+    return Object.keys(this.answers).length;
+  }
+
+  // Helper method to get progress percentage
+  getProgressPercentage(): number {
+    if (!this.testDetails || !this.testDetails.questions) {
+      return 0;
+    }
+    const totalQuestions = this.testDetails.questions.length;
+    const answeredQuestions = this.getAnsweredQuestionsCount();
+    return totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0;
   }
 }

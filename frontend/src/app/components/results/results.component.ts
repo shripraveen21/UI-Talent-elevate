@@ -63,4 +63,49 @@ export class ResultsComponent implements OnInit {
       this.loading = false;
     }
   }
+
+  // Helper methods for the new UI
+  getScorePercentage(): number {
+    if (this.feedback?.quiz_result?.score_percentage) {
+      return this.feedback.quiz_result.score_percentage;
+    }
+    return 0;
+  }
+
+  getGrade(): string {
+    const score = this.getScorePercentage();
+    if (score >= 90) return 'A';
+    if (score >= 80) return 'B';
+    if (score >= 70) return 'C';
+    if (score >= 60) return 'D';
+    return 'F';
+  }
+
+  getCorrectAnswers(): number {
+    if (this.feedback?.quiz_result?.correct_answers) {
+      return this.feedback.quiz_result.correct_answers;
+    }
+    return 0;
+  }
+
+  getTotalQuestions(): number {
+    if (this.feedback?.quiz_result?.total_questions) {
+      return this.feedback.quiz_result.total_questions;
+    }
+    return 0;
+  }
+
+  getStrengths(): any[] {
+    if (this.feedback?.analysis?.strengths) {
+      return this.feedback.analysis.strengths;
+    }
+    return [];
+  }
+
+  getWeaknesses(): any[] {
+    if (this.feedback?.analysis?.weaknesses) {
+      return this.feedback.analysis.weaknesses;
+    }
+    return [];
+  }
 }

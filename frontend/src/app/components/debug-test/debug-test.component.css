@@ -1,31 +1,104 @@
-form {
-  margin: 1em 0;
-  padding: 1em;
-  border: 1px solid #dbeafe;
-  border-radius: 8px;
-  background: #f9fafb;
+/* Main body styling */
+:host {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb; /* gray-50 */
 }
-h3 {
-  margin-top: 1em;
-  color: #2d3748;
+
+/* Code editor styling */
+.code-editor {
+  background-color: #f3f4f6; /* gray-100 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #1f2937; /* gray-800 */
+  border: 1px solid #e5e7eb; /* gray-200 */
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
 }
-pre {
-  background: #f3f4f6;
-  padding: 0.5em;
-  border-radius: 5px;
+
+.code-editor:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+/* Code blocks styling */
+pre, code {
+  background-color: #f3f4f6; /* gray-100 */
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #1f2937; /* gray-800 */
+  border: 1px solid #e5e7eb; /* gray-200 */
   overflow-x: auto;
 }
-textarea {
-  font-family: 'Fira Mono', 'Consolas', monospace;
-  margin-top: 0.25em;
-  margin-bottom: 0.75em;
-  min-height: 100px;
-  font-size: 1em;
-}
-button[type="submit"] {
-  background: #2563eb;
-  color: white;
-  padding: 0.5em 1.25em;
+
+/* Form styling */
+form {
+  margin: 0;
+  padding: 0;
   border: none;
-  border-radius: 5px;
+  background: transparent;
+}
+
+/* Button styling */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress bar styling */
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .grid-cols-1.lg\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation for loading state */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Focus states for accessibility */
+button:focus,
+textarea:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Hover effects */
+.hover\\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.hover\\:bg-gray-900:hover {
+  background-color: #111827;
+}
+
+.hover\\:bg-blue-700:hover {
+  background-color: #1d4ed8;
 }

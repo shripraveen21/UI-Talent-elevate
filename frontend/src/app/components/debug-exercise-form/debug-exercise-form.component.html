@@ -2,69 +2,118 @@
 <main class="container mx-auto px-6 py-8">
   <!-- Page Title -->
   <h1 class="text-3xl font-bold text-gray-800">Debug Exercise Assessment</h1>
-  <p class="mt-2 text-gray-600">Welcome back Here's what's happening today.</p>
- 
-  <!-- Configuration Panel (shown when no data) -->
-  <div class="mt-8 bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-6">
-    <h2 class="text-xl font-bold text-slate-800 mb-4">Exercise Configuration</h2>
-   
-    <form [formGroup]="debugForm" (ngSubmit)="startDebugExercise()" class="space-y-6">
+  <p class="mt-2 text-gray-600">Welcome back! Here's what's happening today.</p>
 
- 
+  <!-- Form Section (only show when no data) -->
+  <div *ngIf="!data || data.length === 0" class="mt-8">
+    <!-- Debug Exercise Form Component -->
+    <div class="bg-white p-8 rounded-lg border border-gray-200">
+      <div class="flex items-center space-x-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-3-5v5m-3-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <h2 class="text-xl font-semibold">Exercise Configuration</h2>
+      </div>
+      <p class="mt-1 text-sm text-gray-500">Configure your debug exercise parameters and settings.</p>
 
- 
-        <!-- Form Controls Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <form [formGroup]="debugForm" (ngSubmit)="startDebugExercise()" class="mt-6 space-y-6">
+        <!-- Exercise Settings Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Number of Questions -->
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Questions</label>
-            <input type="number" formControlName="num_questions" min="1" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200">
+            <label for="num_questions" class="block text-sm font-medium text-gray-700">Number of Questions *</label>
+            <input 
+              type="number" 
+              id="num_questions"
+              formControlName="num_questions" 
+              min="1" 
+              required 
+              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter number of questions"
+            />
           </div>
+
+          <!-- Duration -->
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Duration (min)</label>
-            <input type="number" formControlName="duration" min="1" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200">
+            <label for="duration" class="block text-sm font-medium text-gray-700">Duration (minutes) *</label>
+            <input 
+              type="number" 
+              id="duration"
+              formControlName="duration" 
+              min="1" 
+              required 
+              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter duration in minutes"
+            />
           </div>
+
+          <!-- Difficulty -->
           <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-2">Difficulty</label>
-            <select formControlName="difficulty" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white">
+            <label for="difficulty" class="block text-sm font-medium text-gray-700">Difficulty *</label>
+            <select 
+              id="difficulty"
+              formControlName="difficulty" 
+              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
             </select>
           </div>
         </div>
- 
+
+        <!-- Tech Stack Display (Read-only) -->
+        <div *ngIf="tech_stack && tech_stack.length > 0">
+          <label class="block text-sm font-medium text-gray-700">Selected Tech Stack</label>
+          <div class="mt-1 flex flex-wrap gap-2">
+            <span 
+              *ngFor="let stack of tech_stack" 
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+            >
+              {{ stack }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Concepts Display (Read-only) -->
+        <div *ngIf="concepts && concepts.length > 0">
+          <label class="block text-sm font-medium text-gray-700">Selected Topics & Concepts</label>
+          <div class="mt-1 flex flex-wrap gap-2">
+            <span 
+              *ngFor="let concept of concepts" 
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+            >
+              {{ concept.name }}
+            </span>
+          </div>
+        </div>
+
         <!-- Generate Button -->
-        <div class="flex justify-center" *ngIf="!data">
-          <button
-            type="submit"
-            [disabled]="loading || !debugForm.valid "
-            class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-3 px-8 rounded-xl hover:from-emerald-600 hover:to-emerald-700 disabled:from-slate-400 disabled:to-slate-500 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl font-medium">
-            <span *ngIf="!loading" class="flex items-center">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-              </svg>
-              Generate Exercises
-            </span>
-            <span *ngIf="loading || data" class="flex items-center">
-              <svg class="animate-spin w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Generating...
-            </span>
+        <div class="pt-4">
+          <button 
+            type="submit" 
+            [disabled]="loading || !debugForm.valid"
+            class="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span *ngIf="!loading">Generate Exercises</span>
+            <span *ngIf="loading">Generating...</span>
           </button>
         </div>
       </form>
     </div>
- 
-  <!-- Loading State
+  </div>
+
+  <!-- Loading State -->
   <div *ngIf="loading" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
     <div class="flex items-center justify-center">
-      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mr-3"></div>
+      <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mr-4"></div>
       <p class="text-gray-600 font-medium">Generating debug exercises...</p>
     </div>
-  </div> -->
- 
+  </div>
+
   <!-- Error State -->
   <div *ngIf="error" class="mt-8 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
     <div class="flex items-center">
@@ -74,23 +123,7 @@
       <p class="text-red-700 font-medium">{{ error }}</p>
     </div>
   </div>
- 
-   <!-- Assessment Progress Section -->
-  <!--<div *ngIf="data && data.length > 0" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
-    <div class="flex justify-between items-center">
-      <div>
-        <h2 class="text-lg font-bold text-gray-800">Debug Exercise Assessment</h2>
-        <p class="text-sm text-gray-500">Find and fix bugs in the provided code</p>
-      </div>
-    </div>
-    <div class="mt-4 flex items-center space-x-4">
-      <div class="w-full bg-gray-200 rounded-full h-2.5">
-        <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="((currentExerciseIndex + 1) / data.length) * 100"></div>
-      </div>
-      <span class="text-sm font-medium text-gray-600">Exercise {{ currentExerciseIndex + 1 }} of {{ data.length }}</span>
-    </div>
-  </div> -->
- 
+
   <!-- Debug Exercise Review (Human-in-the-Loop) -->
   <div *ngIf="data && data.length > 0" class="mt-6">
     <div *ngFor="let exercise of data; let idx = index" class="bg-white p-6 rounded-lg border border-gray-200 mb-6">

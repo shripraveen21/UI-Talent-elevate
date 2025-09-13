@@ -1,63 +1,141 @@
-<div class="max-w-3xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg">
-
-  <div *ngIf="loading" class="flex items-center justify-center py-8">
-    <span class="text-blue-600 font-semibold text-lg animate-pulse">Loading debug exercise...</span>
+<!-- Main Content -->
+<main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+  <!-- Page Title -->
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Debug Exercise Assessment</h1>
+    <p class="mt-2 text-gray-600">Welcome back! Here's what's happening today.</p>
   </div>
 
-  <div *ngIf="error" class="flex items-center justify-center py-8">
-    <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-center justify-center py-8">
+      <span class="text-blue-600 font-semibold text-lg animate-pulse">Loading debug exercise...</span>
+    </div>
   </div>
 
+  <!-- Error State -->
+  <div *ngIf="error" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-center justify-center py-8">
+      <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
   <div *ngIf="!loading && !error && exercises.length > 0">
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">Debug Exercise</h2>
-    <div class="mb-6 text-gray-700">
-      <span class="font-semibold">Time Remaining:</span>
-      <span class="text-blue-600">{{ formatTimer(timer) }}</span>
+    <!-- Assessment Progress Card -->
+    <div class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+      <div class="flex justify-between items-center">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Debug Exercise Assessment</h2>
+          <p class="text-sm text-gray-500">Find and fix bugs in the provided code</p>
+        </div>
+        <div class="flex items-center space-x-2 text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span class="font-medium">{{ formatTimer(timer) }}</span>
+        </div>
+      </div>
+      <div class="mt-4">
+        <div class="flex justify-between text-sm text-gray-500 mb-1">
+          <span>Exercise {{ currentExerciseIndex + 1 }} of {{ exercises.length }}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-blue-600 h-2 rounded-full" [style.width.%]="progressPercentage"></div>
+        </div>
+      </div>
     </div>
 
-    <form (ngSubmit)="submit()" class="space-y-8">
-      <div *ngFor="let exercise of exercises" class="bg-gray-50 rounded-lg p-4 shadow mb-4">
-        <div class="mb-2">
-          <strong class="text-lg text-gray-800">{{ exercise.title }}</strong>
+    <!-- Exercise Content -->
+    <div *ngIf="exercises[currentExerciseIndex]" class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <ng-container *ngFor="let exercise of [exercises[currentExerciseIndex]]; let i = index">
+      <!-- Left Column: Problem Description -->
+      <div class="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="flex items-center space-x-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-3-5v5m-3-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 class="text-xl font-semibold text-gray-900">{{ exercise.title }}</h3>
+            </div>
+            <p class="mt-2 text-sm text-gray-600">{{ exercise.description }}</p>
+          </div>
+          <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">{{ exercise.difficulty }}</span>
         </div>
-        <div class="mb-2 text-gray-700">{{ exercise.description }}</div>
-        <div class="mb-2">
-          <span class="font-semibold text-gray-600">Code:</span>
-          <pre class="bg-gray-100 rounded-md p-3 text-sm text-gray-700 overflow-x-auto">{{ exercise.code }}</pre>
+
+        <div>
+          <label class="text-sm font-medium text-gray-700">Buggy Code:</label>
+          <pre class="mt-2"><code>{{ exercise.code }}</code></pre>
         </div>
-        <div class="mb-2 text-gray-600">
-          <span class="font-medium">Technology:</span> {{ exercise.technology }}
-        </div>
-        <div class="mb-2 text-gray-600">
-          <span class="font-medium">Difficulty:</span> {{ exercise.difficulty }}
-        </div>
-        <div class="mb-2 text-gray-600">
-          <span class="font-medium">Expected Behavior:</span> {{ exercise.expectedBehavior }}
-        </div>
-        <div class="mb-2 text-gray-600">
-          <span class="font-medium">Current Behavior:</span> {{ exercise.currentBehavior }}
-        </div>
-        <!-- Simple code editor -->
-        <div class="mb-2">
-          <label class="block font-semibold text-gray-700 mb-1" [for]="'answer-' + exercise.id">Your Debug Solution:</label>
-          <textarea
-            #answerBox
-            [attr.name]="exercise.id"
-            [id]="'answer-' + exercise.id"
-            rows="10"
-            class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
-            (input)="handleAnswer(exercise.id, answerBox.value)"
-          ></textarea>
+
+        <div class="text-sm text-gray-600 space-y-2">
+          <div><span class="font-medium">Technology:</span> {{ exercise.technology }}</div>
+          <div><span class="font-medium">Expected Behavior:</span> {{ exercise.expectedBehavior }}</div>
+          <div><span class="font-medium">Current Behavior:</span> {{ exercise.currentBehavior }}</div>
         </div>
       </div>
 
-      <button
-        type="submit"
-        [disabled]="submitted"
-        class="px-6 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-      >
-        Submit
-      </button>
+      <!-- Right Column: User Solution -->
+      <div class="bg-white p-6 rounded-lg border border-gray-200 flex flex-col">
+        <div>
+          <h3 class="text-xl font-semibold text-gray-900">Your Solution</h3>
+          <p class="mt-1 text-sm text-gray-600">Fix the buggy code below</p>
+        </div>
+        <textarea 
+          #answerBox
+          [attr.name]="exercise.id"
+          [id]="'answer-' + exercise.id"
+          class="code-editor mt-4 flex-grow"
+          (input)="handleAnswer(exercise.id, answerBox.value)"
+        ></textarea>
+        <div class="mt-4">
+          <button 
+            type="button"
+            class="w-full flex items-center justify-center space-x-2 px-4 py-2.5 bg-gray-800 text-white font-semibold rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800"
+            (click)="runTest(exercise.id, answerBox.value)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            <span>Run & Test</span>
+          </button>
+        </div>
+      </div>
+      </ng-container>
+    </div>
+
+    <!-- Submit Form -->
+    <form (ngSubmit)="submit()" class="mt-8">
+      <!-- Footer Navigation -->
+      <div class="bg-white p-4 rounded-lg border border-gray-200 flex justify-between items-center">
+        <p class="text-sm font-medium text-gray-600">Solved: {{ getSolvedCount() }}/{{ exercises.length }}</p>
+        <div class="flex items-center space-x-3">
+          <button 
+            type="button" 
+            class="px-5 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            (click)="goToPrevious()"
+            [disabled]="currentExerciseIndex === 0"
+          >
+            Previous
+          </button>
+          <button 
+            type="button" 
+            class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700"
+            (click)="goToNext()"
+            [disabled]="currentExerciseIndex >= exercises.length - 1"
+          >
+            Next
+          </button>
+          <button 
+            type="submit"
+            [disabled]="submitted"
+            class="px-5 py-2 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 disabled:opacity-50"
+          >
+            {{ submitted ? 'Submitting...' : 'Submit All' }}
+          </button>
+        </div>
+      </div>
     </form>
   </div>
-</div>
+</main>

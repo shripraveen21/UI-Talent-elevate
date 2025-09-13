@@ -147,7 +147,10 @@ export class CreateAssessmentComponent implements OnInit {
     this.updateAssessmentDetailsStorage();
     this.router.navigate(['/mcq-quiz'], {
       queryParams: {
-        techStack: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+        techStack: JSON.stringify({
+          id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+          name: this.selectedTechStack?.name
+        }),
         concepts: JSON.stringify(this.selectedConcepts)
       }
     });
@@ -158,7 +161,10 @@ export class CreateAssessmentComponent implements OnInit {
     this.updateAssessmentDetailsStorage();
     this.router.navigate(['/debug-exercise'], {
       queryParams: {
-        techStack: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+        techStack: JSON.stringify({
+          id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+          name: this.selectedTechStack?.name
+        }),
         concepts: JSON.stringify(this.selectedConcepts)
       }
     });

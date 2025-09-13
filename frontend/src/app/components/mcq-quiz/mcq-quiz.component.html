@@ -1,12 +1,10 @@
 <div class="container mx-auto px-6 py-8">
     <!-- Page Title -->
-    <h1 class="text-3xl font-bold text-gray-800">MCQ Assessment - React & JavaScript Fundamentals</h1>
-    <p class="mt-2 text-gray-600">Welcome back, nirmal! Here's what's happening today.</p>
+    <h1 class="text-3xl font-bold text-gray-800">{{quizTitle}}</h1>
+    <p class="mt-2 text-gray-600">Welcome back, {{currentUserName}}! Here's what's happening today.</p>
 
     <!-- Form Section (only show when no questions generated) -->
-    <div *ngIf="!quizQuestions || quizQuestions.length === 0" class="mt-8 bg-white rounded-lg border border-gray-200 p-8">
-      <h2 class="text-xl font-bold text-gray-800 mb-4">Quiz Generator</h2>
-      <p class="text-gray-600 mb-6">Configure and generate your MCQ quiz</p>
+    <div *ngIf="!quizQuestions || quizQuestions.length === 0" class="mt-8">
       <app-mcq-form (submitParams)="onSubmitParams($event)"></app-mcq-form>
     </div>
 
@@ -31,18 +29,18 @@
       </div>
     </div>
 
-    <!-- Assessment Progress Section -->
-    <div *ngIf="quizQuestions && quizQuestions.length > 0" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <!-- Assessment Progress Section - Only visible for employees -->
+    <div *ngIf="isEmployee() && quizQuestions && quizQuestions.length > 0" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="text-lg font-bold text-gray-800">React & JavaScript Fundamentals</h2>
-          <p class="text-sm text-gray-500">Multiple Choice Questions Assessment</p>
+          <h2 class="text-lg font-bold text-gray-800">{{quizTitle}}</h2>
+          <p class="text-sm text-gray-500">{{quizDescription}}</p>
         </div>
-        <div class="flex items-center space-x-2 text-sm font-medium text-gray-700">
+        <div class="flex items-center space-x-2 text-sm font-medium text-gray-700" *ngIf="timeRemaining > 0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
           </svg>
-          <span>29:41</span>
+          <span [class.text-red-500]="timeRemaining < 300" [class.text-orange-500]="timeRemaining >= 300 && timeRemaining < 600">{{timeDisplay}}</span>
         </div>
       </div>
       <div class="mt-4">
@@ -55,26 +53,15 @@
 
     <!-- Vertically Stacked Questions -->
     <div *ngIf="quizQuestions && quizQuestions.length > 0" class="mt-6 space-y-8">
-      <div *ngFor="let question of quizQuestions; let i = index" class="bg-white p-8 rounded-lg border border-gray-200 relative">
-        <div class="absolute top-4 right-4">
-          <button class="group w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors" (click)="regenerateQuestion(i)">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 20h5v-5M20 4h-5v5" />
-            </svg>
-            <span class="absolute -top-8 right-0 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">Regenerate</span>
-          </button>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-800">{{question.question}}</h3>
-        <div class="mt-6 space-y-4">
-          <div *ngFor="let optionKey of getOptionKeys(question.options); let j = index" class="option-container">
-            <input type="radio" [name]="'question' + i" [id]="'q' + i + 'option' + j" class="hidden">
-            <label [for]="'q' + i + 'option' + j" class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:border-blue-400">
-              <span class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4 flex-shrink-0"></span>
-              <span class="text-gray-700">{{question.options[optionKey]}}</span>
-            </label>
-          </div>
-        </div>
-      </div>
+      <app-mcq-question 
+        *ngFor="let question of quizQuestions; let i = index"
+        [questionData]="question"
+        [questionIndex]="i"
+        [showAnswer]="showAnswers"
+        [isRegenerating]="regeneratingQuestionIndex === i"
+        (regenerateQuestionEvent)="regenerateQuestion($event)"
+        (regenerateEntireAssessmentEvent)="regenerateEntireAssessment()"
+      ></app-mcq-question>
     </div>
 
     <!-- Final Submission Section -->

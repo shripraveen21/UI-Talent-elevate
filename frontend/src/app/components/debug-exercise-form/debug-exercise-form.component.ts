@@ -78,8 +78,16 @@ export class DebugExerciseFormComponent implements OnInit {
 
     this.route.queryParams.subscribe((params: Record<string, any>) => {
       if (params['techStack']) {
-        this.tech_stack = [params['techStack']];
-        this.debugForm.patchValue({ tech_stack: this.tech_stack });
+        try {
+          // Try to parse as JSON first (new format)
+          const techStackData = JSON.parse(params['techStack']);
+          this.tech_stack = [techStackData.name || 'Selected Tech Stack'];
+          this.debugForm.patchValue({ tech_stack: this.tech_stack });
+        } catch {
+          // Fallback for old format (just name)
+          this.tech_stack = [params['techStack']];
+          this.debugForm.patchValue({ tech_stack: this.tech_stack });
+        }
       }
       if (params['concepts']) {
         try {

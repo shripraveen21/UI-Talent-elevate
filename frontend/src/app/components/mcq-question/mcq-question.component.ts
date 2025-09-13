@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -8,8 +8,8 @@ export interface MCQQuestion {
   correctAnswer: string;
   explanation: string;
   selectedAnswer?: string;
-  topics:[string];  
-  concepts:[string];  
+  topics: string[];  
+  concepts: string[];  
 }
 
 @Component({
@@ -22,6 +22,11 @@ export interface MCQQuestion {
 export class McqQuestionComponent {
   @Input() questionData!: MCQQuestion;
   @Input() showAnswer: boolean = false;
+  @Input() questionIndex: number = 0;
+  @Input() isRegenerating: boolean = false;
+  
+  @Output() regenerateQuestionEvent = new EventEmitter<number>();
+  @Output() regenerateEntireAssessmentEvent = new EventEmitter<void>();
 
   getOptionKeys(options: { [key: string]: string }): string[] {
     return Object.keys(options);
@@ -33,5 +38,13 @@ export class McqQuestionComponent {
 
   isCorrect(): boolean {
     return this.questionData.selectedAnswer === this.questionData.correctAnswer;
+  }
+
+  regenerateQuestion() {
+    this.regenerateQuestionEvent.emit(this.questionIndex);
+  }
+
+  regenerateEntireAssessment() {
+    this.regenerateEntireAssessmentEvent.emit();
   }
 }

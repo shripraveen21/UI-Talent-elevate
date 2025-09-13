@@ -26,19 +26,25 @@ export class McqFormComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      // techStack is a string, concepts is a JSON string
-if (params['techStack']) {
-  // If techStack is a number, use as id; if object, use its id and name; if string, do not default to id:0
-  let stackParam = params['techStack'];
-  if (typeof stackParam === 'object' && stackParam !== null) {
-    this.params.tech_stack = [{ id: stackParam.id, name: stackParam.name }];
-  } else if (!isNaN(Number(stackParam))) {
-    this.params.tech_stack = [{ id: Number(stackParam), name: '' }];
-  } else {
-    // If only name is present, leave id undefined or handle as needed
-    this.params.tech_stack = [{ id: -1, name: stackParam }];
-  }
-}
+      // techStack is now a JSON string, concepts is a JSON string
+      if (params['techStack']) {
+        try {
+          // Try to parse as JSON first (new format)
+          const techStackData = JSON.parse(params['techStack']);
+          this.params.tech_stack = [{ 
+            id: techStackData.id, 
+            name: techStackData.name || 'Selected Tech Stack' 
+          }];
+        } catch {
+          // Fallback for old format (just ID or name)
+          let stackParam = params['techStack'];
+          if (!isNaN(Number(stackParam))) {
+            this.params.tech_stack = [{ id: Number(stackParam), name: 'Selected Tech Stack' }];
+          } else {
+            this.params.tech_stack = [{ id: -1, name: stackParam }];
+          }
+        }
+      }
       if (params['concepts']) {
         try {
           this.params.concepts = JSON.parse(params['concepts']);

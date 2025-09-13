@@ -1,42 +1,77 @@
 <div class="bg-white p-8 rounded-lg border border-gray-200 relative">
-  <!-- Question -->
-  <div class="space-y-4">
-    <h3 class="text-lg font-semibold text-gray-800">{{ questionData.question }}</h3>
-    
-    <!-- Options -->
-    <div class="mt-6 space-y-4">
-      <div *ngFor="let key of getOptionKeys(questionData.options); let j = index" class="option-container">
-        <input 
-          type="radio" 
-          [name]="'question-' + questionData.question" 
-          [id]="'option-' + key" 
-          [value]="key"
-          [(ngModel)]="questionData.selectedAnswer"
-          (change)="selectOption(key)"
-          class="hidden"
-        >
-        <label 
-          [for]="'option-' + key" 
-          class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:border-blue-400"
-          [class.border-blue-500]="questionData.selectedAnswer === key && !showAnswer"
-          [class.bg-blue-50]="questionData.selectedAnswer === key && !showAnswer"
-          [class.border-green-500]="showAnswer && key === questionData.correctAnswer"
-          [class.bg-green-50]="showAnswer && key === questionData.correctAnswer"
-          [class.border-red-500]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
-          [class.bg-red-50]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
-        >
-          <span class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4 flex-shrink-0"
-                [class.border-blue-500]="questionData.selectedAnswer === key && !showAnswer"
-                [class.bg-blue-500]="questionData.selectedAnswer === key && !showAnswer"
-                [class.border-green-500]="showAnswer && key === questionData.correctAnswer"
-                [class.bg-green-500]="showAnswer && key === questionData.correctAnswer"
-                [class.border-red-500]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
-                [class.bg-red-500]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
-          ></span>
-          <span class="text-gray-700">{{ key }}. {{ questionData.options[key] }}</span>
-          
-        </label>
+  <!-- Question Header with Regenerate Button -->
+  <div class="flex justify-between items-start mb-6">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
       </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-800">{{ questionData.question }}</h3>
+        <!-- Topics and Concepts Display -->
+        <div class="flex flex-wrap gap-2 mt-2">
+          <span *ngFor="let topic of questionData.topics" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+            {{ topic }}
+          </span>
+          <span *ngFor="let concept of questionData.concepts" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+            {{ concept }}
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Regenerate Button -->
+    <div class="relative group">
+      <button 
+        class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+        (click)="regenerateQuestion()"
+        [disabled]="isRegenerating"
+        title="Regenerate Question"
+      >
+        <svg *ngIf="!isRegenerating" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <svg *ngIf="isRegenerating" class="animate-spin h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </button>
+      <span class="absolute -top-8 right-0 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        Regenerate
+      </span>
+    </div>
+  </div>
+  
+  <!-- Options -->
+  <div class="mt-6 space-y-4">
+    <div *ngFor="let key of getOptionKeys(questionData.options); let j = index">
+      <input 
+        type="radio" 
+        [name]="'question-' + questionData.question" 
+        [id]="'option-' + key" 
+        [value]="key"
+        [(ngModel)]="questionData.selectedAnswer"
+        (change)="selectOption(key)"
+        class="hidden"
+      >
+      <label 
+        [for]="'option-' + key" 
+        class="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer transition-all hover:border-blue-400"
+        [class.border-blue-500]="questionData.selectedAnswer === key && !showAnswer"
+        [class.border-green-500]="showAnswer && key === questionData.correctAnswer"
+        [class.border-red-500]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
+      >
+        <span class="w-5 h-5 border-2 border-gray-300 rounded-full mr-4 flex-shrink-0"
+              [class.border-blue-500]="questionData.selectedAnswer === key && !showAnswer"
+              [class.bg-blue-500]="questionData.selectedAnswer === key && !showAnswer"
+              [class.border-green-500]="showAnswer && key === questionData.correctAnswer"
+              [class.bg-green-500]="showAnswer && key === questionData.correctAnswer"
+              [class.border-red-500]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
+              [class.bg-red-500]="showAnswer && questionData.selectedAnswer === key && key !== questionData.correctAnswer"
+        ></span>
+        {{ key }}. {{ questionData.options[key] }}
+      </label>
     </div>
   </div>
 

@@ -23,7 +23,7 @@ export const routes: Routes = [
    { path: 'dashboard', component: DashboardComponent },
   { path: 'test/:id', component: TestComponent },
   { path: 'results/:id', component: ResultsComponent },
-{path:'directory',component:ManagerDashboardComponent,canActivate:[authGuard],data:{roles:['CapabilityLeader','ProductManager']}},
+  {path:'directory',component:ManagerDashboardComponent,canActivate:[authGuard],data:{roles:['CapabilityLeader','ProductManager']}},
   { path: 'employee-dashboard', component: EmployeeDashboardComponent, canActivate: [authGuard], data: { roles: ['Employee'] } },
   { path: 'capability-leader-dashboard', component: CapabilityLeaderDashboardComponent, canActivate: [authGuard], data: { roles: ['CapabilityLeader'] } },
   { path: 'delivery-manager-dashboard', component: DeliveryManagerDashboardComponent, canActivate: [authGuard], data: { roles: ['DeliveryManager'] } },
@@ -51,5 +51,6 @@ export const routes: Routes = [
     path: 'debug-results/:id',
     loadComponent: () => import('./components/debug-results/debug-results.component').then(m => m.DebugResultsComponent)
   },
+
   { path: '**', redirectTo: 'home' },
 ];
