@@ -24,7 +24,18 @@ async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: 
             "GURU": ['advanced']
         }
         topics = db.query(Topic).filter(Topic.tech_stack_id == tech_stack.id).all()
-        topics_str = ','.join([t.name for t in topics if t.difficulty.value in MAP_DIFFICULTY_LEVEL[level]])
+        print(f"Found {len(topics)} topics for {tech_stack.name}")
+        
+        # Filter topics by difficulty level
+        filtered_topics = [t for t in topics if t.difficulty.value in MAP_DIFFICULTY_LEVEL[level]]
+        print(f"Filtered topics for level {level}: {[t.name + '(' + t.difficulty.value + ')' for t in filtered_topics]}")
+        
+        if not filtered_topics:
+            raise Exception(f"No topics found for {tech_stack.name} with difficulty levels {MAP_DIFFICULTY_LEVEL[level]} required for skill level {level}")
+        
+        topics_str = ','.join([t.name for t in filtered_topics])
+        print(f"Topics string for generation: {topics_str}")
+        
         mcq_json = await generate_mcq_questions(tech_stack=tech_stack.name, topics=topics_str, level=level)
         if not mcq_json:
             raise Exception(f"No MCQ questions created: {tech_stack.name}")

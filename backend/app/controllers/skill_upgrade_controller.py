@@ -2,7 +2,8 @@ from ..config.database import get_db
 from ..services.skill_upgrade_service import *
 from ..services.rbac_service import RBACService
 from fastapi import APIRouter, Depends, HTTPException
-from ..models.models import Employee, EmployeeSkill
+from sqlalchemy.orm import Session
+from ..models.models import Employee, EmployeeSkill, TechStack
 from ..schemas.test_schema import TestOut
 
 router = APIRouter()
