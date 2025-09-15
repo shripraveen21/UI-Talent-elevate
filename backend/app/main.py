@@ -6,6 +6,7 @@ from .AgentEndpoints.DebugExerciseAgentWs import router as debug_exercise_router
 from .AgentEndpoints.EpicAgentWs import router as agent_chat_router
 from .AgentEndpoints.McqAgentWs import router as mcq_agent_router
 from .AgentEndpoints.TopicAgentWS import router as topic_agent_router
+from .AgentEndpoints.GithubRepoCreatorAgentWs import router as github_router
 from .config.database import SessionLocal, engine
 from .controllers.auth_controller import router as auth_router
 from .controllers.employee_controller import router as employee_router
@@ -14,6 +15,7 @@ from .controllers.tech_stack_controller import router as tech_stack_router
 from .controllers.test_assign_controller import router as test_assign_router
 from .controllers.test_controller import router as test_router
 from .controllers.topics_controller import router as topic_router
+from .controllers.collaborators_controller import router as collaborators_router
 from .models.models import *
 
 bearer_scheme = HTTPBearer()
@@ -49,6 +51,7 @@ from .controllers.employee_dashboard_controller import router as employee_dashbo
 app.include_router(employee_dashboard_router)
 app.include_router(tech_stack_router)
 app.include_router(topic_router)
+app.include_router(collaborators_router)
 app.include_router(test_router)
 app.include_router(agent_chat_router)
 app.include_router(mcq_agent_router)
@@ -60,3 +63,4 @@ app.include_router(skill_upgrade_router)
 
 from .controllers.feedback_pdf_controller import router as feedback_pdf_router
 app.include_router(feedback_pdf_router)
+app.include_router(github_router)

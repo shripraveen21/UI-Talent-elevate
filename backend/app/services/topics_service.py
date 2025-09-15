@@ -5,7 +5,8 @@ from ..models.models import Topic, RoleEnum
 def create_topic(db: Session, user_payload, topic_data):
     new_topic = Topic(
         name=topic_data.name,
-        description=topic_data.description
+        difficulty=topic_data.difficulty,
+        tech_stack_id=topic_data.tech_stack_id
     )
     db.add(new_topic)
     db.commit()

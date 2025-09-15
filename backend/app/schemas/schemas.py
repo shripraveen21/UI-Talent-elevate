@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, Dict, List, Any,Union
+from typing import Optional, Dict, List, Any,Union, Literal
 
 class EmployeeCreate(BaseModel):
     name: str
@@ -18,6 +18,15 @@ class EmployeeOut(BaseModel):
     name: str
     email: EmailStr
     role: str
+
+    class Config:
+        orm_mode = True
+
+class CollaboratorOut(BaseModel):
+    email: str
+    topics: bool
+    test_create: bool
+    test_assign: bool
 
     class Config:
         orm_mode = True
@@ -84,8 +93,20 @@ class DebugExerciseCreate(BaseModel):
 
 class TopicCreate(BaseModel):
     name: str
-    description: Optional[str] = None
-    difficulty: str
+    difficulty: Literal['beginner', 'intermediate', 'advanced']
+    tech_stack_id: int
+class TopicOut(BaseModel):
+    topic_id: int
+    name: str
+    difficulty: str  # Enum will be serialized as string
+    tech_stack_id: int
+
+    class Config:
+        orm_mode = True
+
+class TechStackRequest(BaseModel):
+    name: str
+    description: Optional[str]
 
 class TechStackCreate(BaseModel):
     name: str

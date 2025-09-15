@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { TopicsService } from '../../services/topics/topics.service';
+import { TestListingService } from '../../services/test-listing/test-listing.service';
 
 @Component({
   selector: 'app-capability-leader-dashboard',
@@ -17,39 +19,60 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
   loading: boolean = false;
   activeTab: string = 'topics';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private topicsService: TopicsService,
+    private assessmentsService: TestListingService
+  ) {}
 
   ngOnInit(): void {
     this.loadUserData();
     this.loadTopics();
     this.loadAssessments();
     this.loadTeamOverview();
+
+        const userInfo = localStorage.getItem('user'); // Optional: store user info at login
+
+    if (userInfo) {
+      const user = JSON.parse(userInfo);
+      this.userName = user.name || '';
+    }
+  }
+
+  navigateToCollaborators() {
+    this.router.navigate(['/manage-collaborator']);
   }
 
   loadUserData(): void {
-    // Placeholder for user data loading
     this.userName = 'Capability Leader';
   }
 
   loadTopics(): void {
-    // Placeholder for topics data loading
     this.loading = true;
-    // TODO: Connect to backend service
-    setTimeout(() => {
-      this.topics = [];
-      this.loading = false;
-    }, 1000);
+    this.topicsService.getTopics().subscribe({
+      next: (topics) => {
+        this.topics = topics;
+        this.loading = false;
+      },
+      error: () => {
+        this.topics = [];
+        this.loading = false;
+      }
+    });
   }
 
   loadAssessments(): void {
-    // Placeholder for assessments data loading
-    // TODO: Connect to backend service
-    this.assessments = [];
+    this.assessmentsService.getAssessments().subscribe({
+      next: (assessments) => {
+        this.assessments = assessments;
+      },
+      error: () => {
+        this.assessments = [];
+      }
+    });
   }
 
   loadTeamOverview(): void {
-    // Placeholder for team overview data loading
-    // TODO: Connect to backend service
     this.teamOverview = {
       totalEmployees: 0,
       activeAssessments: 0,
@@ -63,43 +86,39 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
   }
 
   createTopic(): void {
-    // Navigate to topic creation form
     this.router.navigate(['/add-techstack']);
   }
 
   editTopic(topicId: string): void {
-    // Navigate to topic edit form
     console.log('Edit topic:', topicId);
   }
 
   deleteTopic(topicId: string): void {
-    // Delete topic with confirmation
     console.log('Delete topic:', topicId);
   }
 
   createAssessment(): void {
-    // Navigate to assessment creation form
     console.log('Create new assessment');
   }
 
   editAssessment(assessmentId: string): void {
-    // Navigate to assessment edit form
     console.log('Edit assessment:', assessmentId);
   }
 
   viewAssessmentResults(assessmentId: string): void {
-    // Navigate to assessment results view
     console.log('View assessment results:', assessmentId);
   }
 
   viewTeamDetails(): void {
-    // Navigate to detailed team view
     console.log('View team details');
   }
 
   exportReports(): void {
-    // Export team reports
     console.log('Export reports');
+  }
+
+  navigateToFeedback() : void {
+    this.router.navigate(['/feedback']);
   }
 
   navigateToCreateTopic(): void {
@@ -115,12 +134,10 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
   }
 
   viewTopicDetails(topicId: string): void {
-    // Navigate to topic details view
     console.log('View topic details:', topicId);
   }
 
   navigateToDirectory(): void {
-    // Navigate to directory page for test assignment
     this.router.navigate(['/directory']);
   }
 }

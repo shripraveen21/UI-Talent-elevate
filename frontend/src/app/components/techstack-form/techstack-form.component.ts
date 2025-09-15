@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component ,OnInit} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TechStackAgentService, TechStackParams, Topic, AgentMessage } from '../../services/techstack-agent/techstack-agent.service';
@@ -21,7 +21,7 @@ interface SelectableTopic extends Topic {
   standalone: true,
   imports: [CommonModule, FormsModule, ToastComponent]
 })
-export class TechStackFormComponent {
+export class TechStackFormComponent implements OnInit {
   params: TechStackParams = {
     name: '',
   };
@@ -302,5 +302,11 @@ export class TechStackFormComponent {
   // Helper method to check if any topics are selected in a specific level
   hasSelectedTopicsInLevel(level: Level): boolean {
     return this.getSelectedTopicsByLevel(level).length > 0;
+  }
+
+  userName: string = '';
+
+  ngOnInit(): void {
+    this.userName = localStorage.getItem('username') || '';
   }
 }

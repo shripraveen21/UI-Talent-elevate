@@ -2,7 +2,7 @@
 .navbar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-content {
@@ -63,6 +63,7 @@
     opacity: 0;
     transform: translateY(-2px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -160,7 +161,7 @@
 }
 
 /* Icon hover effects */
-.hover\:text-indigo-600:hover {
+.hover\:text-blue-600:hover {
   color: #4f46e5 !important;
   transition: color 0.2s ease-in-out;
 }
@@ -184,16 +185,16 @@
   .navbar-brand {
     font-size: 1.1rem;
   }
-  
+
   .role-badge {
     font-size: 0.75rem;
     padding: 0.25rem 0.5rem;
   }
-  
+
   .user-info {
     display: none;
   }
-  
+
   .mobile-user-info {
     display: flex;
   }

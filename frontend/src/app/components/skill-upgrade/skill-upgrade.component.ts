@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 export class SkillUpgradeComponent implements OnInit {
   techStacks: any[] = [];
   selectedTechStack: any = null;
+  selectedLevel: string | null = null;
   testResult: any = null;
   error: string = '';
   token: string | null = "";
@@ -67,6 +68,10 @@ export class SkillUpgradeComponent implements OnInit {
       this.error = 'Please select a tech stack';
       return;
     }
+    if (!this.selectedLevel) {
+      this.error = 'Please select a level';
+      return;
+    }
     
     this.token = localStorage.getItem('token');
     if (!this.token) {
@@ -77,10 +82,12 @@ export class SkillUpgradeComponent implements OnInit {
     this.loading = true;
     this.error = '';
     
-    // Use the tech stack name for the skill upgrade test
+    // Use the tech stack name and level for the skill upgrade test
     const techStackName = this.selectedTechStack.name;
+    const level = this.selectedLevel;
     
-    this.skillUpgradeService.createSkillUpgradeTest(this.token, techStackName).subscribe({
+    // Pass both techStackName and level to the service
+    this.skillUpgradeService.createSkillUpgradeTest(this.token, techStackName, level).subscribe({
       next: (result) => {
         this.testResult = result;
         this.error = '';

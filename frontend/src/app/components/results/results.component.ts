@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 export class ResultsComponent implements OnInit {
+  userName: string = '';
   testId!: number;
   result: any;
   feedback: any;
@@ -24,6 +25,17 @@ export class ResultsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const userObj = localStorage.getItem('username');
+    let userName = 'User';
+    if (userObj) {
+      try {
+        const user = JSON.parse(userObj);
+        userName = user.name || 'User';
+      } catch {
+        userName = userObj || 'User';
+      }
+    }
+    this.userName = userName;
     this.testId = Number(this.route.snapshot.paramMap.get('id'));
     const token = localStorage.getItem('token');
     if (token && this.testId) {

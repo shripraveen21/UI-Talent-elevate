@@ -40,7 +40,7 @@ export class CreateAssessmentComponent implements OnInit {
   debug_id?: number;
 
   constructor(
-    private router: Router,
+    private router:Router,
     private route: ActivatedRoute,
     private mcqAgentService: McqAgentService,
     private techStackAgentService: TechStackAgentService,

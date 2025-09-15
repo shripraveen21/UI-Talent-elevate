@@ -18,23 +18,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
   userInfo: any = null;
   userRole: string | null = null;
   shouldShowNavbar = false;
+  showCollabMenu = false;
   private routerSubscription?: Subscription;
 
   constructor(
     private loginService: LoginService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadUserInfo();
     this.checkNavbarVisibility();
-    
-    // Subscribe to router events to update navbar visibility
+
     this.routerSubscription = this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => {
         this.loadUserInfo();
         this.checkNavbarVisibility();
+        this.showCollabMenu = false; // Hide menu on navigation
       });
   }
 
@@ -67,15 +68,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (!this.userRole) return 'User';
     switch (this.userRole) {
       case 'employee':
-        return 'Employee';
-      case 'capability_leader':
-        return 'Capability Leader';
-      case 'delivery_manager':
-        return 'Delivery Manager';
       case 'Employee':
         return 'Employee';
+      case 'capability_leader':
       case 'CapabilityLeader':
         return 'Capability Leader';
+      case 'delivery_manager':
       case 'DeliveryManager':
         return 'Delivery Manager';
       case 'ProductManager':
@@ -85,19 +83,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  getRoleColor(): string {
+    getRoleColor(): string {
     if (!this.userRole) return 'gray';
     switch (this.userRole) {
       case 'employee':
         return 'green';
       case 'capability_leader':
-        return 'indigo';
+        return 'blue';
       case 'delivery_manager':
         return 'blue';
       case 'Employee':
         return 'green';
       case 'CapabilityLeader':
-        return 'indigo';
+        return 'blue';
       case 'DeliveryManager':
         return 'blue';
       case 'ProductManager':
@@ -106,9 +104,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
         return 'gray';
     }
   }
+ 
 
   navigateToProfile(): void {
-    // Navigate to profile page
+    // Profile navigation logic (unchanged)
     console.log('Navigate to profile');
   }
 
@@ -144,5 +143,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard']);
         break;
     }
+  }
+
+  // Collab menu navigation methods
+  navigateToTopics(): void {
+    this.showCollabMenu = false;
+    this.router.navigate(['/add-techstack']);
+  }
+  navigateToTests(): void {
+    this.showCollabMenu = false;
+    this.router.navigate(['/create-assessment']);
+  }
+  navigateToAssignTest(): void {
+    this.showCollabMenu = false;
+    this.router.navigate(['/directory']);
+  }
+
+  toggleCollabMenu(): void {
+    this.showCollabMenu = !this.showCollabMenu;
   }
 }

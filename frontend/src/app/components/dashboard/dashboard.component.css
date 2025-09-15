@@ -1,7 +1,8 @@
 /* Dashboard component styles - using Inter font and modern design */
 :host {
   font-family: 'Inter', sans-serif;
-  background-color: #f9fafb; /* gray-50 */
+  background-color: #f9fafb;
+  /* gray-50 */
   display: block;
   min-height: 100vh;
 }
@@ -43,8 +44,8 @@
   transition: all 0.2s ease;
 }
 
-.btn-purple {
-  @apply px-5 py-2 bg-purple-600 text-white text-sm font-semibold rounded-md hover:bg-purple-700;
+.btn-blue {
+  @apply px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700;
   transition: all 0.2s ease;
 }
 
@@ -107,19 +108,19 @@
   .container {
     @apply px-4 py-6;
   }
-  
+
   .stats-grid {
     @apply grid-cols-1 gap-4;
   }
-  
+
   .test-item {
     @apply flex-col items-start space-y-3;
   }
-  
+
   .test-actions {
     @apply w-full flex flex-col space-y-2;
   }
-  
+
   .test-actions button {
     @apply w-full;
   }

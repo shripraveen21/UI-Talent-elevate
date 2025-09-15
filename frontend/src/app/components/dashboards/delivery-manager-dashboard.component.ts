@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-delivery-manager-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './delivery-manager-dashboard.component.html',
   styleUrls: ['./delivery-manager-dashboard.component.css']
 })
@@ -26,6 +26,13 @@ export class DeliveryManagerDashboardComponent implements OnInit {
     this.loadProjects();
     this.loadProgressData();
     this.loadReadinessReports();
+
+        const userInfo = localStorage.getItem('user'); // Optional: store user info at login
+
+    if (userInfo) {
+      const user = JSON.parse(userInfo);
+      this.userName = user.name || '';
+    }
   }
 
   loadUserData(): void {
@@ -124,7 +131,7 @@ export class DeliveryManagerDashboardComponent implements OnInit {
   }
 
   navigateToDirectory(): void {
-    // Navigate to directory page for test assignment
+    console.log("/directory")
     this.router.navigate(['/directory']);
   }
 }

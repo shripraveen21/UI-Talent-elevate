@@ -8,7 +8,7 @@ from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
 from ..models.models import TechStack, Topic, RoleEnum, Employee, DifficultyLevel
 from ..config.database import get_db
 from ..Agents.TopicGenAgent import TopicGenerationSystem  # Your multi-agent system
-from ..schemas.schemas import TechStackCreate
+from ..schemas.topic_schema import TopicsCreateRequest
 from ..services.auth_service import JWT_SECRET
 from ..services.rbac_service import require_roles
 
@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.post("/techstack/store")
 def store_tech_stack(
-    tech_stack: TechStackCreate,
+    tech_stack: TopicsCreateRequest,
     db: Session = Depends(get_db)
 ):
     try:

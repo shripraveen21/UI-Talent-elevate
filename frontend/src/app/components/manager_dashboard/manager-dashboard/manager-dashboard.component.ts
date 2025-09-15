@@ -43,6 +43,7 @@ export class ManagerDashboardComponent implements OnInit {
   dueDate: string = '';
   assignmentResult: any = null;
   error: string = '';
+  userName: string = '';
 
   constructor(
     private employeeService: EmployeeService,
@@ -51,6 +52,17 @@ export class ManagerDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const userObj = localStorage.getItem('username');
+    let userName = 'User';
+    if (userObj) {
+      try {
+        const user = JSON.parse(userObj);
+        userName = user.name || 'User';
+      } catch {
+        userName = userObj || 'User';
+      }
+    }
+    this.userName = userName;
     this.loadFilters();
     this.loadEmployees();
     this.loadTests();

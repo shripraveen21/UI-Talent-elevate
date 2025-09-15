@@ -21,8 +21,9 @@ export class SkillUpgradeService {
     return this.http.get<TechStack[]>(`${this.baseUrl}/get-skills`, { headers });
   }
 
-  createSkillUpgradeTest(token: string, techStack: string): Observable<any> {
+  createSkillUpgradeTest(token: string, techStack: string, level: string): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.post(`${this.baseUrl}/skill-upgrade?tech_stack=${techStack}`, {}, { headers });
+    const payload = { tech_stack: techStack, level: level };
+    return this.http.post(`${this.baseUrl}/skill-upgrade`, payload, { headers });
   }
 }

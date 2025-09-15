@@ -6,7 +6,7 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 from dotenv import load_dotenv
 import os
 
-from app.models.models import RoleEnum
+from ..models.models import RoleEnum
 
 load_dotenv()
 

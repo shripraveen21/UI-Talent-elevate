@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardService } from '../../services/testAttempt/dashboard.service';
 import { FeedbackPdfService } from '../../services/feedback-pdf/feedback-pdf.service';
 import { ToastService } from '../../services/toast/toast.service';
@@ -16,6 +15,7 @@ import 'prismjs/components/prism-python';
 import 'prismjs/components/prism-bash';
 import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-yaml';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-debug-results',
@@ -24,6 +24,7 @@ import 'prismjs/components/prism-yaml';
   imports: [CommonModule, MarkdownModule, PdfDownloadModalComponent]
 })
 export class DebugResultsComponent implements OnInit {
+  userName: string = '';
   debugTestId!: number;
   result: any = null;
   loading = true;
@@ -46,6 +47,17 @@ export class DebugResultsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    const userObj = localStorage.getItem('username');
+    let userName = 'User';
+    if (userObj) {
+      try {
+        const user = JSON.parse(userObj);
+        userName = user.name || 'User';
+      } catch {
+        userName = userObj || 'User';
+      }
+    }
+    this.userName = userName;
     this.debugTestId = Number(this.route.snapshot.paramMap.get('id'));
     const token = localStorage.getItem('token');
     if (token && this.debugTestId) {

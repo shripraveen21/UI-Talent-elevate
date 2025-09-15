@@ -79,48 +79,47 @@ Output ONLY the following JSON:
 Do not add explanations or unrelated information."""
 
     def _get_analysis_system_message(self) -> str:
-        return """You are the PerformanceAnalyzer agent. For each topic and concept, determine which are mastered and which are weak based on quiz results.
-Output ONLY the following JSON:
-{
-  "analysis": {
-    "strengths": [
-      {
-        "topic": "<topic_name>",
-        "concepts_mastered": ["<concept_1>", ...]
-      }
-    ],
-    "weaknesses": [
-      {
-        "topic": "<topic_name>",
-        "concepts_weak": ["<concept_1>", ...]
-      }
-    ]
-  }
-}
-Do not add explanations or extra information."""
+        return """You are the PerformanceAnalyzer agent. For each topic, calculate the number of correct and incorrect answers, and determine if the topic is a strength or weakness.
+
+    Output ONLY the following JSON:
+
+    {
+      "analysis": [
+        {
+          "topic": "<topic_name>",
+          "score": { "correct": <integer>, "incorrect": <integer> },
+          "status": "<strength|weakness>",
+          "concepts_mastered": ["<concept_1>", ...],
+          "concepts_weak": ["<concept_1>", ...]
+        }
+      ]
+    }
+
+    Do not add explanations or extra information."""
 
     def _get_feedback_system_message(self) -> str:
-        return """You are the FeedbackGenerator agent. Add remarks for strengths and actionable areas of improvement for weaknesses.
-Output ONLY the following JSON:
-{
-  "analysis": {
-    "strengths": [
-      {
-        "topic": "<topic_name>",
-        "concepts_mastered": ["<concept_1>", ...],
-        "remarks": "<brief remark>"
-      }
-    ],
-    "weaknesses": [
-      {
-        "topic": "<topic_name>",
-        "concepts_weak": ["<concept_1>", ...],
-        "areas_of_improvement": "<specific improvement suggestion>"
-      }
-    ]
-  }
-}
-Be concise and constructive. Do not add explanations or unrelated information."""
+        return """You are the FeedbackGenerator agent. For each topic, provide detailed feedback in the following JSON structure:
+
+    {
+      "analysis": [
+        {
+          "topic": "<topic_name>",
+          "score": { "correct": <integer>, "incorrect": <integer> },
+          "status": "<strength|weakness>",
+          "concepts_mastered": ["<concept_1>", ...],
+          "concepts_weak": ["<concept_1>", ...],
+          "remarks": "<brief remark>",
+          "areas_of_improvement": "<specific improvement suggestion, only if status is weakness>"
+        }
+      ]
+    }
+
+    Instructions:
+    - For each topic, fill in the correct/incorrect counts, status ("strength" if mostly correct, "weakness" if mostly incorrect).
+    - List mastered and weak concepts for each topic.
+    - Add a concise remark for each topic.
+    - For weaknesses, provide a specific area of improvement.
+    - Do not add explanations or unrelated information. Output ONLY the JSON."""
 
     def _get_resource_system_message(self) -> str:
         return """You are the LearningResourceAgent. 

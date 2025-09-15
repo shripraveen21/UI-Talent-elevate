@@ -17,11 +17,9 @@ class DebugExerciseGenerator:
     DEFAULT_DURATION_MINUTES = 15
 
     EXPERIENCE_DIFFICULTY_MAP = {
-        "TRAINED": {"Easy": 5, "Medium": 0, "Hard": 0},
-        "BASIC": {"Easy": 4, "Medium": 1, "Hard": 0},
-        "INTERMEDIATE": {"Easy": 2, "Medium": 3, "Hard": 0},
-        "ADVANCED": {"Easy": 1, "Medium": 3, "Hard": 1},
-        "GURU": {"Easy": 0, "Medium": 2, "Hard": 3},
+        "beginner": {"Easy": 4, "Medium": 1, "Hard": 0},
+        "intermediate": {"Easy": 2, "Medium": 3, "Hard": 0},
+        "advanced": {"Easy": 1, "Medium": 2, "Hard": 2}
     }
 
     def __init__(self, model_client):

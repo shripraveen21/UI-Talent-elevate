@@ -5,20 +5,16 @@ from sqlalchemy.orm import Session
 
 def list_tests(db: Session, filters: TestFilter):
     query = db.query(Test)
-    if filters.created_from:
-        query = query.filter(Test.created_at >= filters.created_from)
-    if filters.created_to:
-        query = query.filter(Test.created_at <= filters.created_to)
-    if filters.search:
-        search = f"%{filters.search}%"
+    if filters.get("search"):
+        search = f"%{filters.get('search')}%"
         query = query.filter(Test.test_name.ilike(search))
     total = query.count()
-    tests = query.offset((filters.page-1)*filters.page_size).limit(filters.page_size).all()
+    tests = query.offset((filters.get("page")-1)*filters.get("page_size")).limit(filters.get("page_size")).all()
     return total, tests
 
 from ..utils.email import send_assignment_email
 
-def assign_test(db: Session, request: AssignTestRequest):
+def assign_test(db: Session, request: AssignTestRequest, assigned_by: int):
     assignments = []
     for user_id in request.user_ids:
         assignment = TestAssign(
@@ -26,7 +22,8 @@ def assign_test(db: Session, request: AssignTestRequest):
             test_id=request.test_id,
             status="assigned",
             due_date=request.due_date,
-            mail_sent="Not_sent"
+            mail_sent="Not_sent",
+            assigned_by=assigned_by  # Set assigned_by here
         )
         db.add(assignment)
         db.commit()
@@ -39,3 +36,4 @@ def assign_test(db: Session, request: AssignTestRequest):
         db.refresh(assignment)
         assignments.append(assignment)
     return assignments
+

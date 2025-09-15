@@ -280,7 +280,6 @@ async def get_feedback_for_result(
     from ..Agents.FeedbackAgent.FeedbackAgent import generate_feedback
     import json
 
-    # Fetch result for user
     employee = db.query(Employee).filter(Employee.email == user["sub"]).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
@@ -295,7 +294,6 @@ async def get_feedback_for_result(
     if result.feedback_data:
         return result.feedback_data
 
-    # Prepare quiz_data for agent
     quiz = db.query(Quiz).filter(Quiz.id == result.quiz_id).first()
     questions = quiz.questions if quiz else {}
 
@@ -310,14 +308,12 @@ async def get_feedback_for_result(
     }
     quiz_data_str = json.dumps(quiz_data)
 
-    # Call feedback agent
     feedback_json = await generate_feedback(quiz_data_str)
 
     # Store feedback in QuizResult
     result.feedback_data = json.loads(feedback_json)
     db.commit()
 
-    # Send feedback email to user after feedback is generated and stored
     send_feedback_email(db, result.user_id, result.quiz_id)
 
     return json.loads(feedback_json)

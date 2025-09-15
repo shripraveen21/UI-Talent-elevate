@@ -13,6 +13,10 @@ import { CreateAssessmentComponent } from './components/create-assessment/create
 import { authGuard } from './guards/auth.guard';
 import { LoginGuard } from './guards/login.guard';
 import { SkillUpgradeComponent } from './components/skill-upgrade/skill-upgrade.component';
+import { CanDeactivateTestGuard } from './guards/can-deactivate.guard';
+import { ManageCollaboratorComponent } from './components/collaborator/manage-collaborator.component';
+import { CollabGuard } from './guards/collab.guard';
+import { TechStackFormComponent } from './components/techstack-form/techstack-form.component';
 
 
 export const routes: Routes = [
@@ -21,13 +25,15 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent ,canActivate: [LoginGuard]},
   { path: 'agent-chat', component: AgentChatComponent },
    { path: 'dashboard', component: DashboardComponent },
-  { path: 'test/:id', component: TestComponent },
+  { path: 'test/:id', component: TestComponent, canDeactivate: [CanDeactivateTestGuard] },
   { path: 'results/:id', component: ResultsComponent },
-  {path:'directory',component:ManagerDashboardComponent,canActivate:[authGuard],data:{roles:['CapabilityLeader','ProductManager']}},
+
+  {path:'directory',component:ManagerDashboardComponent,canActivate: [CollabGuard], data: { permission: 'test_assign' }},
   { path: 'employee-dashboard', component: EmployeeDashboardComponent, canActivate: [authGuard], data: { roles: ['Employee'] } },
   { path: 'capability-leader-dashboard', component: CapabilityLeaderDashboardComponent, canActivate: [authGuard], data: { roles: ['CapabilityLeader'] } },
   { path: 'delivery-manager-dashboard', component: DeliveryManagerDashboardComponent, canActivate: [authGuard], data: { roles: ['DeliveryManager'] } },
-  { path: 'create-assessment', component: CreateAssessmentComponent, canActivate: [authGuard], data: { roles: ['CapabilityLeader'] } },
+  { path: 'create-assessment', component: CreateAssessmentComponent, canActivate: [CollabGuard], data: { permission: 'test_create' }},
+
   {
     path: 'mcq-quiz',
     loadComponent: () => import('./components/mcq-quiz/mcq-quiz.component').then(m => m.McqQuizComponent)
@@ -36,12 +42,21 @@ export const routes: Routes = [
     path: 'skill-upgrade', component: SkillUpgradeComponent, canActivate:[authGuard]
   },
   {
-    path: 'debug-exercise',
-    loadComponent: () => import('./components/debug-exercise-form/debug-exercise-form.component').then(m => m.DebugExerciseFormComponent)
+    path: 'manage-collaborator',
+    component: ManageCollaboratorComponent
   },
   {
-    path: 'add-techstack',
-    loadComponent: () => import('./components/techstack-form/techstack-form.component').then(m => m.TechStackFormComponent)
+    path:'feedback',
+    loadComponent: () => import('./components/feedback-result/feedback-result.component').then(m => m.FeedbackResultComponent)
+  },
+  {
+    path: 'debug-exercise', 
+    loadComponent: () => import('./components/debug-exercise-form/debug-exercise-form.component').then(m => m.DebugExerciseFormComponent)
+  },
+
+  {
+    path: 'add-techstack', component: TechStackFormComponent, canActivate: [CollabGuard], data: { permission: 'topics' }
+
   },
   {
   path: 'debug-test/:id',

@@ -1,88 +1,91 @@
 <div class="min-h-screen bg-gray-50">
+
   <!-- Main Content -->
   <main class="container mx-auto px-6 py-8">
-    <!-- Page Title -->
-    <h1 class="text-3xl font-bold text-gray-800">Capability Leader Dashboard</h1>
-    <p class="mt-2 text-gray-600">Welcome back, {{ userName || 'nirmal' }}! Here's what's happening today.</p>
+
+               <h1 class="text-3xl font-bold text-gray-800 mb-2 ">Capability Leader Dashboard</h1>
+    <p class="mt-2 mb-8 text-gray-600">Welcome back, {{ userName || '' }}! Here's what's happening today.</p>
 
     <!-- Stats Cards -->
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Card 1: Active Topics -->
-      <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm text-gray-500">Active Topics</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ topics.length || 12 }}</p>
-            <p class="text-sm text-green-600 mt-1">+2 this week</p>
-          </div>
-          <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
-          </div>
+    <div class="mt-8 grid grid-cols-5 gap-6">
+      <!-- Card 1: Total Topics (1/5 width) -->
+      <div class="col-span-1 bg-white p-6 rounded-lg border border-gray-200 flex flex-col justify-between">
+        <div>
+          <p class="text-sm text-gray-500 text-center">Total Topics</p>
+          <p class="text-3xl font-bold text-gray-800 text-center mt-2">{{ topics.length || 12 }}</p>
+        </div>
+        <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mt-4 self-end">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
         </div>
       </div>
-      <!-- Card 2: Total Assessments -->
-      <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm text-gray-500">Total Assessments</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ assessments.length || 48 }}</p>
-            <p class="text-sm text-green-600 mt-1">+8 this month</p>
-          </div>
-          <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
-          </div>
+
+      <!-- Card 2: Manage Collaborators (3/5 width, button clickable) -->
+      <div class="col-span-3 bg-white p-6 rounded-lg border border-gray-200 flex flex-col items-center justify-center">
+        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
         </div>
+        <span class="text-2xl font-semibold text-gray-800 text-center mb-4">Manage Collaborators</span>
+        <button (click)="navigateToCollaborators()"
+          class="bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-lg">
+          Click to manage
+        </button>
       </div>
-      <!-- Card 3: Team Members -->
-      <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm text-gray-500">Team Members</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ teamOverview.totalEmployees || 156 }}</p>
-            <p class="text-sm text-green-600 mt-1">+12 this quarter</p>
-          </div>
-          <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 21a6 6 0 006-6v-1a3 3 0 00-3-3H9a3 3 0 00-3 3v1a6 6 0 006 6z" /></svg>
-          </div>
+
+      <!-- Card 3: Total Assessments (1/5 width) -->
+      <div class="col-span-1 bg-white p-6 rounded-lg border border-gray-200 flex flex-col justify-between">
+        <div>
+          <p class="text-sm text-gray-500 text-center">Total Assessments</p>
+          <p class="text-3xl font-bold text-gray-800 text-center mt-2">{{ assessments.length || 48 }}</p>
         </div>
-      </div>
-      <!-- Card 4: Avg. Performance -->
-      <div class="bg-white p-6 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-start">
-          <div>
-            <p class="text-sm text-gray-500">Avg. Performance</p>
-            <p class="text-3xl font-bold text-gray-800 mt-1">{{ teamOverview.averageScore || 78 }}%</p>
-            <p class="text-sm text-green-600 mt-1">+5% from last month</p>
-          </div>
-          <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
-          </div>
+
+        <div class="bg-blue-100 text-blue-600 p-2 rounded-lg mt-4 self-end">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
         </div>
       </div>
     </div>
-    
+
     <!-- Action Cards -->
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
       <!-- Manage Topics Card -->
       <div class="bg-white p-6 rounded-lg border border-gray-200">
         <div class="flex items-center mb-4">
           <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
           </div>
           <div class="ml-4">
             <h3 class="text-lg font-semibold text-gray-800">Manage Topics</h3>
             <p class="text-gray-600 text-sm">Create and organize learning topics</p>
           </div>
         </div>
-        <button (click)="createTopic()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+        <button (click)="createTopic()"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
           Create New Topic
         </button>
       </div>
+
       <!-- Assessment Builder Card -->
       <div class="bg-white p-6 rounded-lg border border-gray-200">
         <div class="flex items-center mb-4">
           <div class="bg-green-100 text-green-600 p-3 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
           </div>
           <div class="ml-4">
             <h3 class="text-lg font-semibold text-gray-800">Assessment Builder</h3>
@@ -90,24 +93,53 @@
           </div>
         </div>
         <div class="space-y-2">
-          <button [routerLink]="'/create-assessment'" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+          <button [routerLink]="'/create-assessment'"
+            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
             Create New Assessment
           </button>
         </div>
+      
+        
       </div>
+
       <!-- Directory Card -->
       <div class="bg-white p-6 rounded-lg border border-gray-200">
         <div class="flex items-center mb-4">
-          <div class="bg-purple-100 text-purple-600 p-3 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
           </div>
           <div class="ml-4">
-            <h3 class="text-lg font-semibold text-gray-800">Directory</h3>
+            <h3 class="text-lg font-semibold text-gray-800">Assign Tests</h3>
             <p class="text-gray-600 text-sm">Assign tests to team members</p>
           </div>
         </div>
-        <button (click)="navigateToDirectory()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+        <button (click)="navigateToDirectory()"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
           Assign Tests
+        </button>
+      </div>
+
+      <!-- See feedback -->
+      <div class="bg-white p-6 rounded-lg border border-gray-200">
+        <div class="flex items-center mb-4">
+          <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-semibold text-gray-800">Get feedback</h3>
+            <p class="text-gray-600 text-sm">View and analyze feedback</p>
+          </div>
+        </div>
+        <button (click)="navigateToFeedback()"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+          View feedback
         </button>
       </div>
     </div>
@@ -137,7 +169,6 @@
         </div>
       </div>
     </div>
+
   </main>
-
-
 </div>

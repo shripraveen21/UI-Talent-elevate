@@ -32,7 +32,7 @@ class QuizGenerationSystem:
                 1. Analyze the tech stack and specific concepts to be tested
                 2. Create appropriate questions that test understanding, not just memorization
                 3. Generate plausible options with one correct answer and three incorrect but reasonable distractors
-                4. Vary question difficulty based on the specified experience level (TRAINED, BASIC, INTERMEDIATE, ADVANCED, GURU)
+                4. Vary question difficulty based on the specified experience level (Beginner, Intermediate, Advanced)
                 5. Ensure technical accuracy of all questions and answers
                 6. Cover all requested concepts thoroughly
                 7. Consider time constraints based on the quiz duration

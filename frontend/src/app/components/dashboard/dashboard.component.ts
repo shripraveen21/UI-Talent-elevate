@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { DashboardService } from '../../services/testAttempt/dashboard.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ReactiveFormsModule]
 })
 export class DashboardComponent implements OnInit {
   assignedTests: any[] = [];

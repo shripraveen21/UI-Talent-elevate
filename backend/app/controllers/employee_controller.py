@@ -1,21 +1,52 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from ..services.rbac_service import require_roles
+from ..services.rbac_service import RBACService
+from ..models.models import Employee, Collaborator, RoleEnum
 from ..schemas.employee_schema import EmployeeFilter, EmployeeOut
 from ..config.database import get_db
-from ..models.models import RoleEnum
 from ..services.employee_service import list_employees as list_employees_service, get_employee_tech_stack
 
 router = APIRouter()
+bearer_scheme = HTTPBearer()
+
+def require_employee_permission(
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)
+):
+    payload = RBACService.get_current_user(credentials)
+    email = payload.get("sub")
+    role = payload.get("role")
+
+    # Use .value for all enums
+    if role in [
+        RoleEnum.CapabilityLeader.value,
+        RoleEnum.ProductManager.value,
+        RoleEnum.DeliveryLeader.value,
+        RoleEnum.DeliveryManager.value
+    ]:
+        return payload
+
+    user = db.query(Employee).filter(Employee.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    collab = db.query(Collaborator).filter(Collaborator.collaborator_id == user.user_id).first()
+    if collab and getattr(collab, "test_assign", False):
+        return payload
+
+    raise HTTPException(
+        status_code=403,
+        detail="No permission to manage employees"
+    )
 
 @router.post("/employees", response_model=dict)
 def list_employees(
     filters: EmployeeFilter = None,
     db: Session = Depends(get_db),
-    current_user = Depends(require_roles(RoleEnum.CapabilityLeader,RoleEnum.ProductManager))
+    user_payload = Depends(require_employee_permission)
 ):
-    # If no filters provided, use default EmployeeFilter
     if filters is None:
         filters = EmployeeFilter()
     total, employees = list_employees_service(db=db, filters=filters)
@@ -23,8 +54,6 @@ def list_employees(
         "total": total,
         "employees": [EmployeeOut.from_orm(emp) for emp in employees]
     }
-
-from fastapi import Query
 
 @router.get("/employees", response_model=dict)
 def list_employees_get(
@@ -37,7 +66,7 @@ def list_employees_get(
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1),
     db: Session = Depends(get_db),
-    current_user = Depends(require_roles(RoleEnum.CapabilityLeader,RoleEnum.ProductManager))
+    user_payload = Depends(require_employee_permission)
 ):
     total, employees = list_employees_service(
         db=db,
@@ -50,23 +79,16 @@ def list_employees_get(
         page=page,
         page_size=page_size
     )
-    # Include full tech_stack and python skill_level in response
     employee_list = []
     for emp in employees:
         emp_out = EmployeeOut.from_orm(emp).dict()
-        
-        # Get tech stack data from EmployeeSkill table
         tech_stack_data = get_employee_tech_stack(db, emp.user_id)
-        
-        # Set tech_stack data - use EmployeeSkill table data if available, otherwise fallback to JSON column
         if tech_stack_data and len(tech_stack_data) > 0:
             emp_out["tech_stack"] = tech_stack_data
         elif emp.tech_stack and isinstance(emp.tech_stack, dict) and len(emp.tech_stack) > 0:
             emp_out["tech_stack"] = emp.tech_stack
         else:
-            emp_out["tech_stack"] = None  # Set to None if no data available
-        
-        # Also include python skill_level for backward compatibility
+            emp_out["tech_stack"] = None
         python_level = None
         if tech_stack_data:
             python_level = tech_stack_data.get("python")
@@ -79,11 +101,12 @@ def list_employees_get(
         "employees": employee_list
     }
 
-from ..models.models import BandType, RoleEnum, SkillLevel
-from fastapi import APIRouter
-
 @router.get("/employee-filter-options", response_model=dict)
-def get_employee_filter_options():
+def get_employee_filter_options(
+    db: Session = Depends(get_db),
+    user_payload = Depends(require_employee_permission)
+):
+    from ..models.models import BandType, RoleEnum, SkillLevel
     return {
         "bands": [b.value for b in BandType],
         "roles": [r.value for r in RoleEnum],

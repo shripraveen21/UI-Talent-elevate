@@ -1,6 +1,6 @@
 from sqlalchemy import (
     Column, Integer, String, Date, DateTime, Text, ForeignKey, Enum, UniqueConstraint,
-    JSON, ARRAY, CheckConstraint, func
+    JSON, ARRAY, CheckConstraint, func, Boolean
 )
 
 from sqlalchemy.orm import relationship
@@ -69,10 +69,14 @@ class Employee(Base):
     role = Column(Enum(RoleEnum), nullable=False)
     band = Column(Enum(BandType), nullable=False)
     tech_stack = Column(JSON)
-    bench_start = Column(Date)
-    bench_end = Column(Date)
     manager_id = Column(Integer, ForeignKey('employees.user_id'))
     manager = relationship('Employee', remote_side=[user_id], backref='reports')
+
+    skills = relationship('EmployeeSkill', back_populates='employee')
+    collaborations = relationship('Collaborator', foreign_keys='Collaborator.cl_id', back_populates='owner')
+    collaborated_with = relationship('Collaborator', foreign_keys='Collaborator.collaborator_id',
+                                     back_populates='collaborator')
+
 
 class TechStack(Base):
     __tablename__ = 'tech_stack'
@@ -80,6 +84,8 @@ class TechStack(Base):
     name = Column(String(200), unique=True, nullable=False)
     created_by = Column(Integer, ForeignKey('employees.user_id'))
     created_at = Column(DateTime, default=func.now())
+
+    employee_skills = relationship('EmployeeSkill', back_populates='tech_stack')
 
 class Topic(Base):
     __tablename__ = 'topics'
@@ -123,17 +129,22 @@ class Test(Base):
     debug_test_id = Column(Integer, ForeignKey('debug_exercises.id', ondelete='SET NULL'))
     status = Column(Enum(TestStatus),default=TestStatus.draft)
 
-    collaborators = relationship("Collaborator", back_populates="test")
-
 class Collaborator(Base):
     __tablename__ = 'collaborators'
     id = Column(Integer, primary_key=True)
-    test_id = Column(Integer, ForeignKey('tests.id'), nullable=False)
-    collaborator_id = Column(Integer, ForeignKey('employees.user_id'), nullable=False)
-    test = relationship("Test", back_populates="collaborators")
+    cl_id = Column(Integer, ForeignKey('employees.user_id'))
+    collaborator_id = Column(Integer, ForeignKey('employees.user_id'), nullable=False)    
+    topics = Column(Boolean, default=False)
+    test_create = Column(Boolean, default=False)
+    test_assign = Column(Boolean, default=False)
+
+    owner = relationship('Employee', foreign_keys=[cl_id], back_populates='collaborations')
+    collaborator = relationship('Employee', foreign_keys=[collaborator_id], back_populates='collaborated_with')
+
 
 class TestAssign(Base):
     __tablename__ = 'test_assign'
+
     assign_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('employees.user_id', ondelete='CASCADE'), nullable=False)
     test_id = Column(Integer, ForeignKey('tests.id', ondelete='CASCADE'), nullable=False)
@@ -142,6 +153,7 @@ class TestAssign(Base):
     completed_date = Column(DateTime)
     due_date = Column(DateTime)
     mail_sent = Column(Enum(MailStatus), nullable=False)
+    assigned_by = Column(Integer, ForeignKey('employees.user_id'))  # <-- Add this line
 
     test = relationship('Test', backref='assignments')
 
@@ -184,7 +196,11 @@ class EmployeeSkill(Base):
     id = Column(Integer, primary_key=True)
     employee_id = Column(Integer, ForeignKey('employees.user_id', ondelete='CASCADE'), nullable=False)
     tech_stack_id = Column(Integer, ForeignKey('tech_stack.id', ondelete='CASCADE'), nullable=False)
-    current_level = Column(Enum(SkillLevel), default=SkillLevel.TRAINED)
+    current_level = Column(Enum(SkillLevel), default=DifficultyLevel.beginner)
+
+    employee = relationship('Employee', back_populates='skills')
+    tech_stack = relationship('TechStack', back_populates='employee_skills')
+
     __table_args__ = (
         UniqueConstraint('employee_id', 'tech_stack_id', name='uniq_employee_tech_stack'),
     )

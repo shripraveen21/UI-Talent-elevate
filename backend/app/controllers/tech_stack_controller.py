@@ -3,6 +3,11 @@ from sqlalchemy.orm import Session
 from ..config.database import get_db
 from ..services.tech_stack_service import get_all_techstacks, get_techstack_by_name, get_topics_of_techstack, save_selected_topics
 from typing import Dict, Any
+from ..models.models import Employee
+from ..schemas.schemas import TechStackRequest
+from ..services.rbac_service import RBACService
+from ..utils.email import send_tech_stack_request_email
+
 
 router = APIRouter()
 
@@ -58,4 +63,32 @@ def save_selected_topics_endpoint(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+
+@router.post('/request/techstack')
+def create_tech_stack_request(
+        tech_stack_payload: TechStackRequest,
+        db: Session = Depends(get_db),
+        curr_user = Depends(RBACService.get_current_user),
+):
+
+    user = db.query(Employee).filter_by(email=curr_user.get('sub')).first()
+    if not user:
+        raise HTTPException(status_code=401, detail='Not Allowed')
+
+    existing_tech_stack = get_techstack_by_name(db=db, name=tech_stack_payload.name)
+    if existing_tech_stack:
+        raise HTTPException(status_code=400, detail='TechStack already exists')
+
+    send = send_tech_stack_request_email(
+        db=db, tech_stack=tech_stack_payload, user=curr_user,
+        description=tech_stack_payload.description,
+    )
+    if not send:
+        raise HTTPException(status_code=500, detail='Unable to send email')
+
+    return {
+        "message": "Request sent successfully",
+    }
 
