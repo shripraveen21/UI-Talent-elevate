@@ -160,19 +160,7 @@ export class McqQuizComponent implements OnInit, OnDestroy {
 
   // Generate dynamic title and description based on quiz params
   generateQuizTitle(): string {
-    if (!this.quizParams) return 'MCQ Assessment';
-    
-    const techStackNames = this.quizParams.tech_stack.map(ts => ts.name).join(' & ');
-    const topicNames = this.quizParams.topics.map(t => t.name).join(', ');
-    
-    if (techStackNames && topicNames) {
-      return `${techStackNames} - ${topicNames}`;
-    } else if (techStackNames) {
-      return `${techStackNames} Assessment`;
-    } else if (topicNames) {
-      return `${topicNames} Assessment`;
-    }
-    
+    // Return simple assessment title instead of full topic details
     return 'MCQ Assessment';
   }
 

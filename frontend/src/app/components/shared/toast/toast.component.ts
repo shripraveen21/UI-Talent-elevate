@@ -97,4 +97,76 @@ export class ToastComponent implements OnInit, OnDestroy {
         return 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z';
     }
   }
+
+  // Get container classes based on toast type
+  getToastContainerClasses(): string {
+    const baseClasses = 'max-w-xs rounded-xl shadow-lg';
+    
+    switch (this.toast.type) {
+      case ToastType.SUCCESS:
+        return `${baseClasses} bg-green-500`;
+      case ToastType.ERROR:
+        return `${baseClasses} bg-red-500`;
+      case ToastType.INFO:
+        return `${baseClasses} bg-white border border-gray-200`;
+      case ToastType.WARNING:
+        return `${baseClasses} bg-white border border-gray-200`;
+      default:
+        return `${baseClasses} bg-white border border-gray-200`;
+    }
+  }
+
+  // Get close button classes based on toast type
+  getCloseButtonClasses(): string {
+    const baseClasses = 'absolute top-2 right-2 inline-flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2';
+    
+    switch (this.toast.type) {
+      case ToastType.SUCCESS:
+        return `${baseClasses} text-white hover:text-green-100 focus:ring-green-300`;
+      case ToastType.ERROR:
+        return `${baseClasses} text-white hover:text-red-100 focus:ring-red-300`;
+      case ToastType.INFO:
+        return `${baseClasses} text-gray-400 hover:text-gray-600 focus:ring-blue-500`;
+      case ToastType.WARNING:
+        return `${baseClasses} text-gray-400 hover:text-gray-600 focus:ring-blue-500`;
+      default:
+        return `${baseClasses} text-gray-400 hover:text-gray-600 focus:ring-blue-500`;
+    }
+  }
+
+  // Get title classes based on toast type
+  getTitleClasses(): string {
+    const baseClasses = 'font-bold pr-6';
+    
+    switch (this.toast.type) {
+      case ToastType.SUCCESS:
+        return `${baseClasses} text-white`;
+      case ToastType.ERROR:
+        return `${baseClasses} text-white`;
+      case ToastType.INFO:
+        return `${baseClasses} text-gray-800`;
+      case ToastType.WARNING:
+        return `${baseClasses} text-gray-800`;
+      default:
+        return `${baseClasses} text-gray-800`;
+    }
+  }
+
+  // Get message classes based on toast type
+  getMessageClasses(): string {
+    const baseClasses = 'mt-1 text-sm pr-6';
+    
+    switch (this.toast.type) {
+      case ToastType.SUCCESS:
+        return `${baseClasses} text-white`;
+      case ToastType.ERROR:
+        return `${baseClasses} text-white`;
+      case ToastType.INFO:
+        return `${baseClasses} text-gray-600`;
+      case ToastType.WARNING:
+        return `${baseClasses} text-gray-600`;
+      default:
+        return `${baseClasses} text-gray-600`;
+    }
+  }
 }

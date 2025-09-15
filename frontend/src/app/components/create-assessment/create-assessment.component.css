@@ -33,3 +33,14 @@ button {
   min-height: 220px;
   transition: box-shadow 0.2s, border-color 0.2s;
 }
+
+/* Dropdown arrow rotation animation */
+.rotate-180 {
+  transform: rotate(180deg);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Smooth transition for all dropdown arrows */
+svg {
+  transition: transform 0.2s ease-in-out;
+}

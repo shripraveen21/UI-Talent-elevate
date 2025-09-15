@@ -197,10 +197,43 @@ export class CreateAssessmentComponent implements OnInit {
 
   selectTechStack(stack: any) {
     this.selectedTechStack = stack;
-    this.showTechStackDropdown = false;
+    this.showTechStackDropdown = false; // Auto-close after selection
     this.selectedConcepts = [];
     this.updateAssessmentDetailsStorage();
     this.fetchTopicsForSelectedTechStack();
+  }
+
+  onTechStackBlur(event: FocusEvent) {
+    // Close dropdown when focus is lost, but allow time for click events to process
+    setTimeout(() => {
+      this.showTechStackDropdown = false;
+    }, 150);
+  }
+
+
+
+  onConceptCheckboxChange(concept: any, event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.toggleConcept(concept, target.checked);
+  }
+
+  // Select all concepts for a specific level
+  selectAllConceptsForLevel(level: 'beginner' | 'intermediate' | 'advanced') {
+    const conceptsForLevel = this.availableConceptsByLevel(level);
+    
+    // Add all concepts from this level that aren't already selected
+    conceptsForLevel.forEach(concept => {
+      if (!this.isConceptSelected(concept)) {
+        this.selectedConcepts.push({
+          name: concept.name,
+          level: concept.level,
+          topic_id: concept.topic_id
+        });
+      }
+    });
+    
+    // Update storage after selecting all
+    this.updateAssessmentDetailsStorage();
   }
 
   clearTechStack() {

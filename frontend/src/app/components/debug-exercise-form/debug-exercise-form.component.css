@@ -1,35 +1,188 @@
-/* Import Inter font */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* Component-specific styles */
-body {
+/* Main body styling */
+:host {
   font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f8fafc;
+  background-color: #f9fafb; /* gray-50 */
 }
 
-pre {
-  background-color: #1e293b;
-  color: #e2e8f0;
-  padding: 1rem;
+/* Code editor styling */
+.code-editor {
+  background-color: #f3f4f6; /* gray-100 */
   border-radius: 0.5rem;
-  overflow-x: auto;
-  font-family: 'Courier New', monospace;
+  padding: 1rem;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 0.875rem;
   line-height: 1.5;
+  color: #1f2937; /* gray-800 */
+  border: 1px solid #e5e7eb; /* gray-200 */
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
 }
 
-textarea {
-  font-family: 'Courier New', monospace;
+.code-editor:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  border-color: #3b82f6; /* blue-500 */
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
 }
 
-/* Custom animations that might be needed */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+/* Code blocks styling with syntax highlighting */
+pre {
+  background-color: #f8f8f2 !important;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border: 1px solid #e5e7eb;
+  overflow-x: auto;
+  margin: 0;
 }
 
-/* Any styles that need to be scoped to this component and can't be handled by Tailwind */
+pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: inherit;
+  color: inherit;
+}
 
-/* Keep any styles that might be referenced by TypeScript code */
+/* Prism.js theme overrides */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #708090;
+}
+
+.token.punctuation {
+  color: #999;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #07a;
+}
+
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #e90;
+}
+
+/* Form styling */
+form {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Save status indicator styling */
+.save-status {
+  transition: all 0.3s ease;
+}
+
+/* Button transitions */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Improved textarea styling */
+.code-editor {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.code-editor:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Button styling */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Progress bar styling */
+.progress-bar {
+  transition: width 0.3s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .grid-cols-1.lg\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Animation for loading state */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Focus states for accessibility */
+button:focus,
+textarea:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+/* Hover effects */
+.hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+}
+
+.hover\:bg-gray-900:hover {
+  background-color: #111827;
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: #1d4ed8;
+}

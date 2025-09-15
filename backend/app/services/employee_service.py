@@ -36,6 +36,14 @@ def list_employees(
     if skill_name and skill_level:
         # Filter where tech_stack->>skill_name == skill_level (Postgres JSON column)
         query = query.filter(Employee.tech_stack.op('->>')(skill_name) == skill_level)
+    elif skill_level:
+        # Filter by skill level across all tech stacks in the JSON column
+        # Convert skill_level to lowercase to match the data format in tech_stack JSON
+        # Employee data stores skill levels as lowercase (e.g., "basic", "advanced")
+        # but the enum returns uppercase values (e.g., "BASIC", "ADVANCED")
+        from sqlalchemy import Text
+        skill_level_lower = skill_level.lower()
+        query = query.filter(Employee.tech_stack.cast(Text).ilike(f'%"{skill_level_lower}"%'))
     if search:
         search_pattern = f"%{search}%"
         query = query.filter(or_(Employee.name.ilike(search_pattern), Employee.email.ilike(search_pattern)))

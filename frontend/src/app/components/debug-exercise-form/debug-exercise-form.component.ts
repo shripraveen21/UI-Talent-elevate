@@ -41,6 +41,13 @@ export class DebugExerciseFormComponent implements OnInit {
   userCode = '';
   codeOutput = '';
 
+  // Regenerate modal properties (similar to mcq-quiz)
+  showRegenerateModal: boolean = false;
+  regenerateModalTitle: string = '';
+  regenerateComment: string = '';
+  currentRegenerateTarget: string | number | null = null;
+  regeneratingExerciseIndex: number | null = null;
+
   constructor(
     private fb: FormBuilder,
     private debugService: DebugExerciseAgentService,
@@ -422,5 +429,90 @@ export class DebugExerciseFormComponent implements OnInit {
    */
   public isExerciseList(data: any): boolean {
     return Array.isArray(data) && data.length > 0 && typeof data[0] === 'object';
+  }
+
+  /**
+   * Maps technology names to language identifiers for syntax highlighting.
+   * Used by Prism.js for proper code highlighting in templates.
+   */
+  getLanguageFromTechnology(technology: string): string {
+    const techMap: { [key: string]: string } = {
+      'javascript': 'javascript',
+      'python': 'python',
+      'java': 'java',
+      'c#': 'csharp',
+      'csharp': 'csharp',
+      'c++': 'cpp',
+      'cpp': 'cpp',
+      'typescript': 'typescript'
+    };
+    return techMap[technology?.toLowerCase()] || 'javascript';
+  }
+
+  /**
+   * Helper method to check if a value is an array.
+   * Used in templates for conditional rendering.
+   */
+  isArray(value: any): boolean {
+    return Array.isArray(value);
+  }
+
+  // Regenerate functionality methods (similar to mcq-quiz)
+  regenerateExercise(index: number) {
+    this.regeneratingExerciseIndex = index;
+    this.currentRegenerateTarget = index;
+    this.regenerateModalTitle = `Regenerate Exercise ${index + 1}`;
+    this.showRegenerateModal = true;
+  }
+
+  regenerateEntireAssessment() {
+    this.currentRegenerateTarget = 'Entire Assessment';
+    this.regenerateModalTitle = 'Regenerate Entire Assessment';
+    this.showRegenerateModal = true;
+  }
+
+  closeRegenerateModal() {
+    this.showRegenerateModal = false;
+    this.regenerateComment = '';
+    this.currentRegenerateTarget = null;
+    this.regeneratingExerciseIndex = null;
+  }
+
+  confirmRegenerate() {
+    const comment = this.regenerateComment;
+    console.log(`Regenerating: ${this.currentRegenerateTarget}`);
+    console.log(`With comment: ${comment || 'Regenerate this exercise'}`);
+    
+    if (this.currentRegenerateTarget === 'Entire Assessment') {
+      // Regenerate all exercises
+      this.sendDecision('REFINE', comment);
+    } else if (typeof this.currentRegenerateTarget === 'number') {
+      // Regenerate individual exercise using the same logic as mcq-quiz
+      const exerciseIndex = this.currentRegenerateTarget;
+      const exerciseNumber = exerciseIndex + 1; // 1-based numbering
+      
+      // Format feedback similar to mcq-quiz: "regenerate Nth exercise || feedback"
+      const feedbackMessage = `regenerate ${exerciseNumber}${this.getOrdinalSuffix(exerciseNumber)} exercise || ${comment || ''}`;
+      this.sendDecision('FEEDBACK', feedbackMessage);
+    }
+    
+    this.closeRegenerateModal();
+    this.regeneratingExerciseIndex = null;
+  }
+
+  // Helper method to get ordinal suffix (1st, 2nd, 3rd, etc.)
+  private getOrdinalSuffix(num: number): string {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) {
+      return 'st';
+    }
+    if (j === 2 && k !== 12) {
+      return 'nd';
+    }
+    if (j === 3 && k !== 13) {
+      return 'rd';
+    }
+    return 'th';
   }
 }

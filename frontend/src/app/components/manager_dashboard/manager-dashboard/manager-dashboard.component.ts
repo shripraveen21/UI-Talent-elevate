@@ -13,7 +13,6 @@ import { ToastService } from '../../../services/toast/toast.service';
   styleUrls: ['./manager-dashboard.component.css']
 })
 export class ManagerDashboardComponent implements OnInit {
-  showFiltersPanel = false;
   isAssigning = false; // Loading state for assignment
   
   // Expose Math to template
@@ -26,10 +25,8 @@ export class ManagerDashboardComponent implements OnInit {
 
   // Filters
   bands: string[] = [];
-  roles: string[] = [];
   skillLevels: string[] = [];
   selectedBand = '';
-  selectedRole = '';
   selectedSkillLevel = '';
   search = '';
 
@@ -68,10 +65,7 @@ export class ManagerDashboardComponent implements OnInit {
     this.loadTests();
   }
 
-  // Toggle filters panel
-  toggleFiltersPanel(): void {
-    this.showFiltersPanel = !this.showFiltersPanel;
-  }
+
 
   // Select test method
   selectTest(testId: number): void {
@@ -85,8 +79,8 @@ export class ManagerDashboardComponent implements OnInit {
     this.employeeService.getEmployeeFilterOptions().subscribe({
       next: (data: any) => {
         this.bands = data.bands || [];
-        this.roles = data.roles || [];
         this.skillLevels = data.skill_levels || data.skills || [];
+        console.log('Loaded skill levels:', this.skillLevels); // Debug log
       },
       error: (error) => {
         console.error('Error loading filters:', error);
@@ -99,9 +93,10 @@ export class ManagerDashboardComponent implements OnInit {
   loadEmployees(): void {
     const params: any = {};
     if (this.selectedBand) params.band = this.selectedBand;
-    if (this.selectedRole) params.designation = this.selectedRole;
     if (this.selectedSkillLevel) params.skill_level = this.selectedSkillLevel;
     if (this.search) params.search = this.search;
+    
+    console.log('Filter params:', params); // Debug log
     
     this.employeeService.getEmployees(params).subscribe({
       next: (data: any) => {
@@ -247,10 +242,37 @@ export class ManagerDashboardComponent implements OnInit {
     return test?.test_name || `Test #${this.selectedTestId}`;
   }
 
+  // Helper method to dynamically determine test type based on test data
+  getTestType(test: any): string {
+    // Check if test has specific component IDs to determine type
+    if (test.quiz_id && test.debug_test_id) {
+      return 'MCQ + Debug Exercise';
+    } else if (test.quiz_id) {
+      return 'MCQ';
+    } else if (test.debug_test_id) {
+      return 'Debug Exercise';
+    } else if (test.test_type) {
+      // Use the test_type field if available
+      switch (test.test_type.toLowerCase()) {
+        case 'mcq':
+          return 'MCQ';
+        case 'debug-exercise':
+          return 'Debug Exercise';
+        case 'handson':
+          return 'Hands-On';
+        case 'debug-mini-project':
+          return 'Debug Mini Project';
+        default:
+          return test.test_type;
+      }
+    }
+    // Default fallback
+    return 'MCQ';
+  }
+
   // Clear all filters
   clearAllFilters(): void {
     this.selectedBand = '';
-    this.selectedRole = '';
     this.selectedSkillLevel = '';
     this.search = '';
     this.onEmployeeFilterChange();
@@ -258,14 +280,13 @@ export class ManagerDashboardComponent implements OnInit {
 
   // Check if any filters are active
   hasActiveFilters(): boolean {
-    return !!(this.selectedBand || this.selectedRole || this.selectedSkillLevel || this.search);
+    return !!(this.selectedBand || this.selectedSkillLevel || this.search);
   }
 
   // Get count of active filters
   getActiveFiltersCount(): number {
     let count = 0;
     if (this.selectedBand) count++;
-    if (this.selectedRole) count++;
     if (this.selectedSkillLevel) count++;
     if (this.search) count++;
     return count;

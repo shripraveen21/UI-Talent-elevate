@@ -24,6 +24,7 @@ export class ManageCollaboratorComponent implements OnInit {
 
   // Employee data & filters
   employees: any[] = [];
+  filteredEmployees: any[] = [];
   totalEmployees = 0;
   bands: string[] = [];
   roles: string[] = [];
@@ -32,10 +33,12 @@ export class ManageCollaboratorComponent implements OnInit {
   selectedRole = '';
   selectedSkillLevel = '';
   search = '';
+  searchQuery = '';
   loadingEmployees = false;
   errorEmployees = '';
 
   // For selecting an employee to add as collaborator
+  selectedEmployee: any = null;
   selectedEmployeeEmail = '';
 
   constructor(
@@ -155,15 +158,47 @@ export class ManageCollaboratorComponent implements OnInit {
 
   onEmployeeFilterChange() {
     this.loadEmployees();
+    // Update search results if there's an active search query
+    if (this.searchQuery.trim()) {
+      this.onSearchChange();
+    }
+  }
+
+  // New search-based employee selection methods
+  onSearchChange() {
+    if (this.searchQuery.trim()) {
+      // Filter employees based on search query and current filters
+      this.filteredEmployees = this.employees.filter(emp => {
+        const searchLower = this.searchQuery.toLowerCase();
+        const nameMatch = emp.name?.toLowerCase().includes(searchLower);
+        const emailMatch = emp.email?.toLowerCase().includes(searchLower);
+        return nameMatch || emailMatch;
+      }).slice(0, 10); // Limit to 10 results for performance
+    } else {
+      this.filteredEmployees = [];
+    }
+  }
+
+  selectEmployeeFromSearch(employee: any) {
+    this.selectedEmployee = employee;
+    this.selectedEmployeeEmail = employee.email;
+    this.collaboratorForm.patchValue({ collaborator_email: employee.email });
+    this.searchQuery = '';
+    this.filteredEmployees = [];
   }
 
   selectEmployee(email: string) {
-    this.selectedEmployeeEmail = email;
-    this.collaboratorForm.patchValue({ collaborator_email: email });
+    const employee = this.employees.find(emp => emp.email === email);
+    if (employee) {
+      this.selectEmployeeFromSearch(employee);
+    }
   }
 
   clearEmployeeSelection() {
+    this.selectedEmployee = null;
     this.selectedEmployeeEmail = '';
+    this.searchQuery = '';
+    this.filteredEmployees = [];
     this.collaboratorForm.patchValue({ collaborator_email: '' });
   }
 
@@ -172,10 +207,12 @@ export class ManageCollaboratorComponent implements OnInit {
     this.selectedRole = '';
     this.selectedSkillLevel = '';
     this.search = '';
+    this.searchQuery = '';
+    this.filteredEmployees = [];
     this.onEmployeeFilterChange();
   }
 
   hasActiveFilters(): boolean {
-    return !!(this.selectedBand || this.selectedRole || this.selectedSkillLevel || this.search);
+    return !!(this.selectedBand || this.selectedRole || this.selectedSkillLevel || this.search || this.searchQuery);
   }
 }
