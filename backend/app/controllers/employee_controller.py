@@ -5,7 +5,7 @@ from ..services.rbac_service import require_roles
 from ..schemas.employee_schema import EmployeeFilter, EmployeeOut
 from ..config.database import get_db
 from ..models.models import RoleEnum
-from ..services.employee_service import list_employees as list_employees_service
+from ..services.employee_service import list_employees as list_employees_service, get_employee_tech_stack
 
 router = APIRouter()
 
@@ -50,12 +50,27 @@ def list_employees_get(
         page=page,
         page_size=page_size
     )
-    # Only include python skill_level in response
+    # Include full tech_stack and python skill_level in response
     employee_list = []
     for emp in employees:
         emp_out = EmployeeOut.from_orm(emp).dict()
+        
+        # Get tech stack data from EmployeeSkill table
+        tech_stack_data = get_employee_tech_stack(db, emp.user_id)
+        
+        # Set tech_stack data - use EmployeeSkill table data if available, otherwise fallback to JSON column
+        if tech_stack_data and len(tech_stack_data) > 0:
+            emp_out["tech_stack"] = tech_stack_data
+        elif emp.tech_stack and isinstance(emp.tech_stack, dict) and len(emp.tech_stack) > 0:
+            emp_out["tech_stack"] = emp.tech_stack
+        else:
+            emp_out["tech_stack"] = None  # Set to None if no data available
+        
+        # Also include python skill_level for backward compatibility
         python_level = None
-        if emp.tech_stack and isinstance(emp.tech_stack, dict):
+        if tech_stack_data:
+            python_level = tech_stack_data.get("python")
+        elif emp.tech_stack and isinstance(emp.tech_stack, dict):
             python_level = emp.tech_stack.get("python")
         emp_out["python_skill_level"] = python_level
         employee_list.append(emp_out)

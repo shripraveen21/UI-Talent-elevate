@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { McqFormComponent } from '../mcq-form/mcq-form.component';
 import { McqQuestionComponent, MCQQuestion } from '../mcq-question/mcq-question.component';
 import { McqAgentService, QuizParams, AgentMessage } from '../../services/mcq-agent/mcq-agent.service';
@@ -43,7 +44,8 @@ export class McqQuizComponent implements OnInit, OnDestroy {
   constructor(
     private mcqAgentService: McqAgentService,
     private toastService: ToastService,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -59,6 +61,46 @@ export class McqQuizComponent implements OnInit, OnDestroy {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
+  }
+
+  navigateToNextWorkflowStep() {
+    const workflowSequence = JSON.parse(sessionStorage.getItem('workflowSequence') || '[]');
+    const currentStep = parseInt(sessionStorage.getItem('currentWorkflowStep') || '0');
+    const nextStep = currentStep + 1;
+
+    if (nextStep < workflowSequence.length) {
+      // Move to next component
+      sessionStorage.setItem('currentWorkflowStep', nextStep.toString());
+      const nextComponent = workflowSequence[nextStep];
+      
+      // Get assessment details for navigation
+      const assessmentDetails = JSON.parse(sessionStorage.getItem('assessmentDetails') || '{}');
+      
+      if (nextComponent === 'debug') {
+        this.router.navigate(['/debug-exercise'], {
+          queryParams: {
+            techStack: JSON.stringify({
+              id: assessmentDetails.selectedTechStack?.id || assessmentDetails.selectedTechStack?.tech_stack_id,
+              name: assessmentDetails.selectedTechStack?.name
+            }),
+            concepts: JSON.stringify(assessmentDetails.selectedConcepts || [])
+          }
+        });
+      } else if (nextComponent === 'handsOn') {
+        // Navigate to hands-on component when implemented
+        console.log('Hands-on component not yet implemented');
+        this.proceedToSaveAssessment();
+      }
+    } else {
+      // All components completed, go to save assessment
+      this.proceedToSaveAssessment();
+    }
+  }
+
+  proceedToSaveAssessment() {
+    this.router.navigate(['/create-assessment'], {
+      queryParams: { step: 'save' }
+    });
   }
 
   getOptionKeys(options: { [key: string]: string }): string[] {
@@ -213,6 +255,8 @@ export class McqQuizComponent implements OnInit, OnDestroy {
           this.toastService.showQuizSaved();
           this.loading = false;
           this.reviewMode = false;
+          // Navigate to next component in workflow
+          this.navigateToNextWorkflowStep();
         },
         error: (err) => {
           const errorMessage = "Failed to store quiz: " + (err?.message || "Unknown error");

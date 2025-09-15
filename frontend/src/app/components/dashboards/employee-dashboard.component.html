@@ -61,11 +61,21 @@
               </button>
             </div>
             
-            <button 
-              (click)="viewProgress()"
-              class="w-full bg-white text-blue-600 border border-blue-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors">
-              View Detailed Progress
-            </button>
+            <div class="space-y-3">
+              <button 
+                (click)="navigateToSkillUpgrade()"
+                class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                <svg class="inline-block w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                Skill Upgrade Test
+              </button>
+              <button 
+                (click)="viewProgress()"
+                class="w-full bg-white text-blue-600 border border-blue-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors">
+                View Detailed Progress
+              </button>
+            </div>
           </div>
         </div>
         

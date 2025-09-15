@@ -26,17 +26,81 @@
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
 }
 
-/* Code blocks styling */
-pre, code {
-  background-color: #f3f4f6; /* gray-100 */
+/* Code blocks styling with syntax highlighting */
+pre {
+  background-color: #f8f8f2 !important;
   border-radius: 0.5rem;
   padding: 1rem;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: #1f2937; /* gray-800 */
-  border: 1px solid #e5e7eb; /* gray-200 */
+  border: 1px solid #e5e7eb;
   overflow-x: auto;
+  margin: 0;
+}
+
+pre code {
+  background: transparent !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* Prism.js theme overrides */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #708090;
+}
+
+.token.punctuation {
+  color: #999;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #9a6e3a;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #07a;
+}
+
+.token.function,
+.token.class-name {
+  color: #DD4A68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #e90;
 }
 
 /* Form styling */
@@ -45,6 +109,26 @@ form {
   padding: 0;
   border: none;
   background: transparent;
+}
+
+/* Save status indicator styling */
+.save-status {
+  transition: all 0.3s ease;
+}
+
+/* Button transitions */
+button {
+  transition: all 0.2s ease;
+}
+
+/* Improved textarea styling */
+.code-editor {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.code-editor:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Button styling */

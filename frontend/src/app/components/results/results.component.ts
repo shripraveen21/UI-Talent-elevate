@@ -95,16 +95,52 @@ export class ResultsComponent implements OnInit {
     return 0;
   }
 
-  getStrengths(): any[] {
-    if (this.feedback?.analysis?.strengths) {
-      return this.feedback.analysis.strengths;
+  // Get all analysis topics
+  getAnalysis(): any[] {
+    if (this.feedback?.analysis && Array.isArray(this.feedback.analysis)) {
+      return this.feedback.analysis;
     }
     return [];
   }
 
+  // Get topics categorized as strengths
+  getStrengths(): any[] {
+    return this.getAnalysis().filter(topic => topic.status === 'strength');
+  }
+
+  // Get topics categorized as weaknesses
   getWeaknesses(): any[] {
-    if (this.feedback?.analysis?.weaknesses) {
-      return this.feedback.analysis.weaknesses;
+    return this.getAnalysis().filter(topic => topic.status === 'weakness');
+  }
+
+  // Get topic performance summary
+  getTopicSummary(): any[] {
+    return this.getAnalysis().map(topic => ({
+      ...topic,
+      totalQuestions: topic.score.correct + topic.score.incorrect,
+      percentage: Math.round((topic.score.correct / (topic.score.correct + topic.score.incorrect)) * 100) || 0
+    }));
+  }
+
+  // Get overall statistics
+  getOverallStats() {
+    const analysis = this.getAnalysis();
+    const totalTopics = analysis.length;
+    const strengthTopics = this.getStrengths().length;
+    const weaknessTopics = this.getWeaknesses().length;
+    
+    return {
+      totalTopics,
+      strengthTopics,
+      weaknessTopics,
+      strengthPercentage: totalTopics > 0 ? Math.round((strengthTopics / totalTopics) * 100) : 0
+    };
+  }
+
+  // Get resources for weak topics
+  getRecommendedResources(): any[] {
+    if (this.feedback?.resources && Array.isArray(this.feedback.resources)) {
+      return this.feedback.resources;
     }
     return [];
   }

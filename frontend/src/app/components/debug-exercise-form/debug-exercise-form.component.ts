@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { DebugExerciseAgentService } from '../../services/debug-exercise-agent/debug-exercise-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
@@ -46,7 +46,8 @@ export class DebugExerciseFormComponent implements OnInit {
     private debugService: DebugExerciseAgentService,
     private techStackAgentService: TechStackAgentService,
     private route: ActivatedRoute,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private router: Router
   ) {
     this.debugForm = this.fb.group({
       tech_stack: [[], [Validators.required, this.arrayNotEmptyValidator]],
@@ -334,12 +335,41 @@ export class DebugExerciseFormComponent implements OnInit {
       }
       this.toastService.showDebugExerciseCreated();
       this.loading = false;
+      // Navigate to next component in workflow
+      this.navigateToNextWorkflowStep();
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to store debug exercise';
       this.error = errorMessage;
       this.toastService.showError(errorMessage);
       this.loading = false;
     }
+  }
+
+  navigateToNextWorkflowStep() {
+    const workflowSequence = JSON.parse(sessionStorage.getItem('workflowSequence') || '[]');
+    const currentStep = parseInt(sessionStorage.getItem('currentWorkflowStep') || '0');
+    const nextStep = currentStep + 1;
+
+    if (nextStep < workflowSequence.length) {
+      // Move to next component
+      sessionStorage.setItem('currentWorkflowStep', nextStep.toString());
+      const nextComponent = workflowSequence[nextStep];
+      
+      if (nextComponent === 'handsOn') {
+        // Navigate to hands-on component when implemented
+        console.log('Hands-on component not yet implemented');
+        this.proceedToSaveAssessment();
+      }
+    } else {
+      // All components completed, go to save assessment
+      this.proceedToSaveAssessment();
+    }
+  }
+
+  proceedToSaveAssessment() {
+    this.router.navigate(['/create-assessment'], {
+      queryParams: { step: 'save' }
+    });
   }
 
   // Split-screen functionality methods

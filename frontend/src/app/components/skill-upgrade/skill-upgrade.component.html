@@ -1,6 +1,18 @@
 <div class="min-h-screen bg-gray-50 font-inter">
   <!-- Main Content -->
   <main class="container mx-auto max-w-5xl px-4 py-10">
+    <!-- Navigation and Page Title -->
+    <div class="flex items-center justify-between mb-6">
+      <button 
+        (click)="returnToDashboard()"
+        class="flex items-center px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Return to Dashboard
+      </button>
+    </div>
+    
     <!-- Page Title -->
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Skill Upgrade Test</h1>

@@ -1,8 +1,8 @@
 from sqlalchemy import or_
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from ..schemas.employee_schema import EmployeeFilter, EmployeeOut
-from ..models.models import Employee
+from ..models.models import Employee, EmployeeSkill, TechStack
 
 from sqlalchemy import and_, cast
 from sqlalchemy.dialects.postgresql import JSONB
@@ -41,3 +41,18 @@ def list_employees(
     total = query.count()
     employees = query.offset((page-1)*page_size).limit(page_size).all()
     return total, employees
+
+def get_employee_tech_stack(db: Session, employee_id: int) -> dict:
+    """
+    Get employee's tech stack data from EmployeeSkill table
+    Returns a dictionary with tech stack names as keys and skill levels as values
+    """
+    employee_skills = db.query(EmployeeSkill, TechStack).join(
+        TechStack, EmployeeSkill.tech_stack_id == TechStack.id
+    ).filter(EmployeeSkill.employee_id == employee_id).all()
+    
+    tech_stack_dict = {}
+    for emp_skill, tech_stack in employee_skills:
+        tech_stack_dict[tech_stack.name.lower()] = emp_skill.current_level.value.lower()
+    
+    return tech_stack_dict

@@ -56,5 +56,9 @@ export class EmployeeDashboardComponent implements OnInit {
     console.log('Explore skill:', skillId);
   }
 
+  navigateToSkillUpgrade(): void {
+    this.router.navigate(['/skill-upgrade']);
+  }
+
 
 }

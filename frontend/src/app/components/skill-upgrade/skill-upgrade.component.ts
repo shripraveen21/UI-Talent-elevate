@@ -48,6 +48,10 @@ export class SkillUpgradeComponent implements OnInit {
     });
   }
 
+  returnToDashboard(): void {
+    this.router.navigate(['/employee-dashboard']);
+  }
+
   selectTechStack(stack: any) {
     this.selectedTechStack = stack;
     this.showTechStackDropdown = false;

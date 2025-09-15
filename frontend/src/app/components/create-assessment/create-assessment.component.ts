@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { McqAgentService } from '../../services/mcq-agent/mcq-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
@@ -41,6 +41,7 @@ export class CreateAssessmentComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private mcqAgentService: McqAgentService,
     private techStackAgentService: TechStackAgentService,
     private testListingService: TestListingService,
@@ -71,6 +72,16 @@ export class CreateAssessmentComponent implements OnInit {
     if (this.selectedTechStack) {
       this.fetchTopicsForSelectedTechStack();
     }
+
+    // Check if we're returning from workflow to save assessment
+    this.route.queryParams.subscribe(params => {
+      if (params['step'] === 'save') {
+        // Auto-trigger save assessment after a brief delay
+        setTimeout(() => {
+          this.saveAssessment();
+        }, 500);
+      }
+    });
   }
 
   loadTechStacks() {
@@ -145,6 +156,8 @@ export class CreateAssessmentComponent implements OnInit {
   goToMcqQuiz(event: Event) {
     event.stopPropagation();
     this.updateAssessmentDetailsStorage();
+    // Store the workflow sequence in session storage
+    this.storeWorkflowSequence();
     this.router.navigate(['/mcq-quiz'], {
       queryParams: {
         techStack: JSON.stringify({
@@ -159,6 +172,8 @@ export class CreateAssessmentComponent implements OnInit {
   goToDebugExercise(event: Event) {
     event.stopPropagation();
     this.updateAssessmentDetailsStorage();
+    // Store the workflow sequence in session storage
+    this.storeWorkflowSequence();
     this.router.navigate(['/debug-exercise'], {
       queryParams: {
         techStack: JSON.stringify({
@@ -214,6 +229,61 @@ export class CreateAssessmentComponent implements OnInit {
     }));
   }
 
+  storeWorkflowSequence() {
+    const selectedComponentsList = [];
+    if (this.selectedComponents.mcq) selectedComponentsList.push('mcq');
+    if (this.selectedComponents.debug) selectedComponentsList.push('debug');
+    if (this.selectedComponents.handsOn) selectedComponentsList.push('handsOn');
+    
+    sessionStorage.setItem('workflowSequence', JSON.stringify(selectedComponentsList));
+    sessionStorage.setItem('currentWorkflowStep', '0');
+  }
+
+  startSequentialWorkflow() {
+    if (!this.selectedTechStack || this.selectedConcepts.length === 0) {
+      this.toastService.showError('Please select tech stack and concepts before starting the workflow.');
+      return;
+    }
+
+    const selectedComponentsList = [];
+    if (this.selectedComponents.mcq) selectedComponentsList.push('mcq');
+    if (this.selectedComponents.debug) selectedComponentsList.push('debug');
+    if (this.selectedComponents.handsOn) selectedComponentsList.push('handsOn');
+
+    if (selectedComponentsList.length === 0) {
+      this.toastService.showError('Please select at least one assessment component.');
+      return;
+    }
+
+    this.updateAssessmentDetailsStorage();
+    this.storeWorkflowSequence();
+
+    // Start with the first component
+    const firstComponent = selectedComponentsList[0];
+    if (firstComponent === 'mcq') {
+      this.router.navigate(['/mcq-quiz'], {
+        queryParams: {
+          techStack: JSON.stringify({
+            id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+            name: this.selectedTechStack?.name
+          }),
+          concepts: JSON.stringify(this.selectedConcepts)
+        }
+      });
+    } else if (firstComponent === 'debug') {
+      this.router.navigate(['/debug-exercise'], {
+        queryParams: {
+          techStack: JSON.stringify({
+            id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+            name: this.selectedTechStack?.name
+          }),
+          concepts: JSON.stringify(this.selectedConcepts)
+        }
+      });
+    }
+    // Add handsOn navigation when implemented
+  }
+
   saveAssessment() {
     const quizId = sessionStorage.getItem('quiz_id');
     const debugId = sessionStorage.getItem('exercise_id');
@@ -235,9 +305,14 @@ export class CreateAssessmentComponent implements OnInit {
       next: (response) => {
         console.log('Assessment stored successfully:', response);
         this.toastService.showSuccess('Assessment created and stored successfully!');
+        // Clean up session storage
         sessionStorage.removeItem('assessmentDetails');
         sessionStorage.removeItem('quiz_id');
         sessionStorage.removeItem('exercise_id');
+        sessionStorage.removeItem('workflowSequence');
+        sessionStorage.removeItem('currentWorkflowStep');
+        // Navigate back to dashboard
+        this.router.navigate(['/manager-dashboard']);
       },
       error: (err) => {
         console.error('Error storing assessment:', err);

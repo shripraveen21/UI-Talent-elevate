@@ -259,6 +259,54 @@ export class ManagerDashboardComponent implements OnInit {
     return count;
   }
 
+  // Generate stable pending assessments count based on employee ID
+  getPendingAssessmentsCount(employeeId: number): number {
+    // Generate a consistent "random" number based on employee ID
+    // This ensures the same employee always shows the same count
+    return (employeeId % 5) + 1;
+  }
+
+  // Format tech stack display
+  formatTechStack(techStack: any): string {
+    // Handle null, undefined, or empty values
+    if (!techStack || techStack === null || techStack === undefined) {
+      return 'Not specified';
+    }
+    
+    // If it's already a string, return it
+    if (typeof techStack === 'string') {
+      return techStack.trim() || 'Not specified';
+    }
+    
+    // If it's an array, join the elements
+    if (Array.isArray(techStack)) {
+      const filteredArray = techStack.filter(item => item && item.toString().trim() !== '');
+      return filteredArray.length > 0 ? filteredArray.join(', ') : 'Not specified';
+    }
+    
+    // If it's an object (JSON structure from backend)
+    if (typeof techStack === 'object') {
+      // Handle empty objects
+      if (Object.keys(techStack).length === 0) {
+        return 'Not specified';
+      }
+      
+      // The tech_stack is a JSON object with skill names as keys and levels as values
+      // e.g., {"python": "intermediate", "javascript": "advanced"}
+      const techStackEntries = Object.entries(techStack)
+        .filter(([key, value]) => {
+          // Filter out null, undefined, empty strings, and non-string values
+          return value && (typeof value === 'string' || typeof value === 'number') && key.trim() !== '';
+        })
+        .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1)} (${value})`)
+        .join(', ');
+      
+      return techStackEntries || 'Not specified';
+    }
+    
+    return 'Not specified';
+  }
+
   // Check if ready to assign test
   isReadyToAssign(): boolean {
     return !!(this.selectedTestId && this.selectedEmployeeIds.length > 0 && this.dueDate);
