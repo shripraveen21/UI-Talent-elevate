@@ -87,4 +87,11 @@ export class TechStackAgentService {
     });
   }
 
+  // Update topic assignment for drag-and-drop functionality
+  updateTopicAssignment(assignmentData: any): Observable<any> {
+    return this.http.post(environment.apiUrl + '/topics/update-assignment', assignmentData, {
+      headers: { 'ngrok-skip-browser-warning': 'true' }
+    });
+  }
+
 }

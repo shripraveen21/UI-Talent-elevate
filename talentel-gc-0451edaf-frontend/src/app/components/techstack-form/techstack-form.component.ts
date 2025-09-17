@@ -1,4 +1,4 @@
-import { Component ,OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TechStackAgentService, TechStackParams, Topic, AgentMessage } from '../../services/techstack-agent/techstack-agent.service';
@@ -7,12 +7,15 @@ import { ToastComponent } from '../shared/toast/toast.component';
 import { Toast } from '../../models/interface/toast';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
+// Define skill level types for better type safety
 type Level = 'beginner' | 'intermediate' | 'advanced';
 
-// Extended Topic interface with selection state
+// Extended Topic interface with selection state and drag-drop support
 interface SelectableTopic extends Topic {
   selected: boolean;
+  assignedLevel?: Level; // Track which skill level bucket the topic is assigned to
 }
 
 @Component({
@@ -20,7 +23,7 @@ interface SelectableTopic extends Topic {
   templateUrl: './techstack-form.component.html',
   styleUrls: ['./techstack-form.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent]
+  imports: [CommonModule, FormsModule, ToastComponent, DragDropModule]
 })
 export class TechStackFormComponent implements OnInit {
   params: TechStackParams = {
@@ -41,10 +44,15 @@ export class TechStackFormComponent implements OnInit {
   selectAllIntermediate = false;
   selectAllAdvanced = false;
 
+  // Drag-and-drop bucket arrays for assigned topics
+  assignedBeginnerTopics: SelectableTopic[] = [];
+  assignedIntermediateTopics: SelectableTopic[] = [];
+  assignedAdvancedTopics: SelectableTopic[] = [];
+
   constructor(
     private agent: TechStackAgentService,
     private toastService: ToastService,
-    private router : Router
+    private router: Router
   ) {
     this.toasts$ = this.toastService.toasts$;
   }
@@ -216,7 +224,7 @@ export class TechStackFormComponent implements OnInit {
       this.agent.saveSelectedTopics(topicsData).subscribe({
         next: (response: any) => {
           this.toastService.showSuccess(`Successfully saved ${response.saved_topics_count || selectedTopics.length} topics to database!`);
-          this.router.navigate(["capability-leader-dashboard"])
+          this.router.navigate(["capability-leader-dashboard"]);
         },
         error: (error) => {
           console.error('Error saving topics:', error);
@@ -311,5 +319,258 @@ export class TechStackFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.userName = localStorage.getItem('username') || '';
+  }
+
+  // Drag and drop event handlers for enhanced visual feedback
+  onDragStarted(event: any): void {
+    // Add visual feedback when drag starts
+    const dragElement = event.source.element.nativeElement;
+    dragElement.classList.add('drag-active');
+    
+    // Add glow effect to all drop zones
+    const dropZones = document.querySelectorAll('.cdk-drop-list');
+    dropZones.forEach(zone => {
+      zone.classList.add('drop-zone-glow', 'active');
+    });
+  }
+
+  onDragEnded(event: any): void {
+    // Remove visual feedback when drag ends
+    const dragElement = event.source.element.nativeElement;
+    dragElement.classList.remove('drag-active');
+    
+    // Remove glow effect from all drop zones
+    const dropZones = document.querySelectorAll('.cdk-drop-list');
+    dropZones.forEach(zone => {
+      zone.classList.remove('drop-zone-glow', 'active');
+    });
+  }
+
+  // Enhanced drop handler with visual feedback
+  onTopicDrop(event: CdkDragDrop<SelectableTopic[]>, targetLevel: Level): void {
+    // Add success animation to the drop container
+    const dropContainer = event.container.element.nativeElement;
+    dropContainer.classList.add('success-drop');
+    setTimeout(() => {
+      dropContainer.classList.remove('success-drop');
+    }, 600);
+
+    if (event.previousContainer === event.container) {
+      // Reordering within the same container
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      // Moving between containers - use transferArrayItem to properly handle the move
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex
+      );
+      
+      // Update the topic's assigned level after transfer
+      const topic = event.container.data[event.currentIndex] as SelectableTopic;
+      topic.assignedLevel = targetLevel;
+      topic.selected = true;
+      
+      // Show success toast with appropriate message
+      const sourceLevel = event.previousContainer.id === 'assigned-beginner' ? 'beginner' :
+                         event.previousContainer.id === 'assigned-intermediate' ? 'intermediate' :
+                         event.previousContainer.id === 'assigned-advanced' ? 'advanced' : undefined;
+      
+      const actionText = sourceLevel ? 'moved to' : 'assigned to';
+      this.toastService.showSuccess(`Topic "${topic.name}" ${actionText} ${targetLevel} level`);
+    }
+  }
+
+  // Helper method to get topic's current level
+  private getTopicLevel(topic: SelectableTopic): Level | undefined {
+    if (this.assignedBeginnerTopics.find(t => t.id === topic.id)) return 'beginner';
+    if (this.assignedIntermediateTopics.find(t => t.id === topic.id)) return 'intermediate';
+    if (this.assignedAdvancedTopics.find(t => t.id === topic.id)) return 'advanced';
+    return undefined;
+  }
+
+  // Remove topic from bucket and return to original list
+  removeFromBucket(topic: SelectableTopic, sourceLevel?: Level): void {
+    // If sourceLevel is provided, remove from specific bucket
+    if (sourceLevel) {
+      switch (sourceLevel) {
+        case 'beginner':
+          const beginnerIndex = this.assignedBeginnerTopics.findIndex(t => t.id === topic.id);
+          if (beginnerIndex !== -1) {
+            this.assignedBeginnerTopics.splice(beginnerIndex, 1);
+          }
+          break;
+        case 'intermediate':
+          const intermediateIndex = this.assignedIntermediateTopics.findIndex(t => t.id === topic.id);
+          if (intermediateIndex !== -1) {
+            this.assignedIntermediateTopics.splice(intermediateIndex, 1);
+          }
+          break;
+        case 'advanced':
+          const advancedIndex = this.assignedAdvancedTopics.findIndex(t => t.id === topic.id);
+          if (advancedIndex !== -1) {
+            this.assignedAdvancedTopics.splice(advancedIndex, 1);
+          }
+          break;
+      }
+    } else {
+      // Find which bucket the topic is in and remove it
+      const buckets = [
+        { array: this.assignedBeginnerTopics, level: 'beginner' as Level },
+        { array: this.assignedIntermediateTopics, level: 'intermediate' as Level },
+        { array: this.assignedAdvancedTopics, level: 'advanced' as Level }
+      ];
+
+      for (const bucket of buckets) {
+        const index = bucket.array.findIndex(t => t.id === topic.id);
+        if (index !== -1) {
+          bucket.array.splice(index, 1);
+          break;
+        }
+      }
+    }
+
+    // Reset topic properties
+    topic.assignedLevel = undefined;
+    topic.selected = false;
+  }
+
+  // Get topics that are not assigned to any bucket (available for dragging)
+  getAvailableTopicsByLevel(level: Level): SelectableTopic[] {
+    return this.topics.filter(topic => 
+      topic.level === level && !topic.assignedLevel
+    );
+  }
+
+  // Get assigned topics for a specific level bucket
+  getAssignedTopicsByLevel(level: Level): SelectableTopic[] {
+    switch (level) {
+      case 'beginner':
+        return this.assignedBeginnerTopics;
+      case 'intermediate':
+        return this.assignedIntermediateTopics;
+      case 'advanced':
+        return this.assignedAdvancedTopics;
+      default:
+        return [];
+    }
+  }
+
+  // Get total count of assigned topics across all levels
+  getTotalAssignedTopicsCount(): number {
+    return this.assignedBeginnerTopics.length + 
+           this.assignedIntermediateTopics.length + 
+           this.assignedAdvancedTopics.length;
+  }
+
+  // Check if any topics are assigned to buckets
+  hasAssignedTopics(): boolean {
+    return this.getTotalAssignedTopicsCount() > 0;
+  }
+
+  /**
+   * Clear all assignment buckets (optional utility method)
+   * Used after saving or when resetting the topic assignments
+   */
+  private clearAllBuckets() {
+    this.assignedBeginnerTopics = [];
+    this.assignedIntermediateTopics = [];
+    this.assignedAdvancedTopics = [];
+    
+    // Reset assignedLevel property for all topics
+    this.topics.forEach(topic => {
+      delete topic.assignedLevel;
+    });
+    
+    // Notify user that buckets have been cleared
+    this.toastService.showInfo('All topic assignments have been cleared.');
+  }
+
+  /**
+   * Save selected topics from drag-and-drop buckets to database
+   * This method handles the new "Save Selected Topics" button functionality
+   * Optimized for better performance with drag-and-drop integration
+   */
+  saveSelectedTopics() {
+    // Check if there are any assigned topics in the buckets
+    const totalAssigned = this.getTotalAssignedTopicsCount();
+    
+    if (totalAssigned === 0) {
+      this.toastService.showWarning('Please assign at least one topic to a skill level before saving.');
+      return;
+    }
+
+    // Show confirmation dialog before saving
+    const confirmed = confirm(`Are you sure you want to save ${totalAssigned} assigned topics to the database?`);
+    
+    if (!confirmed) {
+      return;
+    }
+
+    // Collect all assigned topics from all buckets - avoid unnecessary object spreading
+    // Use direct references to the bucket arrays for better performance
+    const assignedTopics: SelectableTopic[] = [];
+    
+    // Add topics from each bucket with their respective levels
+    this.assignedBeginnerTopics.forEach(topic => {
+      assignedTopics.push({
+        ...topic,
+        assignedLevel: 'beginner'
+      });
+    });
+    
+    this.assignedIntermediateTopics.forEach(topic => {
+      assignedTopics.push({
+        ...topic,
+        assignedLevel: 'intermediate'
+      });
+    });
+    
+    this.assignedAdvancedTopics.forEach(topic => {
+      assignedTopics.push({
+        ...topic,
+        assignedLevel: 'advanced'
+      });
+    });
+
+    // Prepare data for backend API - optimize the mapping operation
+    const topicsData = {
+      topicName: this.params.name,
+      description: this.topicDescription,
+      selectedTopics: assignedTopics.map(topic => ({
+        id: topic.id, // Include ID for better tracking
+        name: topic.name,
+        level: topic.assignedLevel || topic.level // Use assigned level or fallback to original level
+      })),
+      totalSelected: assignedTopics.length
+    };
+
+    try {
+      // Show loading indicator
+      this.toastService.showInfo('Saving topics to database...');
+      
+      // Call the backend API to save topics
+      this.agent.saveSelectedTopics(topicsData).subscribe({
+        next: (response: any) => {
+          this.toastService.showSuccess(`Successfully saved ${response.saved_topics_count || assignedTopics.length} topics to database!`);
+          
+          // Navigate to dashboard after successful save
+          this.router.navigate(["capability-leader-dashboard"]);
+        },
+        error: (error) => {
+          console.error('Error saving assigned topics:', error);
+          this.toastService.showError('Failed to save topics to database. Please try again.');
+        }
+      });
+    } catch (error) {
+      console.error('Exception while saving topics:', error);
+      this.toastService.showError('Failed to save topics. Please try again.');
+    }
+  }
+
+  // Helper method for trackBy function to improve rendering performance
+  trackByTopicId(index: number, topic: SelectableTopic): string {
+    return topic.id || topic.name;
   }
 }
