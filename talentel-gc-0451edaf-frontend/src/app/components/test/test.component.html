@@ -13,7 +13,7 @@
     <button
       type="button"
       (click)="startTestInFullscreen()"
-      class="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-lg"
+      class="w-full px-6 py-3 bg-gradient-hero text-white font-bold rounded-lg hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 text-lg transform"
     >
       Start Test in Full Screen
     </button>
@@ -36,7 +36,7 @@
       <button
         type="button"
         (click)="goToFullScreen()"
-        class="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-lg"
+        class="w-full px-6 py-3 bg-gradient-hero text-white font-bold rounded-lg hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 text-lg transform"
       >
         Go to Full Screen
       </button>
@@ -66,7 +66,7 @@
     <button
       type="button"
       (click)="continueToDashboard()"
-      class="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-lg"
+      class="w-full px-6 py-3 bg-gradient-hero text-white font-bold rounded-lg hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 text-lg transform"
     >
       Continue
     </button>
@@ -116,7 +116,7 @@
     </div>
     <div class="mt-4">
       <div class="w-full bg-gray-200 rounded-full h-2.5">
-        <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="getProgressPercentage()"></div>
+        <div class="bg-gradient-hero h-2.5 rounded-full" [style.width.%]="getProgressPercentage()"></div>
       </div>
       <p class="text-sm text-gray-600 mt-2">Answered {{getAnsweredQuestionsCount()}} of {{testDetails.questions.length}} questions</p>
     </div>
@@ -182,7 +182,7 @@
           type="button"
           (click)="submit()"
           [disabled]="submitted"
-          class="px-10 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-10 py-3 bg-gradient-hero text-white font-bold rounded-lg hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 text-lg disabled:opacity-50 disabled:cursor-not-allowed transform"
         >
           <span *ngIf="!submitted">Submit Test</span>
           <span *ngIf="submitted" class="flex items-center">

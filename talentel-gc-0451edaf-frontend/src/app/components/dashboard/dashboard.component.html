@@ -112,7 +112,7 @@
               <ng-container *ngIf="!test.attempted">
                 <button 
                   (click)="startTest(test)" 
-                  class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors"
+                  class="px-5 py-2 bg-gradient-hero text-white text-sm font-semibold rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform"
                 >
                   Start Test
                 </button>
@@ -129,7 +129,7 @@
                 <ng-container *ngIf="!test.debug_attempted">
                   <button 
                     (click)="startDebugTest(test)" 
-                    class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors"
+                    class="px-5 py-2 bg-gradient-hero text-white text-sm font-semibold rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform"
                   >
                     Debug Test
                   </button>

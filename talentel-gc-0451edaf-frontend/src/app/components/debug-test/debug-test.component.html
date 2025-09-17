@@ -41,7 +41,7 @@
           <span>Exercise {{ currentExerciseIndex + 1 }} of {{ exercises.length }}</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-blue-600 h-2 rounded-full" [style.width.%]="progressPercentage"></div>
+          <div class="bg-gradient-hero h-2 rounded-full" [style.width.%]="progressPercentage"></div>
         </div>
       </div>
     </div>
@@ -115,7 +115,7 @@
             [ngClass]="{
               'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500': !savedAnswers[exercise.id] && answers[exercise.id],
               'bg-gray-300 text-gray-500 cursor-not-allowed': savedAnswers[exercise.id] || !answers[exercise.id],
-              'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500': !answers[exercise.id]
+              'bg-gradient-hero text-white hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform focus:ring-blue-500': !answers[exercise.id]
             }"
             [disabled]="savedAnswers[exercise.id] || !answers[exercise.id]"
             (click)="saveAnswer(exercise.id)"
@@ -170,7 +170,7 @@
             </button>
             <button 
               type="button" 
-              class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50"
+              class="px-5 py-2 bg-gradient-hero text-white text-sm font-semibold rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform disabled:opacity-50"
               (click)="goToNext()"
               [disabled]="currentExerciseIndex >= exercises.length - 1"
             >

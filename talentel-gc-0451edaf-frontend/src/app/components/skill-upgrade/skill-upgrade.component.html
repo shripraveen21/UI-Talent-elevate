@@ -74,7 +74,7 @@
           <button
             (click)="createTest()"
             [disabled]="!selectedTechStackDropdown || !selectedLevelDropdown || loading"
-            class="w-full px-6 py-3 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
+            class="w-full px-6 py-3 bg-gradient-hero border border-transparent rounded-md text-sm font-medium text-white hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400 disabled:cursor-not-allowed"
           >
             {{ loading ? 'Generating Test...' : 'Generate Skill Upgrade Test' }}
           </button>

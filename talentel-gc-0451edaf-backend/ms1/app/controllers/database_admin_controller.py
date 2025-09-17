@@ -59,8 +59,10 @@ async def reset_database():
 
 @router.post("/api/seed-mockdata")
 async def seed_mockdata():
-    # Always resolve to project root (no env var)
-    mockdata_path = "talentel-gc-0451edaf/talentel-gc-0451edaf-backend/ms1/app/controllers/mockdata.txt"
+    # Get the absolute path to mockdata.txt relative to this controller file
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    mockdata_path = os.path.join(current_dir, "mockdata.txt")
+    
     if not os.path.exists(mockdata_path):
         print(f"Mock data file not found: {mockdata_path}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="mockdata.txt not found")
@@ -75,8 +77,19 @@ async def seed_mockdata():
 
         with open(mockdata_path, "r", encoding="utf-8") as f:
             sql_content = f.read()
-        # Split into individual SQL statements (naive split by ';', works for this file)
-        statements = [stmt.strip() for stmt in sql_content.split(';') if stmt.strip() and not stmt.strip().startswith('--')]
+        
+        # Remove comments and clean up the SQL content
+        lines = sql_content.split('\n')
+        cleaned_lines = []
+        for line in lines:
+            line = line.strip()
+            # Skip empty lines and comment lines
+            if line and not line.startswith('--'):
+                cleaned_lines.append(line)
+        
+        # Join all non-comment lines and split by semicolon to get complete statements
+        cleaned_sql = ' '.join(cleaned_lines)
+        statements = [stmt.strip() for stmt in cleaned_sql.split(';') if stmt.strip()]
         inserted = 0
         errors = []
         conn = psycopg2.connect(
@@ -87,13 +100,17 @@ async def seed_mockdata():
             port=DB_PORT
         )
         cursor = conn.cursor()
-        for stmt in statements:
+        for i, stmt in enumerate(statements):
             try:
+                print(f"Executing statement {i+1}: {stmt[:100]}...")  # Log first 100 chars of each statement
                 cursor.execute(stmt)
                 inserted += 1
+                print(f"Statement {i+1} executed successfully")
             except Exception as e:
-                errors.append(str(e))
-                print(f"Error executing statement: {stmt}\n{str(e)}")
+                error_msg = f"Statement {i+1} failed: {str(e)}"
+                errors.append(error_msg)
+                print(f"Error executing statement {i+1}: {stmt}\n{str(e)}")
+                # Continue with next statement instead of stopping
         conn.commit()
         cursor.close()
         conn.close()

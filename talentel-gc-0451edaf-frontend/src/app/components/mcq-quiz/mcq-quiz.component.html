@@ -45,7 +45,7 @@
       </div>
       <div class="mt-4">
         <div class="w-full bg-gray-200 rounded-full h-2.5">
-          <div class="bg-blue-600 h-2.5 rounded-full" [style.width.%]="(1 / quizQuestions.length) * 100"></div>
+          <div class="bg-gradient-hero h-2.5 rounded-full" [style.width.%]="(1 / quizQuestions.length) * 100"></div>
         </div>
         <p class="text-sm text-gray-600 mt-2">Question 1 of {{quizQuestions.length}}</p>
       </div>
@@ -103,7 +103,7 @@
         <button class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-300 transition-colors text-lg" (click)="regenerateEntireAssessment()">
           Regenerate Assessment
         </button>
-        <button class="bg-blue-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-blue-700 transition-colors text-lg" (click)="sendDecision('APPROVE')">
+        <button class="bg-gradient-hero text-white font-bold py-3 px-10 rounded-lg hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform text-lg" (click)="sendDecision('APPROVE')">
           Approve Assessment
         </button>
       </div>
@@ -119,7 +119,7 @@
         </div>
         <div class="mt-6 flex justify-end space-x-3">
           <button (click)="closeRegenerateModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancel</button>
-          <button (click)="confirmRegenerate()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Regenerate</button>
+          <button (click)="confirmRegenerate()" class="px-4 py-2 bg-gradient-hero text-white rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform">Regenerate</button>
         </div>
       </div>
     </div>

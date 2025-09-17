@@ -63,7 +63,7 @@
             <ng-container *ngFor="let page of [].constructor(assessmentTotalPages); let i = index">
               <button
                 class="px-3 py-1 rounded border border-gray-300"
-                [ngClass]="{'bg-blue-600 text-white': assessmentPage === (i+1), 'bg-white text-gray-700 hover:bg-gray-100': assessmentPage !== (i+1)}"
+                [ngClass]="{'bg-gradient-hero text-white': assessmentPage === (i+1), 'bg-white text-gray-700 hover:bg-gray-100': assessmentPage !== (i+1)}"
                 (click)="goToAssessmentPage(i+1)">
                 {{ i + 1 }}
               </button>
@@ -225,7 +225,7 @@
               <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
                 <button
                   class="px-3 py-1 rounded border border-gray-300"
-                  [ngClass]="{'bg-blue-600 text-white': currentPage === (i+1), 'bg-white text-gray-700 hover:bg-gray-100': currentPage !== (i+1)}"
+                  [ngClass]="{'bg-gradient-hero text-white': currentPage === (i+1), 'bg-white text-gray-700 hover:bg-gray-100': currentPage !== (i+1)}"
                   (click)="goToPage(i+1)">
                   {{ i + 1 }}
                 </button>
@@ -270,7 +270,7 @@
           </div>
 
           <button
-            class="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex items-center space-x-2 px-4 py-2 bg-gradient-hero text-white text-sm font-semibold rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform disabled:opacity-50 disabled:cursor-not-allowed"
             (click)="assignTest()" [disabled]="!isReadyToAssign() || isAssigning">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">

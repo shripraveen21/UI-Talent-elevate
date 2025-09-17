@@ -218,7 +218,7 @@
       <div class="mt-6 text-center"
         *ngIf="selectedComponents.mcq || selectedComponents.debug || selectedComponents.handsOn">
         <button
-          class="px-8 py-3 bg-blue-600 text-white border border-blue-600 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors shadow-md"
+          class="px-8 py-3 bg-gradient-hero text-white border border-blue-600 rounded-lg text-lg font-semibold hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform shadow-md"
           (click)="startSequentialWorkflow()">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline mr-2" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
@@ -238,7 +238,7 @@
         <button
           class="px-6 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50">Previous</button>
         <button
-          class="px-6 py-2 bg-blue-600 border border-transparent rounded-md text-sm font-medium text-white hover:bg-blue-700"
+          class="px-6 py-2 bg-gradient-hero border border-transparent rounded-md text-sm font-medium text-white hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform"
           (click)="saveAssessment()">Save Assessment</button>
       </div>
     </div>
