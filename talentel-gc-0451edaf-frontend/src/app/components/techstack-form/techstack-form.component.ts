@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { TechStackAgentService, TechStackParams, Topic, AgentMessage } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
 import { ToastComponent } from '../shared/toast/toast.component';
-import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 import { Toast } from '../../models/interface/toast';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 // Define skill level types for better type safety
 type Level = 'beginner' | 'intermediate' | 'advanced';
@@ -41,6 +41,11 @@ export class TechStackFormComponent implements OnInit {
   feedback: string = '';
   toasts$: Observable<Toast[]>;
   isLoading: boolean = false; // Controls loader visibility
+
+  // Conditional rendering state
+  isCapabilityLeader: boolean = false;
+  isCollaborator: boolean = false;
+  topicsExistForLeader: boolean = false;
   
   // Topic selection properties - level-specific select all states
   selectAllBeginner = false;
@@ -165,7 +170,8 @@ export class TechStackFormComponent implements OnInit {
           intermediate: selectedByLevel.intermediate.length,
           advanced: selectedByLevel.advanced.length
         },
-        generatedAt: new Date().toISOString()
+        generatedAt: new Date().toISOString(),
+        created_by: this.agent.getUserId()
       };
       
       console.log('Saving only selected topics to DB:', topicsData);
@@ -223,7 +229,8 @@ export class TechStackFormComponent implements OnInit {
         name: topic.name,
         level: topic.level
       })),
-      totalSelected: selectedTopics.length
+      totalSelected: selectedTopics.length,
+      created_by: this.agent.getUserId()
     };
 
     try {
@@ -333,6 +340,8 @@ export class TechStackFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.userName = localStorage.getItem('username') || '';
+
+    // If capability leader, stay on techstack-form for topic creation/drag-drop
   }
 
   // Back button handler for shared component
@@ -569,7 +578,8 @@ export class TechStackFormComponent implements OnInit {
         name: topic.name,
         level: topic.assignedLevel || topic.level // Use assigned level or fallback to original level
       })),
-      totalSelected: assignedTopics.length
+      totalSelected: assignedTopics.length,
+      created_by: this.agent.getUserId()
     };
 
     try {

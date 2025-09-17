@@ -77,18 +77,9 @@ export class McqQuizComponent implements OnInit, OnDestroy {
       const assessmentDetails = JSON.parse(sessionStorage.getItem('assessmentDetails') || '{}');
       
       if (nextComponent === 'debug') {
-        this.router.navigate(['/debug-exercise'], {
-          queryParams: {
-            techStack: JSON.stringify({
-              id: assessmentDetails.selectedTechStack?.id || assessmentDetails.selectedTechStack?.tech_stack_id,
-              name: assessmentDetails.selectedTechStack?.name
-            }),
-            concepts: JSON.stringify(assessmentDetails.selectedConcepts || [])
-          }
-        });
+        this.router.navigate(['/debug-gen'])
       } else if (nextComponent === 'handsOn') {
-        // Navigate to hands-on component when implemented
-        console.log('Hands-on component not yet implemented');
+        this.router.navigate(['/handson-gen'])
         this.proceedToSaveAssessment();
       }
     } else {

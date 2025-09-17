@@ -30,6 +30,7 @@ class TestCreate(BaseModel):
     created_by : int
     quiz_id: Optional[int] = None
     debug_test_id: Optional[int] = None
+    handson_test_id : Optional[int] = None
 
 class TestOut(BaseModel):
     id: int

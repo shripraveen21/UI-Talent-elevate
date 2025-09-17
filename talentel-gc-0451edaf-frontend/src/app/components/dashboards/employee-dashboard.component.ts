@@ -69,6 +69,13 @@ export class EmployeeDashboardComponent implements OnInit {
     this.router.navigate(['/dashboard']);
   }
 
+  roundPercent(): number {
+    const completed = this.getCompletedTestsCount();
+    const pending = this.getPendingTestsCount();
+    return Math.round((completed * 100) / (completed + pending) * 10) / 10;
+  }
+
+
   getCompletedTestsCount(): number {
     return this.assignedTests.filter(test => test.attempted).length;
   }

@@ -5,12 +5,12 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Depends, HTTPExce
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
-from ..models.models import TechStack, Topic, RoleEnum, Employee, DifficultyLevel
+from ..models.models import TechStack, Topic, RoleEnum, Employee, DifficultyLevel, Collaborator
 from ..config.database import get_db
 from ..Agents.TopicGenAgent import TopicGenerationSystem  # Your multi-agent system
 from ..schemas.topic_schema import TopicsCreateRequest
 from ..services.auth_service import JWT_SECRET
-from ..services.rbac_service import require_roles
+from ..services.rbac_service import require_roles, RBACService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -18,21 +18,29 @@ router = APIRouter()
 @router.post("/techstack/store")
 def store_tech_stack(
     tech_stack: TopicsCreateRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    curr_user = Depends(RBACService.get_current_user)
 ):
     try:
+        print(curr_user)
+        
         # 1. Check if tech stack already exists by name
+        print(f"[store_tech_stack] curr_user: {curr_user}")
+        print(f"[store_tech_stack] incoming tech_stack: {tech_stack}")
         db_tech_stack = db.query(TechStack).filter(TechStack.name == tech_stack.name).first()
         if not db_tech_stack:
             # If not, create it
             db_tech_stack = TechStack(
                 name=tech_stack.name,
                 description=tech_stack.description,
-                created_by=1
+                created_by=curr_user.get("user_id")
             )
             db.add(db_tech_stack)
             db.commit()
             db.refresh(db_tech_stack)
+            print(f"[store_tech_stack] created TechStack: id={db_tech_stack.id}, created_by={db_tech_stack.created_by}")
+        else:
+            print(f"[store_tech_stack] existing TechStack: id={db_tech_stack.id}, created_by={db_tech_stack.created_by}")
 
         # 2. Add only new topics for this tech stack
         added_topics = []
@@ -94,7 +102,11 @@ async def topic_generation_review(
         await websocket.close()
         return
 
-    if str(user.role.value) != RoleEnum.CapabilityLeader.value and str(user.role) != RoleEnum.CapabilityLeader.name:
+    # Check if user is Capability Leader or Collaborator
+    is_capability_leader = str(user.role.value) == RoleEnum.CapabilityLeader.value or str(user.role) == RoleEnum.CapabilityLeader.name
+    is_collaborator = db.query(Collaborator).filter(Collaborator.collaborator_id == user.user_id).first() is not None
+
+    if not is_capability_leader and not is_collaborator:
         await websocket.send_json({"type": "error", "content": "Unauthorized"})
         await websocket.close()
         return

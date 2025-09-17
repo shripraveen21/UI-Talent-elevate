@@ -41,7 +41,8 @@ def get_topics_by_techstack_name(
 @router.post('/topics/save-selected')
 def save_selected_topics_endpoint(
     topics_data: Dict[str, Any],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    curr_user = Depends(RBACService.get_current_user)
 ):
     """
     Save selected topics to the database.
@@ -57,7 +58,13 @@ def save_selected_topics_endpoint(
     }
     """
     try:
-        result = save_selected_topics(db=db, topics_data=topics_data)
+        print(topics_data, curr_user)
+        curr_user_id = db.query(Employee.user_id).filter(
+            Employee.email==curr_user.get('sub')
+        ).scalar()
+        if not curr_user_id:
+            raise HTTPException(404, detail="User not found")
+        result = save_selected_topics(db=db, topics_data=topics_data, user_id=curr_user_id)
         return result
     except HTTPException as e:
         raise e

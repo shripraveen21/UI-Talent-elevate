@@ -6,6 +6,7 @@ import { EmployeeService } from '../../../services/employee/employee.service';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { PermissionsService } from '../../../services/auth/permissions.service';
+import { TechStackAgentService } from '../../../services/techstack-agent/techstack-agent.service';
 
 @Component({
   selector: 'app-navbar',
@@ -33,7 +34,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private loginService: LoginService,
     private employeeService: EmployeeService,
-    private permissionsService: PermissionsService
+    private permissionsService: PermissionsService,
+    private techStackAgent: TechStackAgentService
   ) { }
 
 ngOnInit(): void {
@@ -199,7 +201,29 @@ fetchPermissions(): void {
   // Collab menu navigation methods
   navigateToTopics(): void {
     this.showCollabMenu = false;
-    this.router.navigate(['/add-techstack']);
+    this.techStackAgent.getCapabilityLeaderId().subscribe({
+      next: (clId: number | null) => {
+        if (!clId) {
+          this.router.navigate(['/add-techstack']);
+          return;
+        }
+        this.techStackAgent.getTopicsByLeader(clId).subscribe({
+          next: (topics: any[]) => {
+            if (topics && topics.length > 0) {
+              this.router.navigate(['/collab-topics']);
+            } else {
+              this.router.navigate(['/add-techstack']);
+            }
+          },
+          error: () => {
+            this.router.navigate(['/add-techstack']);
+          }
+        });
+      },
+      error: () => {
+        this.router.navigate(['/add-techstack']);
+      }
+    });
   }
   navigateToTests(): void {
     this.showCollabMenu = false;

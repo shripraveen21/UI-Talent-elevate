@@ -28,9 +28,8 @@
   <button (click)="saveHandson()">Save HandsOn</button>
 </div>
 
-<div *ngIf="handsonId">
+<div *ngIf="handsonStored">
   <h3>HandsOn Saved!</h3>
-  <p>Record ID: {{handsonId}}</p>
 </div>
 
 <div *ngIf="error" class="error">{{error}}</div>

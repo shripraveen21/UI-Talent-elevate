@@ -1,7 +1,7 @@
 from ..config.database import get_db
 from ..services.skill_upgrade_service import *
 from ..services.rbac_service import RBACService
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from ..models.models import Employee, EmployeeSkill ,SkillUpgrade
 from ..schemas.test_schema import TestOut,SkillUpgradeRequest
 
@@ -11,7 +11,8 @@ router = APIRouter()
 async def skill_upgrade(
     request: SkillUpgradeRequest,
     db: Session = Depends(get_db),
-    curr_user = Depends(RBACService.get_current_user)
+    curr_user = Depends(RBACService.get_current_user),
+    background_tasks: BackgroundTasks = None
 ):
     try:
         user = db.query(Employee).filter(Employee.email == curr_user.get('sub')).first()
@@ -23,7 +24,8 @@ async def skill_upgrade(
 
         test = await create_skill_upgrade_test(
             db=db, tech_stack_name=request.tech_stack,
-            user_id=user.user_id, level=request.level
+            user_id=user.user_id, level=request.level,
+            background_tasks=background_tasks
         )
         # Convert SQLAlchemy model to Pydantic schema
         return TestOut.from_orm(test)
@@ -60,4 +62,3 @@ async def get_curr_user_skills(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
- 

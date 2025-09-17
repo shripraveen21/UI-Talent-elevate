@@ -17,7 +17,7 @@ def get_topics_of_techstack(db: Session, techstack_name: str, difficulty_level: 
 
     return db.query(Topic).filter(Topic.tech_stack_id == techstack.id).all()
 
-def save_selected_topics(db: Session, topics_data: Dict[str, Any]):
+def save_selected_topics(db: Session, topics_data: Dict[str, Any], user_id):
     """
     Save selected topics to the database.
     This function creates new Topic entries for the selected topics.
@@ -29,12 +29,18 @@ def save_selected_topics(db: Session, topics_data: Dict[str, Any]):
             raise HTTPException(status_code=400, detail="Tech stack name is required")
         
         tech_stack = get_techstack_by_name(db=db, name=tech_stack_name)
+        created_by = topics_data.get('created_by')
         if not tech_stack:
             # Create new tech stack if it doesn't exist
-            tech_stack = TechStack(name=tech_stack_name)
+            tech_stack = TechStack(name=tech_stack_name, created_by=user_id)
             db.add(tech_stack)
             db.commit()
             db.refresh(tech_stack)
+        else:
+            # If tech stack exists and created_by is missing, update it
+            if not tech_stack.created_by and created_by:
+                tech_stack.created_by = created_by
+                db.commit()
         
         selected_topics = topics_data.get('selectedTopics', [])
         if not selected_topics:
@@ -68,7 +74,7 @@ def save_selected_topics(db: Session, topics_data: Dict[str, Any]):
         # Refresh all saved topics to get their IDs
         for topic in saved_topics:
             db.refresh(topic)
-        
+   
         return {
             "success": True,
             "message": f"Successfully saved {len(saved_topics)} new topics",
@@ -80,5 +86,5 @@ def save_selected_topics(db: Session, topics_data: Dict[str, Any]):
         
     except Exception as e:
         db.rollback()
+        print(f"[tech_stack_service] Exception: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to save topics: {str(e)}")
-

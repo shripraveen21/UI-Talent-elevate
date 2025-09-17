@@ -311,22 +311,29 @@ export class CreateAssessmentComponent implements OnInit {
         }
       });
     } else if (firstComponent === 'debug') {
-      this.router.navigate(['/debug-exercise'], {
-        queryParams: {
-          techStack: JSON.stringify({
-            id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
-            name: this.selectedTechStack?.name
-          }),
-          concepts: JSON.stringify(this.selectedConcepts)
-        }
-      });
+      this.router.navigate(['/debug-gen'])
+    } else if (firstComponent === 'handsOn') {
+      this.router.navigate(['/handson-gen']) 
+      
     }
+    // } else if (firstComponent === 'debug') {
+    //   this.router.navigate(['/debug-exercise'], {
+    //     queryParams: {
+    //       techStack: JSON.stringify({
+    //         id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+    //         name: this.selectedTechStack?.name
+    //       }),
+    //       concepts: JSON.stringify(this.selectedConcepts)
+    //     }
+    //   });
+    // }
     // Add handsOn navigation when implemented
   }
 
   saveAssessment() {
     const quizId = sessionStorage.getItem('quiz_id');
-    const debugId = sessionStorage.getItem('exercise_id');
+    const debugId = sessionStorage.getItem('debug_id');
+    const handsOn_id = sessionStorage.getItem('handson_id');
     const payload: any = {
       test_name: this.testName,
       description: this.testDescription,
@@ -334,13 +341,14 @@ export class CreateAssessmentComponent implements OnInit {
       created_by: this.currentUserId,
       quiz_id: quizId ? Number(quizId) : null,
       debug_test_id: debugId ? Number(debugId) : null,
+      handson_test_id : handsOn_id ? Number(handsOn_id) : null,
       tech_stack: this.selectedTechStack,
       concepts: this.selectedConcepts
     };
     console.log('Test creation payload:', payload);
-    Object.keys(payload).forEach(key => {
-      console.log(`${key}:`, payload[key], 'type:', typeof payload[key]);
-    });
+    // Object.keys(payload).forEach(key => {
+    //   console.log(`${key}:`, payload[key], 'type:', typeof payload[key]);
+    // });
     this.testListingService.createTest(payload).subscribe({
       next: (response) => {
         console.log('Assessment stored successfully:', response);

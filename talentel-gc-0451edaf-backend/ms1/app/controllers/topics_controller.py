@@ -153,18 +153,4 @@ def delete_suggestion(suggestion_id: int, db: Session = Depends(get_db)):
     db.delete(suggestion)
     db.commit()
     return {"detail": "Suggestion deleted"}
-@router.post("/topics/save-selected")
-def save_selected_topics_endpoint(
-    topics_data: Dict[str, Any],
-    db: Session = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)
-):
-    # Use same permission logic for saving selected topics
-    require_topic_permission(db, credentials)
-    try:
-        result = save_selected_topics(db=db, topics_data=topics_data)
-        return result
-    except HTTPException as e:
-        raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+

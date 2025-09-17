@@ -1,8 +1,13 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from ..models.models import Topic, RoleEnum
+from ..models.models import Topic, RoleEnum, Employee
 
 def create_topic(db: Session, user_payload, topic_data):
+    curr_user_id = db.query(Employee.user_id).filter(
+            Employee.email==user_payload.get('sub')
+        ).scalar()
+    if not curr_user_id:
+        raise HTTPException(404, detail="User not found")
     new_topic = Topic(
         name=topic_data.name,
         difficulty=topic_data.difficulty,

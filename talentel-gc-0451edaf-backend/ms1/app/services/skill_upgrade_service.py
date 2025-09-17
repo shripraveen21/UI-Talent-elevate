@@ -5,12 +5,14 @@ from ..schemas.test_schema import AssignTestRequest
 from ..services.test_assign import assign_test
 from ..models.models import Test
 from ..AgentEndpoints.DebugGenAuto import run_debug_gen_auto
+from ..AgentEndpoints.HandsONGenAuto import run_handson_gen_auto
 from ..Agents.MCQGenSystem import generate_mcq_questions
+import asyncio
 from sqlalchemy.orm import Session
 from ..models.models import TechStack, Topic, Quiz, DebugExercise, Test
 
 
-async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: int, level: str) -> Test:
+async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: int, level: str, background_tasks=None) -> Test:
     try:
         tech_stack = db.query(TechStack).filter(TechStack.name == tech_stack_name).first()
         if tech_stack is None:
@@ -27,6 +29,14 @@ async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: 
         if not mcq_json:
             raise Exception(f"No MCQ questions created: {tech_stack.name}")
         # Use agent-based debug exercise generation from DebugGenAuto
+        # Use agent-based hands-on generation from HandsONGenAuto
+        handson_result = run_handson_gen_auto(
+            db=db,
+            tech_stack=tech_stack.name if hasattr(tech_stack, "name") else tech_stack,
+            topics=[t.name for t in topics if hasattr(t, "name")],
+            duration=1
+        )
+        hands_on_id = handson_result.get("handson_id")
         await run_debug_gen_auto(
             db=db,
             tech_stack=tech_stack.name,
@@ -59,6 +69,7 @@ async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: 
             test_name=f'Skill Upgrade Test {user_id}: {tech_stack.name}: level {level}',
             quiz_id=mcq.id,
             debug_test_id=exercise.id,
+            handson_id=hands_on_id,
             duration=35,
             description=f'Skill Upgrade Test {user_id} of level {level} for {tech_stack.name}'
         )

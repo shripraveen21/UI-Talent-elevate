@@ -63,7 +63,7 @@ def push_files_to_github(repo_full_name: str, files_dir: str, github_token: str,
         
         for file in files:
             # Skip unwanted files
-            if file.endswith('.orig') or file.endswith('.json'):
+            if file.endswith('.orig') or file in ['bug_hints.json', 'bug_manifest.json', 'manifest.json']:
                 print(f"[DEBUG] Skipping file: {file}")
                 continue
             

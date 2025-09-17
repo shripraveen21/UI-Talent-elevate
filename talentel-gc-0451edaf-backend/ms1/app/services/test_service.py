@@ -20,7 +20,8 @@ def create_test(db: Session, user_payload, test_data:TestCreate):
         duration=test_data.duration,
         created_by=user.user_id,
         quiz_id=test_data.quiz_id,
-        debug_test_id=test_data.debug_test_id
+        debug_test_id=test_data.debug_test_id,
+        handson_id = test_data.handson_test_id
     )
     db.add(test)
     db.commit()

@@ -28,6 +28,19 @@ class TestOut(BaseModel):
     debug_test_id: Optional[int] = None
     debug_duration: Optional[str] = None
     debug_attempted: Optional[bool] = False
+
+class AssingedTest(BaseModel):
+    test_id: int
+    test_name: str
+    due_date : datetime.datetime
+    debug_url : str
+    handson_url : str
+    attempted: bool
+    quiz_id: Optional[int] = None
+    quiz_name: Optional[str] = None
+    quiz_duration: Optional[str] = None
+    quiz_attempted: Optional[bool] = None
+
 class TestStartOut(BaseModel):
     test_id: int
     test_name: str
@@ -40,7 +53,7 @@ class SubmitResultIn(BaseModel):
     answers: Dict[str, str]
     start_time: datetime.datetime
  
-@router.get("/assigned-tests", response_model=list[TestOut])
+@router.get("/assigned-tests", response_model=list[AssingedTest])
 def get_assigned_tests(
     db: Session = Depends(get_db),
     user=Depends(RBACService.get_current_user)
@@ -50,64 +63,43 @@ def get_assigned_tests(
         raise HTTPException(status_code=404, detail="Employee not found")
     assignments = db.query(TestAssign).filter(TestAssign.user_id == employee.user_id).all()
     tests = []
-    for a in assignments:
-        if a.test:
-            # Quiz details
-            duration_sec = a.test.duration
-            quiz_id = a.test.quiz_id
-            quiz_name = None
-            quiz_duration_str = None
-            quiz_attempted = None
-            attempted = False
-            if quiz_id:
-                quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
-                if quiz:
-                    quiz_name = quiz.name if hasattr(quiz, "name") else None
-                    quiz_duration_sec = quiz.duration * 60
-                    quiz_duration_str = f"{quiz.duration}:00"
-                    duration_sec = quiz_duration_sec
-                result = db.query(QuizResult).filter(
-                    QuizResult.user_id == employee.user_id,
-                    QuizResult.quiz_id == quiz_id
-                ).first()
-                attempted = result is not None
-                quiz_attempted = attempted
+    for assignment in assignments:
 
-            minutes = duration_sec // 60
-            seconds = duration_sec % 60
-            formatted_duration = f"{minutes}:{seconds:02d}"
+        # Quiz details
+        test = db.query(Test).filter(Test.id == assignment.test_id).first()
+        quiz_id = test.quiz_id
 
-            # Debug test info
-            debug_test_id = a.test.debug_test_id
-            debug_duration_str = None
-            debug_attempted = False
+        quiz_name = None
+        quiz_duration_str = None
+        quiz_attempted = None
+        attempted = False
+        if quiz_id:
+            quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
+            if quiz:
+                quiz_name = quiz.name if hasattr(quiz, "name") else None
+                quiz_duration_str = f"{quiz.duration}:00"
+            result = db.query(QuizResult).filter(
+                QuizResult.user_id == employee.user_id,
+                QuizResult.quiz_id == quiz_id
+            ).first()
+            attempted = result is not None
+            quiz_attempted = attempted
 
-            if debug_test_id:
-                debug_test = db.query(DebugExercise).filter(DebugExercise.id == debug_test_id).first()
-                if debug_test:
-                    debug_duration_minutes = debug_test.duration
-                    debug_duration_str = f"{debug_duration_minutes}:00"  # Assuming minutes
-                debug_result = db.query(DebugResult).filter(
-                    DebugResult.user_id == employee.user_id,
-                    DebugResult.debug_id == debug_test_id
-                ).first()
-                debug_attempted = debug_result is not None
+        tests.append(
+            AssingedTest(
+                test_id=assignment.test_id,
+                test_name=test.test_name,
+                due_date = assignment.due_date,
+                debug_url = assignment.debug_github_url or "",
+                handson_url = assignment.handson_github_url or "",
+                attempted=attempted,
 
-            tests.append(
-                TestOut(
-                    test_id=a.test.id,
-                    test_name=a.test.test_name,
-                    test_duration=formatted_duration,
-                    attempted=attempted,
-                    quiz_id=quiz_id,
-                    quiz_name=quiz_name,
-                    quiz_duration=quiz_duration_str,
-                    quiz_attempted=quiz_attempted,
-                    debug_test_id=debug_test_id,
-                    debug_duration=debug_duration_str,
-                    debug_attempted=debug_attempted
-                )
+                quiz_id=quiz_id,
+                quiz_name=quiz_name,
+                quiz_duration=quiz_duration_str,
+                quiz_attempted=quiz_attempted,
             )
+        )
     return tests
  
 @router.get("/start-test/{test_id}", response_model=TestStartOut)

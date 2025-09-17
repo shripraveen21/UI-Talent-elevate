@@ -1,7 +1,7 @@
 from ..models.models import DebugExercise, DebugResult
 from ..config.database import get_db
 
-def save_debug_results(path_id, user_id, results):
+async def save_debug_results(path_id, user_id, results):
     db = None
     try:
         db = next(get_db())  # Get the session from the generator

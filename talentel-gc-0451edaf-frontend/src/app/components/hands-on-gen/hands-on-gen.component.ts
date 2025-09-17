@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HandsonAgentService, AgentMessage } from '../../services/hands-on.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-handson-workflow',
@@ -15,10 +16,11 @@ export class HandsonWorkflowComponent {
 
   srsReview?: AgentMessage;
   finalData?: any;
-  handsonId?: number;
   error?: string;
+  handsonStored : boolean = false
 
-  constructor(private handsonAgent: HandsonAgentService) { }
+  constructor(private handsonAgent: HandsonAgentService,private router: Router) { }
+
 
   addTopic() {
     this.topics.push('');
@@ -59,13 +61,23 @@ export class HandsonWorkflowComponent {
     }
   }
 
+  proceedToSaveAssessment() {
+    this.router.navigate(['/create-assessment'], {
+      queryParams: { step: 'save' }
+    });
+  }
+
   saveHandson() {
     if (this.finalData) {
       this.handsonAgent.storeHandson(this.finalData).subscribe(response => {
-        this.handsonId = response.handson_id;
+        let handsonId = response.handson_id;
+        sessionStorage.setItem("handson_id", handsonId);
+        this.handsonStored = true
+        this.proceedToSaveAssessment();
       }, err => {
         this.error = 'Failed to save HandsOn record.';
       });
     }
   }
 }
+

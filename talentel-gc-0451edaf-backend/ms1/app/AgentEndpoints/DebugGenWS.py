@@ -16,14 +16,14 @@ from ..services.auth_service import JWT_SECRET
 from ..Agents.DebugGen.BugInjectionWorkflow import bug_injection_workflow
 from ..Agents.DebugGen.ProjectCreationWorkflow import write_project_files, CodeAgent, StructureAgent, BRDAgent
 from ..config.database import get_db
-from ..models.models import DebugExercise, Topic, TechStack
+from ..models.models import DebugExercise, Topic, TechStack, Test
 
 router = APIRouter()
 
 
 async def bug_injection_and_db_save(
         db, model_client, unique_id, final_topics, tech_stack,
-        difficulty, project_dir, duration, user_feedback
+        difficulty, project_dir, duration, user_feedback, test_id=None
 ):
     try:
         logging.info(f"[{unique_id}] Background task started.")
@@ -63,15 +63,6 @@ async def bug_injection_and_db_save(
                 ).all()
             ]
             logging.info(f"[{unique_id}] Saving DebugExercise: tech_stack_id={tech_stack_id}, topic_ids={topic_ids}, duration={duration}, path_id={unique_id}")
-            print()
-            debug_exercise = DebugExercise(
-                tech_stack_id=tech_stack_id,
-                topic_ids=topic_ids,
-                duration=duration,
-                path_id=unique_id,
-            )
-            db.add(debug_exercise)
-            db.commit()
             logging.info(f"[{unique_id}] DebugExercise saved successfully.")
         else:
             logging.warning(f"[{unique_id}] Bug injection workflow did not create exercise.")
@@ -101,6 +92,7 @@ async def debug_gen_ws(websocket: WebSocket, db: Session = Depends(get_db)):
 
         try:
             data = await websocket.receive_json()
+            test_id = data.get("test_id")
             tech_stack = data.get("tech_stack")
             topics = data.get("topics", [])
             difficulty = data.get("difficulty", "intermediate")
@@ -157,15 +149,43 @@ async def debug_gen_ws(websocket: WebSocket, db: Session = Depends(get_db)):
             })
             logging.info(f"[{unique_id}] Accepted response sent to client.")
 
+            tech_stack_id = db.query(TechStack.id).filter(TechStack.name == tech_stack).scalar()
+            topic_ids = [
+                tid for (tid,) in db.query(Topic.topic_id).filter(
+                    Topic.name.in_(final_topics),
+                    Topic.tech_stack_id==tech_stack_id
+                ).all()
+            ]
+
+            print("dataaa",tech_stack_id,topic_ids)
+
+            debug_exercise = DebugExercise(
+                tech_stack_id=tech_stack_id,
+                topic_ids=topic_ids,
+                duration=duration,
+                path_id=unique_id,
+            )
+            db.add(debug_exercise)
+            db.commit()
+            print("idddd",debug_exercise.id)
+
+            await websocket.send_json({
+                "type": "final_id",
+                "debug_exercise":debug_exercise.id
+                })
+
             asyncio.create_task(
                 bug_injection_and_db_save(
                     db, model_client, unique_id, final_topics, tech_stack,
-                    difficulty, project_dir, duration, user_feedback
+                    difficulty, project_dir, duration, user_feedback,test_id
                 )
             )
 
+
             await websocket.close()
             logging.info(f"[{unique_id}] WebSocket closed after accept.")
+
+            return 
 
         except Exception as e:
             logging.error(f"Error during WebSocket workflow: {e}")

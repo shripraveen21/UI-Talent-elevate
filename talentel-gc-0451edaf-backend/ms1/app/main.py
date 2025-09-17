@@ -17,12 +17,27 @@ from .controllers.test_controller import router as test_router
 from .controllers.topics_controller import router as topic_router
 from .controllers.collaborators_controller import router as collaborators_router
 from .models.models import *
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from .utils.evaluation_scheduler import debug_evaluator
 
 bearer_scheme = HTTPBearer()
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
+scheduler = AsyncIOScheduler()
+
+@app.on_event("startup")
+def start_scheduler():
+    scheduler.add_job(
+        debug_evaluator,trigger="interval",
+        seconds=3600,id="debug_evaluator",
+    )
+    scheduler.start()
+
+@app.on_event("shutdown")
+def stop_scheduler():
+    scheduler.shutdown("debug_evaluator")
 
 
 # CORS configuration to allow frontend requests
@@ -48,6 +63,7 @@ app.include_router(rbac_router)
 from .controllers.debug_test_controller import router as debug_test_router
 app.include_router(debug_test_router)
 from .AgentEndpoints.DebugGenWS import router as debug_gen_router
+from .controllers.debug_feedback_controller import router as debug_res_router
 
 from .AgentEndpoints.HandsONGen import router as handson_router
 
@@ -56,6 +72,7 @@ app.include_router(employee_dashboard_router)
 app.include_router(tech_stack_router)
 app.include_router(topic_router)
 app.include_router(handson_router)
+app.include_router(debug_res_router)
 app.include_router(collaborators_router)
 app.include_router(test_router)
 app.include_router(agent_chat_router)

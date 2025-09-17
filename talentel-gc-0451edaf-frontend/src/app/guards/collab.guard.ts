@@ -19,7 +19,7 @@ export class CollabGuard implements CanActivate {
           return true;
         }
         // Optionally, show a toast or redirect
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/employee-dashboard']);
         return false;
       })
     );

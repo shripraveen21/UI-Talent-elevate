@@ -17,8 +17,11 @@ import { CanDeactivateTestGuard } from './guards/can-deactivate.guard';
 import { ManageCollaboratorComponent } from './components/collaborator/manage-collaborator.component';
 import { CollabGuard } from './guards/collab.guard';
 import { TechStackFormComponent } from './components/techstack-form/techstack-form.component';
+import { CollabTopicsComponent } from './components/collab-topics/collabtopics.component';
 import { ProfilePageComponent } from './components/profile-page/profile-page.component';
 import { DebugExerciseComponent } from './components/debug-gen/debug-gen.component';
+import { HandsonWorkflowComponent } from './components/hands-on-gen/hands-on-gen.component';
+import { DebugFeedbackComponent } from './components/debug-feedback/debug-feedback.component';
 
 
 export const routes: Routes = [
@@ -29,6 +32,7 @@ export const routes: Routes = [
    { path: 'dashboard', component: DashboardComponent },
   { path: 'test/:id', component: TestComponent },
   { path: 'results/:id', component: ResultsComponent },
+  { path: "debug-res", component: DebugFeedbackComponent},
 
   {path:'directory',component:ManagerDashboardComponent,canActivate: [CollabGuard], data: { permission: 'test_assign' }},
   { path: 'employee-dashboard', component: EmployeeDashboardComponent, canActivate: [authGuard], data: { roles: ['Employee'] } },
@@ -51,6 +55,9 @@ export const routes: Routes = [
     path: 'debug-gen', component: DebugExerciseComponent
   },
   {
+    path: 'handson-gen', component: HandsonWorkflowComponent
+  },
+  {
     path:'feedback',
     loadComponent: () => import('./components/feedback-result/feedback-result.component').then(m => m.FeedbackResultComponent)
   },
@@ -61,7 +68,12 @@ export const routes: Routes = [
 
   {
     path: 'add-techstack', component: TechStackFormComponent, canActivate: [CollabGuard], data: { permission: 'topics' }
-
+  },
+  {
+    path: 'collab-topics',
+    component: CollabTopicsComponent,
+    canActivate: [CollabGuard],
+    data: { permission: 'topics' }
   },
   {
   path: 'debug-test/:id',

@@ -18,6 +18,7 @@ export class DashboardComponent implements OnInit {
   error = '';
   userName = '';
   userRole = '';
+  testDropdownSelections: string[] = []; // Tracks dropdown selection for each test
 
   constructor(
     private dashboardService: DashboardService,
@@ -41,6 +42,7 @@ ngOnInit(): void {
         next: (data: any[]) => {
           
           this.assignedTests = data;
+          this.testDropdownSelections = data.map(() => 'Quiz'); // Default selection is 'Quiz'
           console.log(this.assignedTests)
           this.loading = false;
         },
@@ -58,17 +60,29 @@ ngOnInit(): void {
 
   
   startTest(test: any): void {
-    console.log(test)
     if (test.quiz_id) {
       this.router.navigate(['/test', test.test_id]);
-    } else if (test.debug_test_id) {
-      console.log("debug")
-      this.router.navigate(['/debug-test', test.debug_test_id]);
     } else {
-      // Fallback: show error or do nothing
-      console.log("no test")
-      this.toastService?.showError?.('No available test type for this assignment.');
+      this.toastService?.showError?.('No available quiz for this assignment.');
     }
+  }
+
+  dueDateOver(test:any) : Boolean {
+    console.log(new Date(test.due_date),"due date",new Date())
+    return new Date() > new Date(test.due_date);
+  }
+
+  getGithubUrl(test: any, type: string): string {
+    if (type === 'Debug') {
+      return test.debug_url;
+    } else if (type === 'Handson') {
+      return test.handson_url;
+    }
+    return '';
+  }
+
+  onDropdownChange(index: number, value: string): void {
+    this.testDropdownSelections[index] = value;
   }
 
   viewResults(testId: number): void {

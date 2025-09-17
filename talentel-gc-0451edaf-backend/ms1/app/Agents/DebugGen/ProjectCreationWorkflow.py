@@ -43,20 +43,27 @@ class BRDAgent:
             model_client=model_client,
             system_message=f"""
 You are a senior business analyst and software architect.
+
 Your tasks:
 1. Given a technology stack and initial topics, create a comprehensive Business Requirements Document (BRD) for a realistic mini-project.
 2. Suggest additional topics/features that would make the project robust, practical, and educational. For each suggestion, explain briefly why it adds value.
 3. Include in the BRD: project overview, user stories, acceptance criteria, assumptions, limitations, and a summary of why the suggested topics were added.
-4. Output ONLY valid JSON:
-{{
+
+IMPORTANT:
+- Output ONLY valid JSON. Do NOT include any code block markers (such as ```json), explanations, or extra text.
+- Do NOT split the JSON across multiple messages. The output must be a single, valid JSON object matching this schema:
+{
     "brd": "BRD text here",
     "topics": ["topic1", "topic2", ...],
     "suggested_topics": [
-        {{"topic": "additional1", "reason": "Why it's valuable"}},
+        {"topic": "additional1", "reason": "Why it's valuable"},
         ...
     ]
-}}
-5. You have access to tools for reading and writing files and directories in the project folder: {project_dir}. Use these tools to inspect or update files if needed.
+}
+- If you do not follow this format exactly, your output will be discarded.
+
+You have access to tools for reading and writing files and directories in the project folder: {project_dir}. Use these tools to inspect or update files if needed.
+
 End with TERMINATE.
 """
         )
@@ -71,7 +78,7 @@ Suggest any additional topics/features for completeness.
         if feedback:
             task += f"\n\nIncorporate the following user feedback or corrections: {feedback}\n"
         result = await team.run(task=task)
-        json_content = ""
+        # Robustly parse only the first valid JSON object from agent output
         for message in result.messages:
             if isinstance(message, TextMessage) and message.source == "brd_agent":
                 content = message.content.replace("TERMINATE", "").strip()
@@ -79,8 +86,11 @@ Suggest any additional topics/features for completeness.
                     content = content[7:-3].strip()
                 elif content.startswith("```") and content.endswith("```"):
                     content = content[3:-3].strip()
-                json_content += content
-        return json.loads(json_content)
+                try:
+                    return json.loads(content)
+                except json.JSONDecodeError:
+                    continue
+        raise ValueError("No valid JSON found in agent output")
 
 def human_feedback_loop(brd_data):
     print("\n--- BRD & Topic Review ---")
@@ -160,17 +170,23 @@ class CodeAgent:
             3. Add comments, docstrings, and basic error handling. Ensure code matches the BRD’s acceptance criteria.
             4. Generate basic unit tests and ensure they pass.
             5. If any file already exists in {project_dir}, use the tools to read it and avoid overwriting unless necessary.
-            6. Output ONLY valid JSON:
-            {{
-                "files": {{
+
+            IMPORTANT:
+            - Output ONLY valid JSON. Do NOT include any code block markers (such as ```json), explanations, or extra text.
+            - Do NOT split the JSON across multiple messages. The output must be a single, valid JSON object matching this schema:
+            {
+                "files": {
                     "src/main.py": "# code here",
                     "src/utils.py": "# code here",
                     "tests/test_main.py": "# code here",
                     "docs/BRD.md": "# BRD text",
                     "docs/README.md": "# README text"
-                }}
-            }}
-            7. You have access to tools for reading, writing, and listing files/directories in {project_dir}. Use these tools to inspect or update files as needed.
+                }
+            }
+            - If you do not follow this format exactly, your output will be discarded.
+
+            You have access to tools for reading, writing, and listing files/directories in {project_dir}. Use these tools to inspect or update files as needed.
+
             End with TERMINATE.
             """
 
@@ -185,7 +201,7 @@ BRD: {brd}
 Topics: {', '.join(topics)}
 """
         result = await team.run(task=task)
-        json_content = ""
+        # Robustly parse only the first valid JSON object from agent output
         for message in result.messages:
             if isinstance(message, TextMessage) and message.source == "code_agent":
                 content = message.content.replace("TERMINATE", "").strip()
@@ -193,8 +209,11 @@ Topics: {', '.join(topics)}
                     content = content[7:-3].strip()
                 elif content.startswith("```") and content.endswith("```"):
                     content = content[3:-3].strip()
-                json_content += content
-        return json.loads(json_content)["files"]
+                try:
+                    return json.loads(content)["files"]
+                except json.JSONDecodeError:
+                    continue
+        raise ValueError("No valid JSON found in agent output")
 
 def write_project_files(base_path, files):
     Path(base_path).mkdir(parents=True, exist_ok=True)
