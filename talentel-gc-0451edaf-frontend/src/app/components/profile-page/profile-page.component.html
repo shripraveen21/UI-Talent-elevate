@@ -1,0 +1,85 @@
+<div class="profile-page-wrapper">
+  <!-- Personal Information Card -->
+  <div class="profile-card-section">
+    <div class="profile-card-header">
+      <span class="profile-card-title">
+        <svg class="profile-card-title-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        Personal Information
+      </span>
+    </div>
+    <div class="profile-card-content">
+      <div class="profile-info-row profile-info-main">
+        <img [src]="getProfileImage()" alt="Profile Image" class="profile-image-main" />
+        <div class="profile-info-main-details">
+          <div class="profile-info-name">{{ profile?.name }}</div>
+          <span class="role-badge-navbar">{{ profile?.designation }}</span>
+        </div>
+      </div>
+      <div class="profile-info-row profile-info-details">
+        <div class="profile-info-col">
+          <div class="profile-info-label">Email</div>
+          <div class="profile-info-value">{{ profile?.email }}</div>
+        </div>
+        <div class="profile-info-col">
+          <div class="profile-info-label">Role</div>
+          <div class="profile-info-value">{{ profile?.designation }}</div>
+        </div>
+      </div>
+      <div class="profile-info-row profile-info-skills">
+        <div class="profile-info-col">
+          <div class="profile-info-label">Skills</div>
+          <div class="profile-info-skills-list">
+<ng-container *ngFor="let skill of profile?.tech_stack">
+  <span class="skill-item">
+    {{ skill.name }}
+    <span class="skill-badge">{{ skill.skill_level }}</span>
+  </span>
+</ng-container>
+          </div>
+        </div>
+      </div>
+      <div class="profile-info-actions">
+        <button class="profile-edit-btn">
+          <svg class="profile-edit-btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 13l6.586-6.586a2 2 0 112.828 2.828L11.828 15.828a2 2 0 01-2.828 0L9 13z"></path>
+          </svg>
+          Edit Profile
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Account Settings Card -->
+  <div class="profile-card-section">
+    <div class="profile-card-header">
+      <span class="profile-card-title">
+        Account Settings
+      </span>
+    </div>
+    <div class="profile-card-content">
+      <div class="account-setting-row">
+        <div class="account-setting-info">
+          <div class="account-setting-title">Change Password</div>
+          <div class="account-setting-desc">Update your account password</div>
+        </div>
+        <button class="account-setting-action">Change</button>
+      </div>
+      <div class="account-setting-row">
+        <div class="account-setting-info">
+          <div class="account-setting-title">Email Notifications</div>
+          <div class="account-setting-desc">Manage your notification preferences</div>
+        </div>
+        <button class="account-setting-action">Manage</button>
+      </div>
+      <div class="account-setting-row">
+        <div class="account-setting-info">
+          <div class="account-setting-title">Privacy Settings</div>
+          <div class="account-setting-desc">Control your data and privacy options</div>
+        </div>
+        <button class="account-setting-action">Configure</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+.toast-container {
+  /* Container for toast notifications */
+  pointer-events: none;
+}
+
+/* Print styles - hide toasts when printing */
+@media print {
+  .toast-container {
+    @apply hidden;
+  }
+}

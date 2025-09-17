@@ -1,0 +1,324 @@
+<!-- Main Content -->
+<main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+  <!-- Page Title -->
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Debug Exercise Management</h1>
+    <p class="mt-2 text-gray-600">Create and review debug exercises for students.</p>
+  </div>
+
+  <!-- Form Section (only show when no data) -->
+  <div *ngIf="!data || data.length === 0" class="mt-8">
+    <!-- Debug Exercise Form Component -->
+    <div class="bg-white p-6 rounded-lg border border-gray-200">
+      <div class="flex items-center space-x-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-3-5v5m-3-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        <h2 class="text-xl font-semibold text-gray-900">Exercise Configuration</h2>
+      </div>
+      <p class="mt-1 text-sm text-gray-600">Configure your debug exercise parameters and settings.</p>
+
+      <form [formGroup]="debugForm" (ngSubmit)="startDebugExercise()" class="mt-6 space-y-6">
+        <!-- Exercise Settings Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Number of Questions -->
+          <div>
+            <label for="num_questions" class="block text-sm font-bold text-gray-900">Number of Questions *</label>
+            <input 
+              type="number" 
+              id="num_questions"
+              formControlName="num_questions" 
+              min="1" 
+              required 
+              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter number of questions"
+            />
+          </div>
+
+          <!-- Duration -->
+          <div>
+            <label for="duration" class="block text-sm font-bold text-gray-900">Duration (minutes) *</label>
+            <input 
+              type="number" 
+              id="duration"
+              formControlName="duration" 
+              min="1" 
+              required 
+              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              placeholder="Enter duration in minutes"
+            />
+          </div>
+
+          <!-- Difficulty -->
+          <div>
+            <label for="difficulty" class="block text-sm font-bold text-gray-900">Difficulty *</label>
+            <select 
+              id="difficulty"
+              formControlName="difficulty" 
+              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            >
+              <option value="easy">Easy</option>
+              <option value="medium">Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tech Stack Display (Read-only) -->
+        <div *ngIf="tech_stack && tech_stack.length > 0">
+          <label class="block text-sm font-bold text-gray-900">Selected Tech Stack</label>
+          <div class="mt-1 flex flex-wrap gap-2">
+            <span 
+              *ngFor="let stack of tech_stack" 
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+            >
+              {{ stack }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Concepts Display (Read-only) -->
+        <div *ngIf="concepts && concepts.length > 0">
+          <label class="block text-sm font-bold text-gray-900">Selected Topics & Concepts</label>
+          <div class="mt-1 flex flex-wrap gap-2">
+            <span 
+              *ngFor="let concept of concepts" 
+              class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+            >
+              {{ concept.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <div class="pt-4">
+          <button 
+            type="submit" 
+            [disabled]="loading || !debugForm.valid"
+            class="w-full flex items-center justify-center px-6 py-3 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span *ngIf="!loading">Generate Exercises</span>
+            <span *ngIf="loading">Generating...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-center justify-center py-8">
+      <span class="text-blue-600 font-semibold text-lg animate-pulse">Generating debug exercises...</span>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex items-center justify-center py-8">
+      <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
+    </div>
+  </div>
+
+  <!-- Debug Exercise Review (Human-in-the-Loop) -->
+  <div *ngIf="data && data.length > 0" class="mt-8">
+    <div *ngFor="let exercise of data; let idx = index" class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Left Column: Exercise Details -->
+      <div class="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 8v8m-3-5v5m-3-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-900">{{ exercise?.title || 'Debug Challenge' }}</h3>
+              </div>
+              <div class="flex items-center space-x-2">
+                <!-- Regenerate Button -->
+                <div class="relative group">
+                  <button 
+                    class="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+                    (click)="regenerateExercise(idx)"
+                    [disabled]="regeneratingExerciseIndex === idx"
+                    title="Regenerate Exercise"
+                  >
+                    <svg *ngIf="regeneratingExerciseIndex !== idx" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <svg *ngIf="regeneratingExerciseIndex === idx" class="animate-spin h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </button>
+                  <span class="absolute -top-8 right-0 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Regenerate
+                  </span>
+                </div>
+                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full" [ngClass]="{
+                  'bg-green-100 text-green-800': exercise?.difficulty === 'easy',
+                  'bg-yellow-100 text-yellow-800': exercise?.difficulty === 'medium',
+                  'bg-red-100 text-red-800': exercise?.difficulty === 'hard'
+                }">{{ exercise?.difficulty || 'Easy' | titlecase }}</span>
+              </div>
+            </div>
+            <p class="mt-2 text-sm text-gray-600">{{ exercise?.description || 'The function below should return the sum of all numbers in an array, but it has a bug. Fix the code to make it work correctly.' }}</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-sm font-bold text-gray-900">Buggy Code:</label>
+          <pre class="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-4 overflow-x-auto language-{{ getLanguageFromTechnology(exercise.technology) }}"><code class="language-{{ getLanguageFromTechnology(exercise.technology) }} text-gray-800">{{ exercise?.code }}</code></pre>
+        </div>
+
+        <div class="text-sm text-gray-600 space-y-2">
+          <div><span class="font-bold text-gray-900">ID:</span> {{ exercise?.id || 'N/A' }}</div>
+          <div><span class="font-bold text-gray-900">Technology:</span> {{ exercise?.technology }}</div>
+          <div><span class="font-bold text-gray-900">Expected Behavior:</span> {{ exercise?.expectedBehavior }}</div>
+          <div><span class="font-bold text-gray-900">Current Behavior:</span> {{ exercise?.currentBehavior }}</div>
+          <div><span class="font-bold text-gray-900">Estimated Time:</span> {{ exercise?.estimatedTime || 'Not specified' }}</div>
+        </div>
+
+        <!-- Learning Objectives -->
+        <div *ngIf="exercise?.learningObjectives">
+          <label class="text-sm font-bold text-gray-900">Learning Objectives:</label>
+          <div class="mt-2 bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div class="flex items-start space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-purple-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <div class="text-sm text-purple-800">
+                 <p *ngIf="exercise.learningObjectives && !isArray(exercise.learningObjectives)">{{ exercise.learningObjectives }}</p>
+                 <ul *ngIf="isArray(exercise.learningObjectives)" class="list-disc list-inside space-y-1">
+                   <li *ngFor="let objective of exercise.learningObjectives">{{ objective }}</li>
+                 </ul>
+               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div *ngIf="exercise?.tags && exercise.tags.length > 0">
+          <label class="text-sm font-bold text-gray-900">Tags:</label>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <span *ngFor="let tag of exercise.tags" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              {{ tag }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Leader-Specific Fields -->
+      <div class="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
+        <div>
+          <h3 class="text-xl font-semibold text-gray-900">Exercise Management</h3>
+          <p class="mt-1 text-sm text-gray-600">Review and manage exercise details</p>
+        </div>
+
+        <!-- Hints Section -->
+        <div>
+          <label class="text-sm font-bold text-gray-900">Hints:</label>
+          <div class="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="text-sm text-blue-800">
+                <p class="font-medium">Level 1:</p>
+                <p>{{ exercise?.hints?.level1 || 'Check the loop condition and variable initialization.' }}</p>
+                <p class="font-medium mt-2">Level 2:</p>
+                <p>{{ exercise?.hints?.level2 || 'Look at how the accumulator variable is being updated.' }}</p>
+                <p class="font-medium mt-2" *ngIf="exercise?.hints?.level3">Level 3:</p>
+                <p *ngIf="exercise?.hints?.level3">{{ exercise.hints.level3 }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Solution Section -->
+        <div>
+          <label class="text-sm font-bold text-gray-900">Solution:</label>
+          <pre class="mt-2 bg-blue-50 border border-blue-200 rounded-lg p-4 overflow-x-auto language-{{ getLanguageFromTechnology(exercise.technology) }}"><code class="language-{{ getLanguageFromTechnology(exercise.technology) }} text-gray-800">{{ exercise?.solution || 'Solution code will be displayed here...' }}</code></pre>
+        </div>
+
+        <!-- Explanation Section -->
+        <div>
+          <label class="text-sm font-bold text-gray-900">Explanation:</label>
+          <div class="mt-2 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div class="flex items-start space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div class="text-sm text-green-800">
+                <p>{{ exercise?.explanation || 'The bug was in the loop initialization. The variable should start at 0, not 1, to include all array elements in the sum calculation.' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Human-in-the-loop decision buttons -->
+    <div class="bg-white p-4 rounded-lg border border-gray-200">
+      <div class="flex justify-center items-center space-x-3">
+        <button
+          (click)="sendDecision('REJECT')"
+          class="px-5 py-2 bg-white text-blue-600 border-2 border-blue-600 text-sm font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          <span>Reject</span>
+        </button>
+        <button
+          (click)="regenerateEntireAssessment()"
+          class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+          </svg>
+          <span>Regenerate</span>
+        </button>
+        <button
+          (click)="sendDecision('APPROVE')"
+          class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+          <span>Approve</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Regenerate Modal -->
+  <div *ngIf="showRegenerateModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+      <div class="mt-3 text-center">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">{{ regenerateModalTitle }}</h3>
+        <div class="mt-2 px-7 py-3">
+          <p class="text-sm text-gray-600 mb-4">
+            Please provide feedback or comments for regeneration (optional):
+          </p>
+          <textarea
+            [(ngModel)]="regenerateComment"
+            placeholder="Enter your feedback here..."
+            class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            rows="4">
+          </textarea>
+        </div>
+        <div class="flex justify-center space-x-3 mt-4">
+          <button
+            (click)="closeRegenerateModal()"
+            class="px-4 py-2 bg-white text-blue-600 border-2 border-blue-600 text-sm font-semibold rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Cancel
+          </button>
+          <button
+            (click)="confirmRegenerate()"
+            class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            Confirm Regenerate
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
