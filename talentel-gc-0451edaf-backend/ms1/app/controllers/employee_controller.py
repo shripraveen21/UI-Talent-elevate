@@ -144,9 +144,8 @@ def get_employee_filter_options(
     db: Session = Depends(get_db),
     user_payload = Depends(require_employee_permission)
 ):
-    from ..models.models import BandType, RoleEnum, SkillLevel
+    from ..models.models import BandType, RoleEnum
     return {
         "bands": [b.value for b in BandType],
-        "roles": [r.value for r in RoleEnum],
-        "skill_levels": [s.value for s in SkillLevel]
+        "roles": [r.value for r in RoleEnum]
     }

@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../../services/employee/employee.service';
 import { TestListingService } from '../../../services/test-listing/test-listing.service';
 import { ToastService } from '../../../services/toast/toast.service';
+import { SharedDropdownComponent } from '../../shared/shared-dropdown/shared-dropdown.component';
+import { BackButtonComponent } from '../../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-manager-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedDropdownComponent, BackButtonComponent],
   templateUrl: './manager-dashboard.component.html',
   styleUrls: ['./manager-dashboard.component.css']
 })
@@ -23,6 +25,11 @@ export class ManagerDashboardComponent implements OnInit {
   totalEmployees = 0;
   selectedEmployeeIds: number[] = [];
 
+  // Pagination state
+  currentPage: number = 1;
+  pageSize: number = 10; // Default page size
+  totalPages: number = 1;
+
   // Filters
   bands: string[] = [];
   skillLevels: string[] = [];
@@ -30,11 +37,40 @@ export class ManagerDashboardComponent implements OnInit {
   selectedSkillLevel = '';
   search = '';
 
+  // SharedDropdown for Band Level
+  bandLevelOptions: { id: string, name: string }[] = [];
+  selectedBandDropdown = { id: '', name: '' };
+
+  onBandLevelChange(option: { id: string | number; name: string }) {
+    this.selectedBandDropdown = { id: String(option.id), name: option.name };
+    this.selectedBand = String(option.id);
+    this.onEmployeeFilterChange();
+  }
+
+  // SharedDropdown for Skill Level
+  skillLevelOptions = [
+    { id: 'BEGINNER', name: 'Beginner' },
+    { id: 'INTERMEDIATE', name: 'Intermediate' },
+    { id: 'ADVANCED', name: 'Advanced' }
+  ];
+  selectedSkillLevelDropdown = { id: '', name: '' };
+
+  onSkillLevelChange(option: { id: string | number; name: string }) {
+    this.selectedSkillLevelDropdown = { id: String(option.id), name: option.name };
+    this.selectedSkillLevel = String(option.id);
+    this.onEmployeeFilterChange();
+  }
+
   // Test data
   tests: any[] = [];
   filteredTests: any[] = [];
   testSearchQuery = '';
   selectedTestId: number | null = null;
+
+  // Assessment pagination state
+  assessmentPage: number = 1;
+  assessmentPageSize: number = 8; // Show 8 assessments per page by default
+  assessmentTotalPages: number = 1;
 
   // Assignment controls
   dueDate: string = '';
@@ -60,6 +96,7 @@ export class ManagerDashboardComponent implements OnInit {
       }
     }
     this.userName = userName;
+    this.dueDate = this.getCurrentDate(); // Set default due date to today
     this.loadFilters();
     this.loadEmployees();
     this.loadTests();
@@ -79,6 +116,7 @@ export class ManagerDashboardComponent implements OnInit {
     this.employeeService.getEmployeeFilterOptions().subscribe({
       next: (data: any) => {
         this.bands = data.bands || [];
+        this.bandLevelOptions = this.bands.map(band => ({ id: band, name: band }));
         this.skillLevels = data.skill_levels || data.skills || [];
         console.log('Loaded skill levels:', this.skillLevels); // Debug log
       },
@@ -89,37 +127,53 @@ export class ManagerDashboardComponent implements OnInit {
     });
   }
 
-  // Load employees with filters
+  // Load employees with filters and pagination
   loadEmployees(): void {
     const params: any = {};
     if (this.selectedBand) params.band = this.selectedBand;
     if (this.selectedSkillLevel) params.skill_level = this.selectedSkillLevel;
     if (this.search) params.search = this.search;
-    
-    console.log('Filter params:', params); // Debug log
-    
+    params.page = this.currentPage;
+    params.page_size = this.pageSize;
+
+    console.log('[ManagerDashboard] Loading employees with params:', params);
+
     this.employeeService.getEmployees(params).subscribe({
       next: (data: any) => {
         this.employees = data.employees || [];
         this.totalEmployees = data.total || 0;
+        this.totalPages = Math.max(1, Math.ceil(this.totalEmployees / this.pageSize));
         // Remove deselected employees if not in current page
         this.selectedEmployeeIds = this.selectedEmployeeIds.filter(id =>
           this.employees.some(emp => emp.user_id === id)
         );
+        console.log(`[ManagerDashboard] Loaded page ${this.currentPage}/${this.totalPages}, employees:`, this.employees.length);
       },
       error: (error) => {
-        console.error('Error loading employees:', error);
+        console.error('[ManagerDashboard] Error loading employees:', error);
         this.handleError(error);
       }
     });
   }
 
-  // Load tests
+  // Load paginated, filtered tests from backend
   loadTests(): void {
-    this.testListingService.getTests().subscribe({
+    const params: any = {
+      page: this.assessmentPage,
+      page_size: this.assessmentPageSize,
+      search: this.testSearchQuery || ''
+    };
+    this.testListingService.getTests(params).subscribe({
       next: (data: any) => {
         this.tests = data.tests || [];
-        this.filteredTests = [...this.tests];
+        console.log('[ManagerDashboard] Loaded tests after search:', this.tests);
+        this.assessmentTotalPages = Math.max(1, Math.ceil((data.total || this.tests.length) / this.assessmentPageSize));
+        // If current page exceeds total pages, reset to last page
+        if (this.assessmentPage > this.assessmentTotalPages) {
+          this.assessmentPage = this.assessmentTotalPages;
+          this.loadTests();
+          return;
+        }
       },
       error: (error) => {
         console.error('Error loading tests:', error);
@@ -128,23 +182,86 @@ export class ManagerDashboardComponent implements OnInit {
     });
   }
 
+  getPaginatedAssessments(): any[] {
+    return this.tests;
+  }
+
+  /**
+   * Get filtered assessments (for empty state)
+   */
+  getFilteredAssessments(): any[] {
+    return this.tests;
+  }
+
+  /**
+   * Assessment pagination controls
+   */
+  goToAssessmentPage(page: number): void {
+    if (page < 1 || page > this.assessmentTotalPages) return;
+    this.assessmentPage = page;
+    this.loadTests();
+  }
+
+  nextAssessmentPage(): void {
+    if (this.assessmentPage < this.assessmentTotalPages) {
+      this.assessmentPage++;
+      this.loadTests();
+    }
+  }
+
+  prevAssessmentPage(): void {
+    if (this.assessmentPage > 1) {
+      this.assessmentPage--;
+      this.loadTests();
+    }
+  }
+
+  setAssessmentPageSize(size: number): void {
+    if (size < 1) return;
+    this.assessmentPageSize = size;
+    this.assessmentPage = 1;
+    this.loadTests();
+  }
+
   // Test search functionality
   onTestSearchChange(): void {
-    if (!this.testSearchQuery.trim()) {
-      this.filteredTests = [...this.tests];
-    } else {
-      const query = this.testSearchQuery.toLowerCase();
-      this.filteredTests = this.tests.filter(test => 
-        test.test_name?.toLowerCase().includes(query) ||
-        test.description?.toLowerCase().includes(query) ||
-        test.test_type?.toLowerCase().includes(query) ||
-        test.difficulty?.toLowerCase().includes(query)
-      );
-    }
+    this.assessmentPage = 1;
+    this.loadTests();
   }
 
   // Filter change handler
   onEmployeeFilterChange(): void {
+    this.currentPage = 1; // Reset to first page on filter change
+    this.loadEmployees();
+  }
+
+  /**
+   * Pagination controls
+   */
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.loadEmployees();
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadEmployees();
+    }
+  }
+
+  prevPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadEmployees();
+    }
+  }
+
+  setPageSize(size: number): void {
+    if (size < 1) return;
+    this.pageSize = size;
+    this.currentPage = 1;
     this.loadEmployees();
   }
 
@@ -180,6 +297,7 @@ export class ManagerDashboardComponent implements OnInit {
         // this.selectedTestId = null;
         // this.dueDate = '';
         console.log('Test assigned successfully:', result);
+        window.history.back()
       },
       error: (error:any) => {
         this.isAssigning = false;
@@ -396,5 +514,10 @@ export class ManagerDashboardComponent implements OnInit {
     }
     
     return true;
+  }
+
+  // Back button handler for shared component
+  returnToDashboard(): void {
+    window.history.back();
   }
 }

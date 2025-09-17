@@ -5,13 +5,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { DebugExerciseAgentService } from '../../services/debug-exercise-agent/debug-exercise-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
+import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
 
 @Component({
   selector: 'app-debug-exercise-form',
   templateUrl: './debug-exercise-form.component.html',
   styleUrls: ['./debug-exercise-form.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedDropdownComponent]
 })
 export class DebugExerciseFormComponent implements OnInit {
   debugForm: FormGroup;
@@ -23,6 +24,14 @@ export class DebugExerciseFormComponent implements OnInit {
   // Dropdown state
   showTechStackDropdown = false;
   showConceptDropdown = false;
+
+  // Difficulty dropdown options and selection
+  difficultyOptions = [
+    { id: 'easy', name: 'Easy' },
+    { id: 'medium', name: 'Medium' },
+    { id: 'hard', name: 'Hard' }
+  ];
+  selectedDifficulty = { id: 'medium', name: 'Medium' };
 
   // Tech stack options fetched from DB
   techStackOptions: { id: number; name: string }[] = [];
@@ -63,6 +72,12 @@ export class DebugExerciseFormComponent implements OnInit {
       duration: [15, [Validators.required, Validators.min(1)]],
       difficulty: ['medium']
     });
+  }
+
+  // Handler for difficulty selection change
+  onDifficultyChange(option: { id: string | number; name: string }) {
+    this.selectedDifficulty = { id: String(option.id), name: option.name };
+    this.debugForm.get('difficulty')?.setValue(String(option.id));
   }
 
   // Custom validator to check if array is not empty

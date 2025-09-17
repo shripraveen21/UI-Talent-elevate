@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 import { McqAgentService } from '../../services/mcq-agent/mcq-agent.service';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
@@ -10,7 +12,7 @@ import { ToastService } from '../../services/toast/toast.service';
 
 @Component({
   selector: 'app-create-assessment',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedDropdownComponent, BackButtonComponent],
   templateUrl: './create-assessment.component.html',
   styleUrl: './create-assessment.component.css'
 })
@@ -147,6 +149,11 @@ export class CreateAssessmentComponent implements OnInit {
       this.updateAssessmentDetailsStorage();
     }
   }
+
+  // Back button handler for shared component
+  returnToDashboard(): void {
+    this.router.navigate(['/manager-dashboard']);
+}
 
   toggleComponent(type: 'mcq' | 'debug' | 'handsOn') {
     this.selectedComponents[type] = !this.selectedComponents[type];

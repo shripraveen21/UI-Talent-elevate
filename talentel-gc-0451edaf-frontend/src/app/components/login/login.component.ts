@@ -92,8 +92,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/directory']);
         break;
       default:
-        // Fallback to employee dashboard for unknown roles
-        this.router.navigate(['/employee-dashboard']);
+        this.router.navigate(['/home']);
         break;
     }
   }

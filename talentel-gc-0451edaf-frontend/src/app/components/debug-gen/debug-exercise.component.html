@@ -1,0 +1,51 @@
+<div class="container" style="max-width: 600px; margin: auto;">
+  <h2>Debug Exercise Generator</h2>
+  <form (ngSubmit)="startExercise()">
+    <label>
+      Tech Stack:
+      <input type="text" [(ngModel)]="techStack" name="techStack" required />
+    </label>
+    <br />
+    <label>
+      Topics (comma separated):
+      <input type="text" [(ngModel)]="topics" name="topics" required />
+    </label>
+    <br />
+    <label>
+      Difficulty:
+      <select [(ngModel)]="difficulty" name="difficulty">
+        <option value="beginner">Beginner</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced">Advanced</option>
+      </select>
+    </label>
+    <br />
+    <label>
+      Duration (hours):
+      <input type="number" min="1" [(ngModel)]="duration" name="duration" />
+    </label>
+    <br />
+    <button type="submit">Start Exercise</button>
+  </form>
+  <hr />
+  <div>
+    <strong>Status:</strong> {{ status }}
+  </div>
+  <div *ngIf="brd">
+    <h3>BRD</h3>
+    <pre>{{ brd }}</pre>
+    <h4>Initial Topics</h4>
+    <ul>
+      <li *ngFor="let t of initialTopics">{{ t }}</li>
+    </ul>
+    <h4>Suggested Topics</h4>
+    <ul>
+      <li *ngFor="let t of suggestedTopics">{{ t }}</li>
+    </ul>
+    <button (click)="confirmTopics()">Confirm Topics</button>
+  </div>
+  <div *ngIf="projectInfo">
+    <h3>Project Info</h3>
+    <pre>{{ projectInfo | json }}</pre>
+  </div>
+</div>

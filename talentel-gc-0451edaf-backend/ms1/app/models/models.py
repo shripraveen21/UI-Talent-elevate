@@ -1,12 +1,12 @@
 from sqlalchemy import (
     Column, Integer, String, Date, DateTime, Text, ForeignKey, Enum, UniqueConstraint,
-    JSON, ARRAY, CheckConstraint, func, Boolean
+    JSON, ARRAY, CheckConstraint, func, Boolean, UUID
 )
-
+ 
 from sqlalchemy.orm import relationship
 from ..config.database import Base
 import enum
-
+ 
 # Enums
 class RoleEnum(enum.Enum):
     ProductManager = "ProductManager"
@@ -14,12 +14,12 @@ class RoleEnum(enum.Enum):
     CapabilityLeader = "CapabilityLeader"
     DeliveryManager = "DeliveryManager"
     DeliveryLeader = "DeliveryLeader"
-
+ 
 class DifficultyLevel(enum.Enum):
     beginner = "beginner"
     intermediate = "intermediate"
     advanced = "advanced"
-
+ 
 class StatusType(enum.Enum):
     assigned = "assigned"
     in_progress = "in_progress"
@@ -39,7 +39,7 @@ class BandType(enum.Enum):
     B6L = "B6L"
     B7 = "B7"
     B8 = "B8"
-
+ 
 class MailStatus(enum.Enum):
     Sent = "Sent"
     Failed = "Failed"
@@ -58,7 +58,7 @@ class Employee(Base):
     tech_stack = Column(JSON)
     manager_id = Column(Integer, ForeignKey('employees.user_id'))
     manager = relationship('Employee', remote_side=[user_id], backref='reports')
-
+ 
     skills = relationship('EmployeeSkill', back_populates='employee')
     collaborations = relationship('Collaborator', foreign_keys='Collaborator.cl_id', back_populates='owner')
     collaborated_with = relationship('Collaborator', foreign_keys='Collaborator.collaborator_id',
@@ -70,9 +70,9 @@ class TechStack(Base):
     name = Column(String(200), unique=True, nullable=False)
     created_by = Column(Integer, ForeignKey('employees.user_id'))
     created_at = Column(DateTime, default=func.now())
-
+ 
     employee_skills = relationship('EmployeeSkill', back_populates='tech_stack')
-
+ 
 class Topic(Base):
     __tablename__ = 'topics'
     topic_id = Column(Integer, primary_key=True)
@@ -82,7 +82,7 @@ class Topic(Base):
     __table_args__ = (
         UniqueConstraint('name', 'tech_stack_id', 'difficulty', name='uniq_topic_per_stack'),
     )
-
+ 
 class Quiz(Base):
     __tablename__ = 'quizzes'
     id = Column(Integer, primary_key=True)
@@ -103,11 +103,11 @@ class DebugExercise(Base):
     topic_ids = Column(ARRAY(Integer), nullable=False)
     duration = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=func.now())
-    path_id = Column(String(32), nullable=False)
+    path_id = Column(UUID(as_uuid=False), unique=True)
     __table_args__ = (
         CheckConstraint('duration > 0', name='positive_duration'),  # Added CheckConstraint
     )
-
+ 
 class HandsOn(Base):
     __tablename__ = 'hands_on'  # Fixed typo from _tablename__ to __tablename__
     id = Column(Integer, primary_key=True)
@@ -115,11 +115,11 @@ class HandsOn(Base):
     topic_ids = Column(ARRAY(Integer), nullable=False)
     duration = Column(Integer, nullable=False)
     created_at = Column(DateTime, default=func.now())
-    path_id = Column(String(32), nullable=False)
+    path_id = Column(UUID(as_uuid=False), unique=True)
     __table_args__ = (
         CheckConstraint('duration > 0', name='positive_duration'),  # Added CheckConstraint
     )
-
+ 
 class Test(Base):
     __tablename__ = 'tests'
     id = Column(Integer, primary_key=True)
@@ -143,9 +143,10 @@ class Collaborator(Base):
     topics = Column(Boolean, default=False)
     test_create = Column(Boolean, default=False)
     test_assign = Column(Boolean, default=False)
-
+ 
     owner = relationship('Employee', foreign_keys=[cl_id], back_populates='collaborations')
     collaborator = relationship('Employee', foreign_keys=[collaborator_id], back_populates='collaborated_with')
+
 
 class TestAssign(Base):
     __tablename__ = 'test_assign'
@@ -185,9 +186,6 @@ class DebugResult(Base):
     user_id = Column(Integer, ForeignKey('employees.user_id', ondelete='CASCADE'), nullable=False)
     debug_id = Column(Integer, ForeignKey('debug_exercises.id', ondelete='CASCADE'), nullable=False)
     score = Column(Integer, nullable=False)
-    answers = Column(JSON, nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    submitted_at = Column(DateTime, default=func.now())
     feedback_data = Column(JSON, nullable=True)
     __table_args__ = (
         CheckConstraint('score >= 0 AND score <= 100', name='valid_score'),  # Added CheckConstraint
@@ -199,9 +197,6 @@ class HandsOnResult(Base):  # Added HandsOnResult table
     user_id = Column(Integer, ForeignKey('employees.user_id', ondelete='CASCADE'), nullable=False)
     handson_id = Column(Integer, ForeignKey('hands_on.id', ondelete='CASCADE'), nullable=False)
     score = Column(Integer, nullable=False)
-    answers = Column(JSON, nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    submitted_at = Column(DateTime, default=func.now())
     feedback_data = Column(JSON, nullable=True)
     __table_args__ = (
         CheckConstraint('score >= 0 AND score <= 100', name='valid_score'),  # Added CheckConstraint
@@ -218,7 +213,7 @@ class EmployeeSkill(Base):
     __table_args__ = (
         UniqueConstraint('employee_id', 'tech_stack_id', name='uniq_employee_tech_stack'),
     )
-
+ 
 class SkillUpgrade(Base):
     __tablename__ = 'skill_upgrades'
     id = Column(Integer, primary_key=True)

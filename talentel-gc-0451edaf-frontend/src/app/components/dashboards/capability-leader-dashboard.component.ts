@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TopicsService } from '../../services/topics/topics.service';
 import { TestListingService } from '../../services/test-listing/test-listing.service';
+import { SuggestionComponent } from '../suggestion/suggestion.component';
 
 @Component({
   selector: 'app-capability-leader-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, SuggestionComponent],
   templateUrl: './capability-leader-dashboard.component.html',
   styleUrls: ['./capability-leader-dashboard.component.css']
 })

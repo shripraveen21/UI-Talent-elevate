@@ -17,28 +17,31 @@ model_client = AzureOpenAIChatCompletionClient(
     api_key=os.getenv("AZURE_OPENAI_API_KEY"),
 )
 
+owner = 'Deloitte-US'
+
 class GitHubRepoCreator:
     def __init__(self, github_token: str):
         self.github_token = github_token
-        self.base_url = "https://api.github.com"
+        self.base_url = f"https://api.github.com/orgs/{owner}/repos"
         self.headers = {
             "Authorization": f"token {github_token}",
             "Accept": "application/vnd.github.v3+json",
             "Content-Type": "application/json"
         }
-    
+
     def create_repository(self, repo_data: Dict[str, Any]) -> Dict[str, Any]:
-        url = f"{self.base_url}/user/repos"
-        
+        url = self.base_url
+
         try:
             print("[DEBUG] Payload sent to GitHub API:", json.dumps(repo_data, indent=2))
             response = requests.post(url, headers=self.headers, json=repo_data)
             print("[DEBUG] GitHub API response status:", response.status_code)
             print("[DEBUG] GitHub API response content:", response.text)
             response.raise_for_status()
+            repo_info = response.json()
             return {
                 "success": True,
-                "data": response.json(),
+                "data": repo_info,
                 "message": f"Repository '{repo_data['name']}' created successfully!"
             }
         except requests.exceptions.RequestException as e:
@@ -46,6 +49,48 @@ class GitHubRepoCreator:
                 "success": False,
                 "error": str(e),
                 "message": f"Failed to create repository: {str(e)}",
+                "response": response.text if 'response' in locals() else None
+            }
+
+    def add_collaborator(self, repo_name: str, collaborator_username: str, permission: str = "push") -> Dict[str, Any]:
+        """
+        Add a collaborator to a repository.
+        :param repo_name: Name of the repository
+        :param collaborator_username: GitHub username of the collaborator
+        :param permission: Permission level ('pull', 'push', 'admin')
+        """
+        url = f"https://api.github.com/repos/{owner}/{repo_name}/collaborators/{collaborator_username}"
+        payload = {"permission": permission}
+        try:
+            print(f"[DEBUG] Adding collaborator '{collaborator_username}' to repo '{repo_name}' with permission '{permission}'")
+            response = requests.put(url, headers=self.headers, json=payload)
+            print("[DEBUG] Collaborator API response status:", response.status_code)
+            print("[DEBUG] Collaborator API response content:", response.text)
+            response.raise_for_status()
+            try:
+                data = response.json()
+            except Exception as json_err:
+                print(f"[ERROR] Collaborator API response is not valid JSON: {response.text}")
+                data = None
+            if response.status_code == 201 or response.status_code == 204:
+                return {
+                    "success": True,
+                    "message": f"Collaborator '{collaborator_username}' added successfully!",
+                    "data": data
+                }
+            else:
+                error_msg = f"Failed to add collaborator: status {response.status_code}, response: {response.text}"
+                return {
+                    "success": False,
+                    "error": error_msg,
+                    "message": error_msg,
+                    "response": response.text
+                }
+        except requests.exceptions.RequestException as e:
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"Failed to add collaborator: {str(e)}",
                 "response": response.text if 'response' in locals() else None
             }
 
@@ -99,9 +144,9 @@ def get_user_input_and_approval():
             else:
                 print("Please enter 'y' for yes or 'n' for no.")
 
-def create_repository_directly(github_creator: GitHubRepoCreator, repo_params: Dict[str, Any]) -> str:
-    """Create repository directly without agent interaction."""
-    
+def create_repository_directly(github_creator: GitHubRepoCreator, repo_params: Dict[str, Any], collaborator_username: str = None) -> str:
+    """Create repository directly without agent interaction, and add collaborator if provided."""
+
     # Prepare repository data
     repo_data = {
         "name": repo_params["name"],
@@ -109,18 +154,18 @@ def create_repository_directly(github_creator: GitHubRepoCreator, repo_params: D
         "private": True,  # Always enforce private
         "auto_init": repo_params["auto_init"],
     }
-    
+
     # Add optional parameters
     if repo_params["gitignore_template"]:
         repo_data["gitignore_template"] = repo_params["gitignore_template"]
     if repo_params["license_template"]:
         repo_data["license_template"] = repo_params["license_template"]
-    
+
     print(f"\n🚀 Creating repository '{repo_params['name']}'...")
-    
+
     # Create the repository
     result = github_creator.create_repository(repo_data)
-    
+
     if result["success"]:
         repo_info = result["data"]
         success_msg = f"""✅ Repository created successfully!
@@ -130,6 +175,15 @@ def create_repository_directly(github_creator: GitHubRepoCreator, repo_params: D
 🔒 Privacy: Private
 📝 Description: {repo_info.get('description', 'No description')}"""
         print(success_msg)
+
+        # Add collaborator if provided
+        if collaborator_username:
+            collab_result = github_creator.add_collaborator(repo_params["name"], collaborator_username)
+            if collab_result["success"]:
+                print(f"✅ Collaborator '{collaborator_username}' added successfully!")
+            else:
+                print(f"❌ Failed to add collaborator: {collab_result['message']}")
+
         return repo_info['html_url']
     else:
         error_msg = f"❌ Error creating repository: {result['message']}"
@@ -293,13 +347,29 @@ def create_repo_api(repo_name: str, description: str = "", gitignore: str = "", 
             "approved": True
         }
         
-        repo_url = create_repository_directly(github_creator, repo_params)
-        
-        return {
-            "success": True,
-            "repository_url": repo_url,
-            "message": "Repository created successfully"
-        }
+        repo_info = github_creator.create_repository({
+            "name": repo_name,
+            "description": description,
+            "private": True,
+            "auto_init": True,
+            "gitignore_template": gitignore,
+            "license_template": license_template
+        })
+        if repo_info["success"]:
+            repo_data = repo_info["data"]
+            return {
+                "success": True,
+                "repository_url": repo_data.get("html_url"),
+                "clone_url": repo_data.get("clone_url"),
+                "message": "Repository created successfully"
+            }
+        else:
+            return {
+                "success": False,
+                "error": repo_info.get("error"),
+                "message": repo_info.get("message"),
+                "response": repo_info.get("response")
+            }
         
     except Exception as e:
         return {

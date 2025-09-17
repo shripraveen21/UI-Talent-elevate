@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TechStackAgentService, TechStackParams, Topic, AgentMessage } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
 import { ToastComponent } from '../shared/toast/toast.component';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 import { Toast } from '../../models/interface/toast';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
@@ -23,14 +24,15 @@ interface SelectableTopic extends Topic {
   templateUrl: './techstack-form.component.html',
   styleUrls: ['./techstack-form.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent, DragDropModule]
+  imports: [CommonModule, FormsModule, ToastComponent, DragDropModule, BackButtonComponent]
 })
 export class TechStackFormComponent implements OnInit {
+  topicDescription: string = '';
   params: TechStackParams = {
     name: '',
+    description:this.topicDescription
   };
 
-  topicDescription: string = '';
   topics: SelectableTopic[] = [];
   log: string[] = [];
   reviewIteration = 0;
@@ -38,6 +40,7 @@ export class TechStackFormComponent implements OnInit {
   showControls = false;
   feedback: string = '';
   toasts$: Observable<Toast[]>;
+  isLoading: boolean = false; // Controls loader visibility
   
   // Topic selection properties - level-specific select all states
   selectAllBeginner = false;
@@ -62,10 +65,12 @@ export class TechStackFormComponent implements OnInit {
     this.topics = [];
     this.wsConnected = true;
     this.feedback = '';
+    this.isLoading = true; // Show loader when starting generation
     
     this.agent.connect(this.params).subscribe({
       next: (msg: AgentMessage) => {
         this.log.push(JSON.stringify(msg, null, 2));
+        this.isLoading = false; // Hide loader on any response
         if (msg.type === 'review') {
           this.topics = this.addSelectionState(msg.content);
           this.reviewIteration = msg.iteration || 1;
@@ -85,6 +90,7 @@ export class TechStackFormComponent implements OnInit {
       error: (error) => {
         this.wsConnected = false;
         this.showControls = false;
+        this.isLoading = false; // Hide loader on error
         this.toastService.showError('Connection error. Please check your network and try again.');
       }
     });
@@ -236,21 +242,29 @@ export class TechStackFormComponent implements OnInit {
     }
   }
 
-  rejectTopics() {
+  regenerateTopics() {
     if (!this.feedback.trim()) {
-      this.toastService.showWarning('Please provide feedback for rejection.');
+      this.toastService.showWarning('Please provide feedback for Regenerate.');
       return;
     }
-    this.sendDecision('reject', this.feedback);
-    this.feedback = '';
-    this.toastService.showInfo('Topics rejected. Regenerating with your feedback...');
-  }
-
-  regenerateTopics() {
-    const feedbackText = this.feedback.trim() || 'Please regenerate the topics';
-    this.sendDecision('regenerate', feedbackText);
+    this.isLoading = true; // Show loader while waiting for regenerate response
+    this.sendDecision('feedback', this.feedback);
+    console.log(this.feedback)
     this.feedback = '';
     this.toastService.showInfo('Regenerating topics...');
+  }
+
+  rejectTopics() {
+    // Clear topics and assignment buckets before regenerating
+    this.topics = [];
+    this.assignedBeginnerTopics = [];
+    this.assignedIntermediateTopics = [];
+    this.assignedAdvancedTopics = [];
+    const feedbackText = 'Please regenerate the topics';
+    this.isLoading = true; // Show loader while waiting for reject & regenerate response
+    this.sendDecision('reject', feedbackText);
+    this.feedback = '';
+    this.toastService.showInfo('Topics rejected. Regenerating...');
   }
 
   onToastDismiss(toastId: string) {
@@ -321,29 +335,24 @@ export class TechStackFormComponent implements OnInit {
     this.userName = localStorage.getItem('username') || '';
   }
 
+  // Back button handler for shared component
+  returnToDashboard(): void {
+    this.router.navigate(['/capability-leader-dashboard']);
+  }
+
   // Drag and drop event handlers for enhanced visual feedback
   onDragStarted(event: any): void {
     // Add visual feedback when drag starts
     const dragElement = event.source.element.nativeElement;
     dragElement.classList.add('drag-active');
-    
-    // Add glow effect to all drop zones
-    const dropZones = document.querySelectorAll('.cdk-drop-list');
-    dropZones.forEach(zone => {
-      zone.classList.add('drop-zone-glow', 'active');
-    });
+    // Removed drop zone glow effect for static drag-and-drop experience
   }
 
   onDragEnded(event: any): void {
     // Remove visual feedback when drag ends
     const dragElement = event.source.element.nativeElement;
     dragElement.classList.remove('drag-active');
-    
-    // Remove glow effect from all drop zones
-    const dropZones = document.querySelectorAll('.cdk-drop-list');
-    dropZones.forEach(zone => {
-      zone.classList.remove('drop-zone-glow', 'active');
-    });
+    // Removed drop zone glow effect for static drag-and-drop experience
   }
 
   // Enhanced drop handler with visual feedback
@@ -359,26 +368,43 @@ export class TechStackFormComponent implements OnInit {
       // Reordering within the same container
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-      // Moving between containers - use transferArrayItem to properly handle the move
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex
-      );
-      
-      // Update the topic's assigned level after transfer
-      const topic = event.container.data[event.currentIndex] as SelectableTopic;
-      topic.assignedLevel = targetLevel;
-      topic.selected = true;
-      
-      // Show success toast with appropriate message
-      const sourceLevel = event.previousContainer.id === 'assigned-beginner' ? 'beginner' :
-                         event.previousContainer.id === 'assigned-intermediate' ? 'intermediate' :
-                         event.previousContainer.id === 'assigned-advanced' ? 'advanced' : undefined;
-      
-      const actionText = sourceLevel ? 'moved to' : 'assigned to';
-      this.toastService.showSuccess(`Topic "${topic.name}" ${actionText} ${targetLevel} level`);
+      // Multi-selection drag-and-drop support
+      const draggedTopic = event.item.data as SelectableTopic;
+      let topicsToMove: SelectableTopic[] = [];
+
+      // If the dragged topic is selected, move all selected topics from the source container
+      if (draggedTopic.selected) {
+        // Only move selected topics that are in the source container
+        topicsToMove = event.previousContainer.data.filter(t => t.selected);
+      } else {
+        // Move only the dragged topic
+        topicsToMove = [draggedTopic];
+      }
+
+      // Remove topics from previous container
+      topicsToMove.forEach(topic => {
+        const idx = event.previousContainer.data.findIndex(t => t.id === topic.id);
+        if (idx !== -1) {
+          event.previousContainer.data.splice(idx, 1);
+        }
+      });
+
+      // Insert topics into target container at the drop index
+      // If dropping multiple, insert all at the drop index
+      event.container.data.splice(event.currentIndex, 0, ...topicsToMove);
+
+      // Update assignedLevel and selection state
+      topicsToMove.forEach(topic => {
+        topic.assignedLevel = targetLevel;
+        topic.selected = true;
+      });
+
+      // Show success toast
+      if (topicsToMove.length > 1) {
+        this.toastService.showSuccess(`Moved ${topicsToMove.length} topics to ${targetLevel} level`);
+      } else {
+        this.toastService.showSuccess(`Topic "${topicsToMove[0].name}" assigned to ${targetLevel} level`);
+      }
     }
   }
 

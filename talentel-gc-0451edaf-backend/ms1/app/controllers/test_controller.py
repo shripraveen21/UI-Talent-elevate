@@ -79,7 +79,7 @@ def get_tests_created_by_self(db: Session = Depends(get_db), user_payload=Depend
     user_id = user.user_id
     tests = db.execute(
         text("""
-        SELECT id, test_name, description, duration, created_at, status
+        SELECT id, test_name, description, duration, created_at
         FROM tests
         WHERE created_by = :user_id
         """),
@@ -160,12 +160,19 @@ def get_test_attempts(test_id: int, db: Session = Depends(get_db)):
     print(attempts,"att")
     return {"attempts": attempts}
 
-    # # Combine results
-    # attempts = []
-    # for row in quiz_results:
-    #     attempts.append({"user_id": row.user_id, "name": row.name, "score": row.score,"test_id":row.test_id,"quiz":True})
-    # for row in debug_results:
-    #     attempts.append({"user_id": row.user_id, "name": row.name, "score": row.score,"test_id":row.test_id,"quiz":False})
-    
-    # print("atemps",attempts,test_id)
-    # return {"attempts": attempts}
+@router.get("/tests/{test_id}/debug-id")
+def get_debug_id_for_test(test_id: int, db: Session = Depends(get_db)):
+    """
+    Returns the debug_id for a given test_id from the tests table.
+    """
+    test = db.query(Test).filter(Test.id == test_id).first()
+    if not test:
+        # Structured error logging
+        import logging
+        logging.error(f"Test not found for test_id={test_id}")
+        raise HTTPException(status_code=404, detail="Test not found")
+    debug_id = getattr(test, "debug_id", None)
+    # Structured info logging
+    import logging
+    logging.info(f"Fetched debug_id={debug_id} for test_id={test_id}")
+    return {"debug_id": debug_id}

@@ -1,0 +1,131 @@
+-- Insert mock data for employees
+INSERT INTO employees (name, email, hashed_password, role, band, tech_stack, manager_id) VALUES
+('John Doe', 'pm@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'ProductManager', 'B2', '{"skills": ["Python", "Java"]}', NULL),
+('Jane Smith', 'e@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'Employee', 'B4L', '{"skills": ["JavaScript", "React"]}', (SELECT user_id FROM employees WHERE email = 'pm@example.com')),
+('Alice Johnson', 'cl@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'CapabilityLeader', 'B3H', '{"skills": ["Java", "Spring"]}', (SELECT user_id FROM employees WHERE email = 'pm@example.com')),
+('Bob Wilson', 'dm@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'DeliveryManager', 'B5H', '{"skills": ["Python", "Django"]}', (SELECT user_id FROM employees WHERE email = 'pm@example.com')),
+('Emma Brown', 'dl@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'DeliveryLeader', 'B7', '{"skills": ["Node.js", "AWS"]}', (SELECT user_id FROM employees WHERE email = 'cl@example.com')),
+('Tom Clark', 'tc@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'Employee', 'B6L', '{"skills": ["Java", "Node.js"]}', (SELECT user_id FROM employees WHERE email = 'cl@example.com')),
+('Sarah Davis', 'sd@example.com', '$2a$10$fg0cYno033LEkCUOJBK0EOzOIsc3YUjk6emeZgE0qTRyyNtdq1Nyy', 'Employee', 'B8', '{"skills": ["Python", "React"]}', (SELECT user_id FROM employees WHERE email = 'pm@example.com'));
+
+-- Insert mock data for tech_stack
+INSERT INTO tech_stack (name, created_by, created_at) VALUES
+('Python', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), '2025-01-01 10:00:00'),
+('JavaScript', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), '2025-01-02 12:00:00'),
+('Java', (SELECT user_id FROM employees WHERE email = 'cl@example.com'), '2025-01-03 14:00:00'),
+('React', (SELECT user_id FROM employees WHERE email = 'e@example.com'), '2025-01-04 16:00:00'),
+('Node.js', (SELECT user_id FROM employees WHERE email = 'dl@example.com'), '2025-01-05 18:00:00');
+
+-- Insert mock data for topics
+INSERT INTO topics (name, difficulty, tech_stack_id) VALUES
+('Python Basics', 'beginner', (SELECT id FROM tech_stack WHERE name = 'Python')),
+('Advanced Python', 'advanced', (SELECT id FROM tech_stack WHERE name = 'Python')),
+('JavaScript ES6', 'intermediate', (SELECT id FROM tech_stack WHERE name = 'JavaScript')),
+('React Components', 'intermediate', (SELECT id FROM tech_stack WHERE name = 'React')),
+('Node.js APIs', 'advanced', (SELECT id FROM tech_stack WHERE name = 'Node.js')),
+('Java Basics', 'beginner', (SELECT id FROM tech_stack WHERE name = 'Java'));
+
+-- Insert mock data for quizzes
+INSERT INTO quizzes (tech_stack_id, topic_ids, num_questions, duration, questions, created_at) VALUES
+((SELECT id FROM tech_stack WHERE name = 'Python'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Python Basics'), (SELECT topic_id FROM topics WHERE name = 'Advanced Python')], 10, 30, '{"q1": {"text": "What is a list?", "options": ["A", "B", "C"]}}', '2025-01-10 09:00:00'),
+((SELECT id FROM tech_stack WHERE name = 'JavaScript'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'JavaScript ES6')], 15, 45, '{"q1": {"text": "What is ES6?", "options": ["A", "B", "C"]}}', '2025-01-11 10:00:00'),
+((SELECT id FROM tech_stack WHERE name = 'Java'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Java Basics')], 12, 40, '{"q1": {"text": "What is a class?", "options": ["A", "B", "C"]}}', '2025-01-12 11:00:00'),
+((SELECT id FROM tech_stack WHERE name = 'React'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'React Components')], 8, 25, '{"q1": {"text": "What is a component?", "options": ["A", "B", "C"]}}', '2025-01-13 12:00:00'),
+((SELECT id FROM tech_stack WHERE name = 'Node.js'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Node.js APIs')], 10, 35, '{"q1": {"text": "What is an API?", "options": ["A", "B", "C"]}}', '2025-01-14 13:00:00');
+
+-- Insert mock data for debug_exercises
+INSERT INTO debug_exercises (tech_stack_id, topic_ids, duration, created_at, path_id) VALUES
+((SELECT id FROM tech_stack WHERE name = 'Python'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Python Basics')], 60, '2025-01-15 14:00:00', '550e8400-e29b-41d4-a716-446655440001'),
+((SELECT id FROM tech_stack WHERE name = 'JavaScript'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'JavaScript ES6')], 70, '2025-01-16 15:00:00', '550e8400-e29b-41d4-a716-446655440002'),
+((SELECT id FROM tech_stack WHERE name = 'Java'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Java Basics')], 50, '2025-01-17 16:00:00', '550e8400-e29b-41d4-a716-446655440003'),
+((SELECT id FROM tech_stack WHERE name = 'React'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'React Components')], 55, '2025-01-18 17:00:00', '550e8400-e29b-41d4-a716-446655440004'),
+((SELECT id FROM tech_stack WHERE name = 'Node.js'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Node.js APIs')], 65, '2025-01-19 18:00:00', '550e8400-e29b-41d4-a716-446655440005');
+
+-- Insert mock data for hands_on
+INSERT INTO hands_on (tech_stack_id, topic_ids, duration, created_at, path_id) VALUES
+((SELECT id FROM tech_stack WHERE name = 'Python'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Python Basics')], 120, '2025-01-20 09:00:00', '550e8400-e29b-41d4-a716-446655440006'),
+((SELECT id FROM tech_stack WHERE name = 'JavaScript'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'JavaScript ES6')], 130, '2025-01-21 10:00:00', '550e8400-e29b-41d4-a716-446655440007'),
+((SELECT id FROM tech_stack WHERE name = 'Java'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Java Basics')], 110, '2025-01-22 11:00:00', '550e8400-e29b-41d4-a716-446655440008'),
+((SELECT id FROM tech_stack WHERE name = 'React'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'React Components')], 100, '2025-01-23 12:00:00', '550e8400-e29b-41d4-a716-446655440009'),
+((SELECT id FROM tech_stack WHERE name = 'Node.js'), ARRAY[(SELECT topic_id FROM topics WHERE name = 'Node.js APIs')], 140, '2025-01-24 13:00:00', '550e8400-e29b-41d4-a716-446655440010');
+
+-- Insert mock data for tests
+INSERT INTO tests (test_name, description, duration, created_at, created_by, quiz_id, debug_test_id, handson_id) VALUES
+('Python Basics Test', 'Test on Python fundamentals', 30, '2025-01-25 09:00:00', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), (SELECT id FROM quizzes WHERE num_questions = 10 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Python')), NULL, NULL),
+('JavaScript ES6 Test', 'Test on ES6 features', 45, '2025-01-26 10:00:00', (SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM quizzes WHERE num_questions = 15 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'JavaScript')), NULL, NULL),
+('Java Debug Test', 'Debugging Java code', 50, '2025-01-27 11:00:00', (SELECT user_id FROM employees WHERE email = 'cl@example.com'), NULL, (SELECT id FROM debug_exercises WHERE tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Java')), NULL),
+('React Hands-On Test', 'Hands-on React project', 100, '2025-01-28 12:00:00', (SELECT user_id FROM employees WHERE email = 'e@example.com'), NULL, NULL, (SELECT id FROM hands_on WHERE tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'React'))),
+('Node.js Debug Test', 'Debugging Node.js APIs', 65, '2025-01-29 13:00:00', (SELECT user_id FROM employees WHERE email = 'dl@example.com'), NULL, (SELECT id FROM debug_exercises WHERE tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Node.js')), NULL);
+
+-- Insert mock data for collaborators
+INSERT INTO collaborators (cl_id, collaborator_id, topics, test_create, test_assign) VALUES
+((SELECT user_id FROM employees WHERE email = 'pm@example.com'), (SELECT user_id FROM employees WHERE email = 'cl@example.com'), TRUE, TRUE, TRUE),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT user_id FROM employees WHERE email = 'pm@example.com'), TRUE, TRUE, TRUE),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT user_id FROM employees WHERE email = 'dm@example.com'), FALSE, FALSE, TRUE),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT user_id FROM employees WHERE email = 'dl@example.com'), FALSE, FALSE, TRUE),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT user_id FROM employees WHERE email = 'e@example.com'), FALSE, FALSE, TRUE);
+
+-- Insert mock data for test_assign
+INSERT INTO test_assign (user_id, test_id, status, assigned_date, completed_date, due_date, mail_sent, assigned_by, debug_github_url, handson_github_url) VALUES
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM tests WHERE test_name = 'Python Basics Test'), 'assigned', '2025-02-01 09:00:00', NULL, '2025-02-10 23:59:59', 'Sent', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), NULL, NULL),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM tests WHERE test_name = 'JavaScript ES6 Test'), 'in_progress', '2025-02-02 10:00:00', NULL, '2025-02-12 23:59:59', 'Sent', (SELECT user_id FROM employees WHERE email = 'cl@example.com'), NULL, NULL),
+((SELECT user_id FROM employees WHERE email = 'dm@example.com'), (SELECT id FROM tests WHERE test_name = 'Java Debug Test'), 'completed', '2025-02-03 11:00:00', '2025-02-05 11:30:00', '2025-02-13 23:59:59', 'Sent', (SELECT user_id FROM employees WHERE email = 'cl@example.com'), 'https://github.com/dm/java_debug', NULL),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT id FROM tests WHERE test_name = 'React Hands-On Test'), 'canceled', '2025-02-04 12:00:00', NULL, '2025-02-14 23:59:59', 'Failed', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), NULL, 'https://github.com/dl/react_handson'),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM tests WHERE test_name = 'Node.js Debug Test'), 'not_completed', '2025-02-05 13:00:00', NULL, '2025-02-15 23:59:59', 'Not_sent', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), 'https://github.com/cl/node_debug', NULL),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT id FROM tests WHERE test_name = 'Java Debug Test'), 'assigned', '2025-02-06 14:00:00', NULL, '2025-02-16 23:59:59', 'Sent', (SELECT user_id FROM employees WHERE email = 'cl@example.com'), 'https://github.com/tc/java_debug', NULL),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT id FROM tests WHERE test_name = 'Python Basics Test'), 'in_progress', '2025-02-07 15:00:00', NULL, '2025-02-17 23:59:59', 'Sent', (SELECT user_id FROM employees WHERE email = 'pm@example.com'), NULL, NULL);
+
+-- Insert mock data for quiz_results
+INSERT INTO quiz_results (user_id, quiz_id, score, start_time, submitted_at, answers, feedback_data) VALUES
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM quizzes WHERE num_questions = 10 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Python')), 80, '2025-02-01 09:30:00', '2025-02-01 10:00:00', '{"q1": "A"}', '{"feedback": "Good effort"}'),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM quizzes WHERE num_questions = 15 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'JavaScript')), 90, '2025-02-02 10:30:00', '2025-02-02 11:15:00', '{"q1": "B"}', '{"feedback": "Excellent"}'),
+((SELECT user_id FROM employees WHERE email = 'dm@example.com'), (SELECT id FROM quizzes WHERE num_questions = 10 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Python')), 70, '2025-02-03 11:30:00', '2025-02-03 12:00:00', '{"q1": "C"}', '{"feedback": "Needs improvement"}'),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT id FROM quizzes WHERE num_questions = 8 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'React')), 85, '2025-02-04 12:30:00', '2025-02-04 12:55:00', '{"q1": "A"}', '{"feedback": "Well done"}'),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM quizzes WHERE num_questions = 15 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'JavaScript')), 75, '2025-02-05 13:30:00', '2025-02-05 14:15:00', '{"q1": "B"}', '{"feedback": "Good attempt"}'),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT id FROM quizzes WHERE num_questions = 12 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Java')), 82, '2025-02-06 14:30:00', '2025-02-06 15:10:00', '{"q1": "A"}', '{"feedback": "Solid performance"}'),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT id FROM quizzes WHERE num_questions = 10 AND tech_stack_id = (SELECT id FROM tech_stack WHERE name = 'Python')), 78, '2025-02-07 15:30:00', '2025-02-07 16:00:00', '{"q1": "B"}', '{"feedback": "Good start"}');
+
+-- Insert mock data for debug_results
+INSERT INTO debug_results (user_id, debug_id, score, feedback_data) VALUES
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440001'), 85, '{"feedback": "Good fix"}'),
+((SELECT user_id FROM employees WHERE email = 'dm@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440003'), 90, '{"feedback": "Excellent fix"}'),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440005'), 80, '{"feedback": "Nice work"}'),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440003'), 70, '{"feedback": "Needs more practice"}'),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440005'), 88, '{"feedback": "Great job"}'),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440003'), 83, '{"feedback": "Good effort"}'),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT id FROM debug_exercises WHERE path_id = '550e8400-e29b-41d4-a716-446655440001'), 76, '{"feedback": "Keep practicing"}');
+
+-- Insert mock data for hands_on_results
+INSERT INTO hands_on_results (user_id, handson_id, score, feedback_data) VALUES
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT id FROM hands_on WHERE path_id = '550e8400-e29b-41d4-a716-446655440009'), 82, '{"feedback": "Solid project"}'),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM hands_on WHERE path_id = '550e8400-e29b-41d4-a716-446655440009'), 88, '{"feedback": "Great implementation"}'),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT id FROM hands_on WHERE path_id = '550e8400-e29b-41d4-a716-446655440008'), 75, '{"feedback": "Good effort"}'),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT id FROM hands_on WHERE path_id = '550e8400-e29b-41d4-a716-446655440006'), 80, '{"feedback": "Nice work"}');
+
+-- Insert mock data for employee_skills
+INSERT INTO employee_skills (employee_id, tech_stack_id, current_level) VALUES
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM tech_stack WHERE name = 'Python'), 'beginner'),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM tech_stack WHERE name = 'JavaScript'), 'beginner'),
+((SELECT user_id FROM employees WHERE email = 'dm@example.com'), (SELECT id FROM tech_stack WHERE name = 'Java'), 'intermediate'),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT id FROM tech_stack WHERE name = 'React'), 'beginner'),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM tech_stack WHERE name = 'Node.js'), 'advanced'),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT id FROM tech_stack WHERE name = 'Java'), 'beginner'),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT id FROM tech_stack WHERE name = 'Python'), 'beginner');
+
+-- Insert mock data for skill_upgrades
+INSERT INTO skill_upgrades (employee_id, tech_stack_id, target_level, status, assigned_test_id, start_time, completed_at) VALUES
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM tech_stack WHERE name = 'Python'), 'intermediate', 'assigned', (SELECT id FROM tests WHERE test_name = 'Python Basics Test'), '2025-02-01 09:00:00', NULL),
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT id FROM tech_stack WHERE name = 'JavaScript'), 'intermediate', 'in_progress', (SELECT id FROM tests WHERE test_name = 'JavaScript ES6 Test'), '2025-02-02 10:00:00', NULL),
+((SELECT user_id FROM employees WHERE email = 'dm@example.com'), (SELECT id FROM tech_stack WHERE name = 'Java'), 'advanced', 'completed', (SELECT id FROM tests WHERE test_name = 'Java Debug Test'), '2025-02-03 11:00:00', '2025-02-03 12:00:00'),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT id FROM tech_stack WHERE name = 'React'), 'intermediate', 'canceled', (SELECT id FROM tests WHERE test_name = 'React Hands-On Test'), '2025-02-04 12:00:00', NULL),
+((SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM tech_stack WHERE name = 'Node.js'), 'advanced', 'not_completed', (SELECT id FROM tests WHERE test_name = 'Node.js Debug Test'), '2025-02-05 13:00:00', NULL),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT id FROM tech_stack WHERE name = 'Java'), 'intermediate', 'assigned', (SELECT id FROM tests WHERE test_name = 'Java Debug Test'), '2025-02-06 14:00:00', NULL),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT id FROM tech_stack WHERE name = 'Python'), 'intermediate', 'in_progress', (SELECT id FROM tests WHERE test_name = 'Python Basics Test'), '2025-02-07 15:00:00', NULL);
+
+-- Insert mock data for suggestions
+INSERT INTO suggestions (collaborator_id, capability_leader_id, tech_stack_id, message, raised_at) VALUES
+((SELECT user_id FROM employees WHERE email = 'e@example.com'), (SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM tech_stack WHERE name = 'Python'), 'Suggest Jane for Python project', '2025-02-01 09:00:00'),
+((SELECT user_id FROM employees WHERE email = 'dm@example.com'), (SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM tech_stack WHERE name = 'Java'), 'Bob is suitable for Java debugging', '2025-02-02 10:00:00'),
+((SELECT user_id FROM employees WHERE email = 'dl@example.com'), (SELECT user_id FROM employees WHERE email = 'pm@example.com'), (SELECT id FROM tech_stack WHERE name = 'React'), 'Emma for React hands-on task', '2025-02-03 11:00:00'),
+((SELECT user_id FROM employees WHERE email = 'tc@example.com'), (SELECT user_id FROM employees WHERE email = 'cl@example.com'), (SELECT id FROM tech_stack WHERE name = 'Java'), 'Tom for Java project', '2025-02-04 12:00:00'),
+((SELECT user_id FROM employees WHERE email = 'sd@example.com'), (SELECT user_id FROM employees WHERE email = 'pm@example.com'), (SELECT id FROM tech_stack WHERE name = 'Python'), 'Sarah for Python basics', '2025-02-05 13:00:00');

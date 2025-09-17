@@ -18,10 +18,10 @@
             <div>
               <div class="flex items-center justify-between mb-2">
                 <span class="text-sm font-medium text-gray-700">Overall Progress</span>
-                <span class="text-sm text-gray-500">{{ progressData.overall || 0 }}%</span>
+                <span class="text-sm text-gray-500">{{ (getCompletedTestsCount() * 100) / (getCompletedTestsCount() + getPendingTestsCount()) }}%</span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
-                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" [style.width.%]="progressData.overall || 0"></div>
+                <div class="bg-blue-600 h-2 rounded-full transition-all duration-300" [style.width.%]="(getCompletedTestsCount() * 100) / (getCompletedTestsCount() + getPendingTestsCount()) || 0"></div>
               </div>
             </div>
             
@@ -29,7 +29,7 @@
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-2xl font-semibold text-gray-900">{{ progressData.completed || 0 }}</p>
+                  <p class="text-2xl font-semibold text-gray-900">{{ getCompletedTestsCount() }}</p>
                   <p class="text-sm text-gray-600">Completed Assessments</p>
                 </div>
                 <div class="p-3 bg-green-100 rounded-full">
@@ -44,7 +44,7 @@
             <div class="bg-gray-50 rounded-lg p-4">
               <div class="flex items-center justify-between mb-3">
                 <div>
-                  <p class="text-2xl font-semibold text-gray-900">{{ progressData.pending || 0 }}</p>
+                  <p class="text-2xl font-semibold text-gray-900">{{ getPendingTestsCount() }}</p>
                   <p class="text-sm text-gray-600">Pending Assessments</p>
                 </div>
                 <div class="p-3 bg-yellow-100 rounded-full">
@@ -54,11 +54,11 @@
                 </div>
               </div>
               <!-- New Button Added Here -->
-              <button 
+              <!-- <button 
                 (click)="navigateToDashboard()"
                 class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
                 Attend the Assessments
-              </button>
+              </button> -->
             </div>
             
             <div class="space-y-3">
@@ -70,11 +70,11 @@
                 </svg>
                 Skill Upgrade Test
               </button>
-              <button 
+              <!-- <button 
                 (click)="viewProgress()"
                 class="w-full bg-white text-blue-600 border border-blue-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition-colors">
                 View Detailed Progress
-              </button>
+              </button> -->
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from typing import Optional, Dict, List, Any,Union, Literal
 
@@ -112,3 +113,32 @@ class TechStackCreate(BaseModel):
     name: str
     description: Optional[str] = None
     topics : List[TopicCreate]
+
+class SuggestionCreate(BaseModel):
+    collaborator_id: int
+    capability_leader_id: int
+    tech_stack_id: int
+    message: str
+
+class SuggestionOut(BaseModel):
+    id: int
+    collaborator_id: int
+    capability_leader_id: int
+    tech_stack_id: int
+    message: str
+    raised_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class SuggestionForLeaderOut(BaseModel):
+    id: int
+    collaborator_id: int
+    collaborator_name: str
+    tech_stack_id: int
+    tech_stack_name: Optional[str]
+    message: str
+    raised_at: datetime
+
+    class Config:
+        orm_mode = True

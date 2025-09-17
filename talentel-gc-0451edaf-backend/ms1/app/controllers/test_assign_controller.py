@@ -1,3 +1,4 @@
+import string
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
@@ -44,11 +45,12 @@ def require_test_assign_permission(
 def list_tests(
     page: int = 1,
     page_size: int = 10,
+    search: str='',
     db: Session = Depends(get_db),
     user_payload=Depends(require_test_assign_permission)
 ):
     filters = {
-        "search": "",
+        "search":search,
         "page": page,
         "page_size": page_size
     }
@@ -82,11 +84,13 @@ def assign_test(
                     "status": a.status.value if hasattr(a.status, "value") else str(a.status),
                     "due_date": a.due_date,
                     "mail_sent": a.mail_sent,
-                    "assigned_by": a.assigned_by
+                    "assigned_by": a.assigned_by,
+                    "debug_github_url": getattr(a, "debug_github_url", None),
+                    "handson_github_url": getattr(a, "handson_github_url", None)
                 }
                 for a in assignments
             ]
         }
     except Exception as e:
+        print("assign-test error:", str(e))
         raise HTTPException(status_code=400, detail=str(e))
-

@@ -63,3 +63,5 @@ body {
     @apply text-success text-sm font-medium mt-1;
   }
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

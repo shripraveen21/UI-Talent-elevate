@@ -3,7 +3,7 @@
   <!-- Main Content -->
   <main class="container mx-auto px-6 py-8">
 
-               <h1 class="text-3xl font-bold text-gray-800 mb-2 ">Capability Leader Dashboard</h1>
+    <h1 class="text-3xl font-bold text-gray-800 mb-2 ">Capability Leader Dashboard</h1>
     <p class="mt-2 mb-8 text-gray-600">Welcome back, {{ userName || '' }}! Here's what's happening today.</p>
 
     <!-- Stats Cards -->
@@ -16,8 +16,8 @@
             <p class="text-sm text-gray-500 mt-1">Total Topics</p>
           </div>
           <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
             </svg>
           </div>
@@ -48,8 +48,8 @@
             <p class="text-sm text-gray-500 mt-1">Total Assessments</p>
           </div>
           <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-              stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
             </svg>
@@ -83,7 +83,7 @@
       <!-- Assessment Builder Card -->
       <div class="bg-white p-6 rounded-lg border border-gray-200">
         <div class="flex items-center mb-4">
-          <div class="bg-green-100 text-green-600 p-3 rounded-lg">
+          <div class="bg-blue-100 text-blue-600 p-3 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -101,8 +101,8 @@
             Create New Assessment
           </button>
         </div>
-      
-        
+
+
       </div>
 
       <!-- Directory Card -->
@@ -157,7 +157,7 @@
               <div>
                 <h3 class="text-lg font-medium text-gray-800">{{ topic.name }}</h3>
               </div>
-              <button (click)="viewTopicDetails(topic.id)" class="text-blue-600 hover:text-blue-800 font-medium">
+              <button disabled class="text-gray-400 font-medium opacity-50 cursor-not-allowed" >
                 View Details
               </button>
             </div>
@@ -166,6 +166,13 @@
             No topics created yet. Create your first topic to get started!
           </div>
         </div>
+      </div>
+    </div>
+    <!-- Suggestions Section -->
+    <div class="mt-12">
+      <h2 class="text-xl font-semibold text-gray-800 mb-6">Recent Suggestions</h2>
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <app-suggestion></app-suggestion>
       </div>
     </div>
 

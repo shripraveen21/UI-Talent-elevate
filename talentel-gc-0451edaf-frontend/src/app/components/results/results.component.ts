@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ResultsComponent implements OnInit {
   userName: string = '';
+  userId: string = '';
   testId!: number;
   result: any;
   feedback: any;
@@ -26,6 +27,8 @@ export class ResultsComponent implements OnInit {
   resources: false
 };
 
+  employeeLogin : Boolean = true;
+
 toggleSection(section: keyof typeof this.expandedSections) {
   this.expandedSections[section] = !this.expandedSections[section];
 }
@@ -37,17 +40,22 @@ toggleSection(section: keyof typeof this.expandedSections) {
   ) {}
 
   ngOnInit(): void {
-    const userObj = localStorage.getItem('username');
+    const userObj = localStorage.getItem('user');
     let userName = 'User';
+    let userId = '';
     if (userObj) {
       try {
         const user = JSON.parse(userObj);
+        console.log(user,"user")
         userName = user.name || 'User';
+        userId = user.user_id || '';
       } catch {
         userName = userObj || 'User';
+        userId = '';
       }
     }
     this.userName = userName;
+    this.userId = userId;
     this.testId = Number(this.route.snapshot.paramMap.get('id'));
     console.log(this.testId,"got the id")
     const token = localStorage.getItem('token');
@@ -56,6 +64,23 @@ toggleSection(section: keyof typeof this.expandedSections) {
         next: (data) => {
           this.result = data;
           this.loading = false;
+          console.log(1)
+
+          // Fetch test details to check if logged-in employee is the creator
+          this.dashboardService.getTestDetails(this.testId, token).subscribe({
+            next: (testDetails) => {
+              console.log(testDetails,"test")
+              const creator = testDetails.created_by;
+              console.log(creator,"hekk",this.userId)
+              this.employeeLogin = (creator === this.userId);
+              console.log(this.employeeLogin,"hekk213")
+
+            },
+            error: (err) => {
+              this.employeeLogin = false;
+            }
+          });
+
           // Get feedback using result_id from backend response
           if (data.result_id) {
             this.dashboardService.getTestFeedback(data.result_id, token).subscribe({
@@ -130,7 +155,6 @@ toggleSection(section: keyof typeof this.expandedSections) {
 
   // Get topics categorized as strengths
   getStrengths(): any[] {
-    console.log("fankj",this.getAnalysis().filter(topic => topic.status === 'strength'))
     return this.getAnalysis().filter(topic => topic.status === 'strength');
   }
 

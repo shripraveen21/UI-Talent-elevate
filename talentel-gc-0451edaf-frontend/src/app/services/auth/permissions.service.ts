@@ -11,4 +11,7 @@ export class PermissionsService {
   getUserPermissions(): Observable<any> {
     return this.http.get(`${this.baseUrl}/me/permissions`);
   }
+  isCollaborator(): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/is-collaborator`);
+  }
 }

@@ -1,0 +1,38 @@
+/* Shared Dropdown Component Styles */
+
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rotate-180 {
+  transform: rotate(180deg);
+}
+
+.bg-blue-100 {
+  background-color: #ebf8ff;
+}
+
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.text-blue-700 {
+  color: #2563eb;
+}
+
+.text-blue-600 {
+  color: #2563eb;
+}
+
+.hover\:bg-blue-50:hover {
+  background-color: #eff6ff;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+}

@@ -6,7 +6,7 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from ..models.models import (
-    TestAssign, Test, Employee, Quiz, QuizResult, DebugExercise, DebugResult
+    StatusType, TestAssign, Test, Employee, Quiz, QuizResult, DebugExercise, DebugResult
 )
 from ..services.rbac_service import RBACService
 from ..config.database import get_db
@@ -21,6 +21,10 @@ class TestOut(BaseModel):
     test_name: str
     test_duration: str
     attempted: bool
+    quiz_id: Optional[int] = None
+    quiz_name: Optional[str] = None
+    quiz_duration: Optional[str] = None
+    quiz_attempted: Optional[bool] = None
     debug_test_id: Optional[int] = None
     debug_duration: Optional[str] = None
     debug_attempted: Optional[bool] = False
@@ -29,6 +33,7 @@ class TestStartOut(BaseModel):
     test_name: str
     test_duration: str
     test_data: Dict[str, Any]
+    created_by:int
  
 class SubmitResultIn(BaseModel):
     test_id: int
@@ -47,23 +52,30 @@ def get_assigned_tests(
     tests = []
     for a in assignments:
         if a.test:
-            # Quiz duration and attempted check
+            # Quiz details
             duration_sec = a.test.duration
             quiz_id = a.test.quiz_id
+            quiz_name = None
+            quiz_duration_str = None
+            quiz_attempted = None
+            attempted = False
             if quiz_id:
                 quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
                 if quiz:
-                    duration_sec = quiz.duration*60
-            minutes = duration_sec // 60
-            seconds = duration_sec % 60
-            formatted_duration = f"{minutes}:{seconds:02d}"
-            attempted = False
-            if quiz_id:
+                    quiz_name = quiz.name if hasattr(quiz, "name") else None
+                    quiz_duration_sec = quiz.duration * 60
+                    quiz_duration_str = f"{quiz.duration}:00"
+                    duration_sec = quiz_duration_sec
                 result = db.query(QuizResult).filter(
                     QuizResult.user_id == employee.user_id,
                     QuizResult.quiz_id == quiz_id
                 ).first()
                 attempted = result is not None
+                quiz_attempted = attempted
+
+            minutes = duration_sec // 60
+            seconds = duration_sec % 60
+            formatted_duration = f"{minutes}:{seconds:02d}"
 
             # Debug test info
             debug_test_id = a.test.debug_test_id
@@ -87,6 +99,10 @@ def get_assigned_tests(
                     test_name=a.test.test_name,
                     test_duration=formatted_duration,
                     attempted=attempted,
+                    quiz_id=quiz_id,
+                    quiz_name=quiz_name,
+                    quiz_duration=quiz_duration_str,
+                    quiz_attempted=quiz_attempted,
                     debug_test_id=debug_test_id,
                     debug_duration=debug_duration_str,
                     debug_attempted=debug_attempted
@@ -104,7 +120,7 @@ def start_test(
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     assignment = db.query(TestAssign).filter(
-        TestAssign.user_id == employee.user_id,
+        # TestAssign.user_id == employee.user_id,
         TestAssign.test_id == test_id
     ).first()
     if not assignment:
@@ -156,12 +172,14 @@ def start_test(
     minutes = duration_sec // 60
     seconds = duration_sec % 60
     formatted_duration = f"{minutes}:{seconds:02d}"
- 
+    
+    print(test.created_by,"crea")
     return {
         "test_id": test.id,
         "test_name": test.test_name,
         "test_duration": formatted_duration,
-        "test_data": test_data
+        "test_data": test_data,
+        "created_by" : test.created_by
     }
  
 @router.post("/submit-test", status_code=201)
@@ -225,6 +243,11 @@ def submit_test(
     db.add(new_result)
     db.commit()
     db.refresh(new_result)
+
+    # Update assignment status to completed
+    assignment.status = StatusType.completed
+    db.commit()
+
     return {
         "result_id": new_result.result_id,
         "status": "submitted",

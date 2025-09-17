@@ -5,10 +5,11 @@ import { ToastService } from '../../services/toast/toast.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-feedback-result',
-  imports: [FormsModule,CommonModule],
+  imports: [FormsModule, CommonModule, BackButtonComponent],
   templateUrl: './feedback-result.component.html',
   styleUrl: './feedback-result.component.css'
 })
@@ -399,5 +400,10 @@ export class FeedbackResultComponent {
       } else {
         this.router.navigate(['/debug-results/', attempt.test_id]);
       }
+    }
+
+    // Back button handler for shared component
+    returnToDashboard(): void {
+      window.history.back();
     }
 }

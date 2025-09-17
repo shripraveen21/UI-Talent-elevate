@@ -18,6 +18,7 @@ import { ManageCollaboratorComponent } from './components/collaborator/manage-co
 import { CollabGuard } from './guards/collab.guard';
 import { TechStackFormComponent } from './components/techstack-form/techstack-form.component';
 import { ProfilePageComponent } from './components/profile-page/profile-page.component';
+import { DebugExerciseComponent } from './components/debug-gen/debug-gen.component';
 
 
 export const routes: Routes = [
@@ -26,7 +27,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent ,canActivate: [LoginGuard]},
   { path: 'agent-chat', component: AgentChatComponent },
    { path: 'dashboard', component: DashboardComponent },
-  { path: 'test/:id', component: TestComponent, canDeactivate: [CanDeactivateTestGuard] },
+  { path: 'test/:id', component: TestComponent },
   { path: 'results/:id', component: ResultsComponent },
 
   {path:'directory',component:ManagerDashboardComponent,canActivate: [CollabGuard], data: { permission: 'test_assign' }},
@@ -47,11 +48,14 @@ export const routes: Routes = [
     component: ManageCollaboratorComponent
   },
   {
+    path: 'debug-gen', component: DebugExerciseComponent
+  },
+  {
     path:'feedback',
     loadComponent: () => import('./components/feedback-result/feedback-result.component').then(m => m.FeedbackResultComponent)
   },
   {
-    path: 'debug-exercise', 
+    path: 'debug-exercise',
     loadComponent: () => import('./components/debug-exercise-form/debug-exercise-form.component').then(m => m.DebugExerciseFormComponent)
   },
 

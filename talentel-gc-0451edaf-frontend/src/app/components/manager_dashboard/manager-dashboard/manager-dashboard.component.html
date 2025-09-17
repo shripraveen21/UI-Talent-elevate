@@ -1,9 +1,16 @@
 <div class="min-h-screen bg-gray-50 font-inter">
   <!-- Main Content -->
   <main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-    <!-- Page Title -->
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">Assign Assessment</h1>
+    <!-- Back Button and Page Title -->
+    <div class="flex items-center justify-between mb-6">
+      <app-backbutton
+        [label]="'Return to Previous Page'"
+        [icon]="true"
+        [clickHandler]="returnToDashboard.bind(this)">
+      </app-backbutton>
+      <div class="flex-1 text-center">
+        <h1 class="text-3xl font-bold text-gray-900">Assign Assessment</h1>
+      </div>
     </div>
 
     <div class="mt-8 space-y-8">
@@ -23,7 +30,7 @@
         </div>
         <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Assessment Cards -->
-          <div *ngFor="let test of filteredTests"
+          <div *ngFor="let test of getPaginatedAssessments()"
             class="assessment-card p-4 border border-gray-200 rounded-lg space-y-3 transition-all cursor-pointer"
             [class.border-blue-500]="selectedTestId === test.id" [class.bg-blue-50]="selectedTestId === test.id"
             (click)="selectTest(test.id)">
@@ -39,9 +46,48 @@
             <p class="text-sm text-gray-500">Questions: {{ test.num_questions || 20 }}</p>
           </div>
         </div>
-        <div *ngIf="filteredTests.length === 0" class="text-center py-8 text-gray-500">
+        <div *ngIf="getFilteredAssessments().length === 0" class="text-center py-8 text-gray-500">
           <i class="fas fa-search text-4xl mb-2"></i>
           <p>No tests found matching your search.</p>
+        </div>
+
+        <!-- Assessment Pagination Controls -->
+        <div class="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
+          <div class="flex items-center gap-2">
+            <button
+              class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+              [disabled]="assessmentPage === 1"
+              (click)="prevAssessmentPage()">
+              Previous
+            </button>
+            <ng-container *ngFor="let page of [].constructor(assessmentTotalPages); let i = index">
+              <button
+                class="px-3 py-1 rounded border border-gray-300"
+                [ngClass]="{'bg-blue-600 text-white': assessmentPage === (i+1), 'bg-white text-gray-700 hover:bg-gray-100': assessmentPage !== (i+1)}"
+                (click)="goToAssessmentPage(i+1)">
+                {{ i + 1 }}
+              </button>
+            </ng-container>
+            <button
+              class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+              [disabled]="assessmentPage === assessmentTotalPages"
+              (click)="nextAssessmentPage()">
+              Next
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="assessmentPageSize" class="text-sm text-gray-700">Rows per page:</label>
+            <select id="assessmentPageSize"
+              class="px-2 py-1 border border-gray-300 rounded text-sm"
+              [(ngModel)]="assessmentPageSize"
+              (change)="setAssessmentPageSize(assessmentPageSize)">
+              <option [value]="4">4</option>
+              <option [value]="8">8</option>
+              <option [value]="16">16</option>
+              <option [value]="32">32</option>
+            </select>
+            <span class="text-sm text-gray-500">Page {{ assessmentPage }} of {{ assessmentTotalPages }}</span>
+          </div>
         </div>
       </div>
 
@@ -107,23 +153,25 @@
                  placeholder="Name or email..." [(ngModel)]="search" (input)="onEmployeeFilterChange()">
              </div>
              <div class="md:col-span-1">
-               <label for="band" class="block text-sm font-medium text-gray-700">Band Level</label>
-               <select id="band"
-                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                 [(ngModel)]="selectedBand" (change)="onEmployeeFilterChange()">
-                 <option value="">All bands</option>
-                 <option *ngFor="let band of bands" [value]="band">{{ band }}</option>
-               </select>
+               <app-shared-dropdown
+                 [options]="bandLevelOptions"
+                 [selectedOption]="selectedBandDropdown"
+                 [label]="'Band Level'"
+                 [placeholder]="'Select Band Level'"
+                 [disabled]="false"
+                 (selectionChange)="onBandLevelChange($event)">
+               </app-shared-dropdown>
              </div>
-             <div>
-               <label for="experience" class="block text-sm font-medium text-gray-700">Experience Level</label>
-               <select id="experience"
-                 class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                 [(ngModel)]="selectedSkillLevel" (change)="onEmployeeFilterChange()">
-                 <option value="">All levels</option>
-                 <option *ngFor="let level of skillLevels" [value]="level">{{ level }}</option>
-               </select>
-             </div>
+             <!-- <div>
+               <app-shared-dropdown
+                 [options]="skillLevelOptions"
+                 [selectedOption]="selectedSkillLevelDropdown"
+                 [label]="'Skill Level'"
+                 [placeholder]="'Select Skill Level'"
+                 [disabled]="false"
+                 (selectionChange)="onSkillLevelChange($event)">
+               </app-shared-dropdown>
+             </div> -->
            </div>
         </div>
 
@@ -164,6 +212,45 @@
               </div>
             </div>
           </div>
+
+          <!-- Pagination Controls -->
+          <div class="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
+            <div class="flex items-center gap-2">
+              <button
+                class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                [disabled]="currentPage === 1"
+                (click)="prevPage()">
+                Previous
+              </button>
+              <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+                <button
+                  class="px-3 py-1 rounded border border-gray-300"
+                  [ngClass]="{'bg-blue-600 text-white': currentPage === (i+1), 'bg-white text-gray-700 hover:bg-gray-100': currentPage !== (i+1)}"
+                  (click)="goToPage(i+1)">
+                  {{ i + 1 }}
+                </button>
+              </ng-container>
+              <button
+                class="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+                [disabled]="currentPage === totalPages"
+                (click)="nextPage()">
+                Next
+              </button>
+            </div>
+            <div class="flex items-center gap-2">
+              <label for="pageSize" class="text-sm text-gray-700">Rows per page:</label>
+              <select id="pageSize"
+                class="px-2 py-1 border border-gray-300 rounded text-sm"
+                [(ngModel)]="pageSize"
+                (change)="setPageSize(pageSize)">
+                <option [value]="5">5</option>
+                <option [value]="10">10</option>
+                <option [value]="20">20</option>
+                <option [value]="50">50</option>
+              </select>
+              <span class="text-sm text-gray-500">Page {{ currentPage }} of {{ totalPages }}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -176,9 +263,9 @@
         </div>
         <div class="flex items-center space-x-4">
           <div class="flex items-center space-x-2">
-            <label for="dueDate" class="text-sm font-medium text-gray-700">Due Date:</label>
+            <label class="text-sm font-medium text-gray-700">Due Date:</label>
             <input type="date" id="dueDate"
-              class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full cursor-pointer"
               [(ngModel)]="dueDate" [min]="getCurrentDate()">
           </div>
 

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DashboardComponent } from '../dashboard/dashboard.component';
+import { DashboardService } from '../../services/testAttempt/dashboard.service';
 
 @Component({
   selector: 'app-employee-dashboard',
@@ -16,14 +17,48 @@ export class EmployeeDashboardComponent implements OnInit {
   recommendedSkills: any[] = [];
   
 
-
-  constructor(private router: Router) {}
-
+  assignedTests: any[] = [];
+    loading = true;
+    error = '';
+    userRole = '';
+  
+    constructor(
+      private dashboardService: DashboardService,
+      private router: Router
+    ) {}
+  
   ngOnInit(): void {
-    this.loadUserData();
-    this.loadProgressData();
-    this.loadRecommendedSkills();
-  }
+      const token = localStorage.getItem('token');
+      const userInfo = localStorage.getItem('user'); // Optional: store user info at login
+  
+      if (userInfo) {
+        const user = JSON.parse(userInfo);
+        this.userName = user.name || '';
+        this.userRole = user.role || '';
+      }
+  
+      if (token) {
+        this.loadUserData();
+        this.loadProgressData();
+        this.loadRecommendedSkills();
+        
+        this.dashboardService.getAssignedTests(token).subscribe({
+          next: (data: any[]) => {
+            
+            this.assignedTests = data;
+            this.loading = false;
+          },
+          error: () => {
+            
+            this.error = 'Failed to load assigned tests';
+            this.loading = false;
+          }
+        });
+      } else {
+        this.error = 'User not authenticated';
+        this.loading = false;
+      }
+    }
 
   loadUserData(): void {
     // Placeholder for user data loading
@@ -32,6 +67,18 @@ export class EmployeeDashboardComponent implements OnInit {
 
   navigateToDashboard(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  getCompletedTestsCount(): number {
+    return this.assignedTests.filter(test => test.attempted).length;
+  }
+
+  getPendingTestsCount(): number {
+    return this.assignedTests.filter(test => !test.attempted).length;
+  }
+
+  getDebugTestsCount(): number {
+    return this.assignedTests.filter(test => test.debug_test_id).length;
   }
 
   loadProgressData(): void {

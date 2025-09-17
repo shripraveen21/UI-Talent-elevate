@@ -2,9 +2,11 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 export interface TechStackParams {
   name: string;
+  description:string;
 }
 
 export interface Topic {
@@ -86,6 +88,67 @@ export class TechStackAgentService {
       headers: { 'ngrok-skip-browser-warning': 'true' }
     });
   }
+  getTokenPayload(): any {
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+  if (!token) return null;
+  try {
+    const payload = token.split('.')[1];
+    // Add padding if needed for base64 decoding
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+}
+getTopicsByLeader(leaderId: number): Observable<any[]> {
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+  return this.http.get<any[]>(
+    environment.apiUrl + `/topics/by-leader-with-stack/${leaderId}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
+      }
+    }
+  );
+}
+getUserId(): number | null {
+  const payload = this.getTokenPayload();
+  return payload && payload.user_id ? Number(payload.user_id) : null;
+}
+
+getCapabilityLeaderId(): Observable<number | null> {
+  return this.http.get<any>(environment.apiUrl + `/rbac/get-cl`).pipe(
+    map(response => {
+      // Defensive: check if capability_leader and user_id exist
+      if (response && response.capability_leader && response.capability_leader.user_id) {
+        return response.capability_leader.user_id; // This is cl_id
+      }
+      return null; // Not assigned or error
+    })
+  );
+}
+
+
+
+
+getUserRole(): string | null {
+  const payload = this.getTokenPayload();
+  return payload && payload.role ? payload.role : null;
+}
+
+getUserEmail(): string | null {
+  const payload = this.getTokenPayload();
+  return payload && payload.sub ? payload.sub : null;
+}
 
   // Update topic assignment for drag-and-drop functionality
   updateTopicAssignment(assignmentData: any): Observable<any> {

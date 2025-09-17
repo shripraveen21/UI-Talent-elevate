@@ -111,7 +111,7 @@
             <div class="flex items-center space-x-2">
               <ng-container *ngIf="!test.attempted">
                 <button 
-                  (click)="startTest(test.test_id)" 
+                  (click)="startTest(test)" 
                   class="px-5 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors"
                 >
                   Start Test
@@ -125,7 +125,7 @@
                   View Results
                 </button>
               </ng-container> -->
-              <ng-container *ngIf="test.debug_test_id">
+              <!-- <ng-container *ngIf="test.debug_test_id">
                 <ng-container *ngIf="!test.debug_attempted">
                   <button 
                     (click)="startDebugTest(test)" 
@@ -134,15 +134,15 @@
                     Debug Test
                   </button>
                 </ng-container>
-                <!-- <ng-container *ngIf="test.debug_attempted">
+                <ng-container *ngIf="test.debug_attempted">
                   <button 
                     (click)="viewDebugResults(test.debug_test_id)" 
                     class="px-5 py-2 bg-white text-blue-600 border border-blue-600 text-sm font-semibold rounded-md hover:bg-blue-50 transition-colors"
                   >
                     Debug Results
                   </button>
-                </ng-container> -->
-              </ng-container>
+                </ng-container>
+              </ng-container> -->
             </div>
           </div>
         </div>

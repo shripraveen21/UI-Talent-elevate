@@ -1,0 +1,36 @@
+<form (ngSubmit)="onSubmit()" #handsonForm="ngForm">
+  <h3>HandsOn Project Setup</h3>
+  <div>
+    <label>Tech Stack:</label>
+    <input [(ngModel)]="techStackName" name="techStackName" placeholder="Tech Stack Name" required />
+  </div>
+  <div>
+  <label>Topics (comma separated):</label>
+  <input [(ngModel)]="topicsInput" name="topicsInput" placeholder="Topic1, Topic2, Topic3" required />
+</div>
+  <div>
+    <label>Duration (minutes):</label>
+    <input [(ngModel)]="duration" name="duration" type="number" required />
+  </div>
+  <button type="submit">Start SRS Review</button>
+</form>
+
+<div *ngIf="srsReview">
+  <h3>SRS Review (Attempt {{srsReview.regen_count}}/{{srsReview.max_regen}})</h3>
+  <pre>{{srsReview.content.srs_md}}</pre>
+  <button (click)="approve()">Approve</button>
+  <button (click)="suggest()">Suggest Changes</button>
+</div>
+
+<div *ngIf="finalData">
+  <h3>SRS Finalized!</h3>
+  <pre>{{finalData | json}}</pre>
+  <button (click)="saveHandson()">Save HandsOn</button>
+</div>
+
+<div *ngIf="handsonId">
+  <h3>HandsOn Saved!</h3>
+  <p>Record ID: {{handsonId}}</p>
+</div>
+
+<div *ngIf="error" class="error">{{error}}</div>

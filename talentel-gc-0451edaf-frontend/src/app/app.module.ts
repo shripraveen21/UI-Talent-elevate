@@ -5,27 +5,20 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 
 import { AppComponent } from './app.component';
+import { SharedDropdownComponent } from './components/shared/shared-dropdown/shared-dropdown.component';
+
+import { NavbarComponent } from './components/shared/navbar/navbar.component';
+import { ToastContainerComponent } from './components/shared/toast/toast-container.component';
 
 @NgModule({
-
-  declarations: [
-
-    AppComponent
-
-  ],
-
   imports: [
-
     BrowserModule,
-
-    AppRoutingModule
-
+    AppRoutingModule,
+    AppComponent,
+    NavbarComponent,
+    ToastContainerComponent,
+    SharedDropdownComponent
   ],
-
-  providers: [],
-
-  bootstrap: [AppComponent]
-
+  providers: []
 })
-
 export class AppModule { }

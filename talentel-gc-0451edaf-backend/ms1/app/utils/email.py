@@ -5,11 +5,30 @@ from email.mime.text import MIMEText
 from ..models.models import Employee, Test, TechStack, RoleEnum
 
 
-def send_assignment_email(db, user_id, test_id, due_date):
+def send_assignment_email(db, user_id, test_id, due_date, debug_github_url=None, handson_github_url=None):
     employee = db.query(Employee).filter_by(user_id=user_id).first()
     test = db.query(Test).filter_by(id=test_id).first()
+    test_types = []
+    if getattr(test, "debug_test_id", None):
+        test_types.append("Debug Exercise")
+    if getattr(test, "handson_id", None):
+        test_types.append("Hands-On Exercise")
+    if getattr(test, "quiz_id", None):
+        test_types.append("Quiz")
+
     subject = f"New Test Assigned: {test.test_name}"
-    body = f"Dear {employee.name},\nYou have been assigned the test '{test.test_name}'. Please complete it by {due_date}."
+    body = f"Dear {employee.name},\n\n"
+    body += f"You have been assigned the test '{test.test_name}'.\n"
+    body += f"Test Types: {', '.join(test_types) if test_types else 'N/A'}\n"
+    body += f"Due Date: {due_date}\n\n"
+
+    if debug_github_url:
+        body += f"Debug Exercise GitHub Repo: {debug_github_url}\n"
+    if handson_github_url:
+        body += f"Hands-On Exercise GitHub Repo: {handson_github_url}\n"
+
+    body += "\nPlease check your assignment and complete it by the due date.\n\nBest regards,\nTalent Elevate Team"
+
     msg = MIMEText(body)
     msg['Subject'] = subject
     msg['From'] = os.getenv("FROM_EMAIL", "noreply@yourdomain.com")

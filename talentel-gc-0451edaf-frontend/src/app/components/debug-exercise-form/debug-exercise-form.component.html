@@ -49,18 +49,16 @@
             />
           </div>
 
-          <!-- Difficulty -->
+          <!-- Difficulty (Shared Dropdown) -->
           <div>
-            <label for="difficulty" class="block text-sm font-bold text-gray-900">Difficulty *</label>
-            <select 
-              id="difficulty"
-              formControlName="difficulty" 
-              class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
+            <app-shared-dropdown
+              [options]="difficultyOptions"
+              [selectedOption]="selectedDifficulty"
+              [label]="'Difficulty *'"
+              [placeholder]="'Select Difficulty'"
+              [disabled]="false"
+              (selectionChange)="onDifficultyChange($event)">
+            </app-shared-dropdown>
           </div>
         </div>
 

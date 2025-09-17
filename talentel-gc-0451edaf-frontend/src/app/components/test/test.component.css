@@ -4,6 +4,11 @@
   min-height: 100vh;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+.container:fullscreen {
+  height: 100vh !important;
+  overflow-y: auto !important;
+  display: block;
+}
 
 /* Page title styling */
 h1 {

@@ -160,7 +160,9 @@ async def topic_generation_review(
 
             elif user_decision.startswith("FEEDBACK"):
                 specific_feedback = user_feedback or user_decision.replace("FEEDBACK:", "").strip()
+                print(f"FEEDBACK received: {specific_feedback}")
                 concepts = await topic_system.refine_concepts(concepts, specific_feedback)
+                print(f"Refined concepts: {json.dumps(concepts, indent=2)}")
 
             else:
                 await websocket.send_json({

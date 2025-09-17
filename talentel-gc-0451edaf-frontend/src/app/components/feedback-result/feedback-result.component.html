@@ -1,9 +1,16 @@
 <div class="min-h-screen bg-gray-50 font-inter">
   <!-- Main Content -->
   <main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-    <!-- Page Title -->
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">Feedback</h1>
+    <!-- Back Button and Page Title -->
+    <div class="flex items-center justify-between mb-6">
+      <app-backbutton
+        [label]="'Return to Previous Page'"
+        [icon]="true"
+        [clickHandler]="returnToDashboard.bind(this)">
+      </app-backbutton>
+      <div class="flex-1 text-center">
+        <h1 class="text-3xl font-bold text-gray-900">Feedback</h1>
+      </div>
     </div>
 
     <div class="mt-8 space-y-8">
