@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TopicsService } from '../../services/topics/topics.service';
 import { TestListingService } from '../../services/test-listing/test-listing.service';
-import { SuggestionComponent } from '../suggestion/suggestion.component';
 
 @Component({
   selector: 'app-capability-leader-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, SuggestionComponent],
+  imports: [CommonModule, RouterModule],
   templateUrl: './capability-leader-dashboard.component.html',
   styleUrls: ['./capability-leader-dashboard.component.css']
 })
@@ -19,6 +18,10 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
   teamOverview: any = {};
   loading: boolean = false;
   activeTab: string = 'topics';
+  
+  // Recent data for dashboard display
+  recentTopics: any[] = [];
+  recentSuggestions: any[] = [];
 
   constructor(
     private router: Router,
@@ -31,6 +34,7 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
     this.loadTopics();
     this.loadAssessments();
     this.loadTeamOverview();
+    this.loadRecentData();
 
         const userInfo = localStorage.getItem('user'); // Optional: store user info at login
 
@@ -82,6 +86,45 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
     };
   }
 
+  // Load recent data for dashboard display
+  loadRecentData(): void {
+    // Mock data for recent topics
+    this.recentTopics = [
+      { id: 1, name: 'React Advanced Patterns', status: 'Active' },
+      { id: 2, name: 'System Design Fundamentals', status: 'Active' },
+      { id: 3, name: 'Database Optimization', status: 'Active' },
+      { id: 4, name: 'API Design Best Practices', status: 'Active' }
+    ];
+
+    // Mock data for recent suggestions
+    this.recentSuggestions = [
+      { 
+        id: 1, 
+        title: 'Suggestions for You',
+        author: 'Tom Clark',
+        date: 'Feb 4, 2023, 12:00:00 PM',
+        tech: 'Java',
+        description: 'Suggest Jane for Python project'
+      },
+      { 
+        id: 2, 
+        title: 'Suggestion',
+        author: 'Bob Wilson',
+        date: 'Feb 2, 2023, 10:00:00 AM',
+        tech: 'Python',
+        description: 'Bob is suitable for Java debugging'
+      },
+      { 
+        id: 3, 
+        title: 'Suggestion',
+        author: 'Jane Smith',
+        date: 'Feb 1, 2023, 09:00:00 AM',
+        tech: 'Python',
+        description: 'Suggest Jane for Python project'
+      }
+    ];
+  }
+
   setActiveTab(tab: string): void {
     this.activeTab = tab;
   }
@@ -118,10 +161,6 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
     console.log('Export reports');
   }
 
-  navigateToFeedback() : void {
-    this.router.navigate(['/feedback']);
-  }
-
   navigateToCreateTopic(): void {
     this.router.navigate(['/add-techstack']);
   }
@@ -140,5 +179,26 @@ export class CapabilityLeaderDashboardComponent implements OnInit {
 
   navigateToDirectory(): void {
     this.router.navigate(['/directory']);
+  }
+
+  // Navigation methods for dashboard action cards
+  navigateToTopics(): void {
+    // Navigate to add-techstack route for managing topics/tech stacks
+    this.router.navigate(['/add-techstack']);
+  }
+
+  navigateToAssessments(): void {
+    // Navigate to create-assessment route for building assessments
+    this.router.navigate(['/create-assessment']);
+  }
+
+  navigateToAssignTests(): void {
+    // Navigate to directory route for assigning tests to team members
+    this.router.navigate(['/directory']);
+  }
+
+  navigateToFeedback(): void {
+    // Navigate to feedback route for viewing feedback and suggestions
+    this.router.navigate(['/feedback']);
   }
 }
