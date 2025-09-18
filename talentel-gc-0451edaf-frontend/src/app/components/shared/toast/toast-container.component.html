@@ -1,8 +1,0 @@
-<div class="toast-container">
-  <app-toast
-    *ngFor="let toast of toasts; trackBy: trackByToastId; let i = index"
-    [toast]="toast"
-    [style.top.px]="20 + (i * 80)"
-    (dismiss)="onToastDismiss($event)">
-  </app-toast>
-</div>
