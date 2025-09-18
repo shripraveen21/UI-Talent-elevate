@@ -1,0 +1,287 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Global styles for the component */
+:host {
+  font-family: 'Inter', sans-serif;
+  display: block;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* Enhanced card styling to match screenshot */
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+/* Icon container styling */
+.icon-container {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.icon-container svg {
+  width: 20px;
+  height: 20px;
+  color: #3b82f6;
+}
+
+/* Button styling to match screenshot */
+.primary-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.primary-button:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  box-shadow: 0 4px 12px 0 rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.primary-button:active {
+  transform: translateY(0);
+}
+
+/* Typography enhancements */
+.dashboard-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 8px;
+  letter-spacing: -0.025em;
+}
+
+.dashboard-subtitle {
+  font-size: 16px;
+  color: #6b7280;
+  margin-bottom: 32px;
+  font-weight: 400;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.card-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 8px 0 16px 0;
+  line-height: 1.5;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  line-height: 1;
+  margin: 8px 0 4px 0;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
+/* Section headers */
+.section-header {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Recent items styling */
+.recent-item {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.recent-item:hover {
+  background-color: #f9fafb;
+}
+
+.recent-item:last-child {
+  border-bottom: none;
+}
+
+.recent-item-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.view-details-button {
+  color: #3b82f6;
+  font-weight: 500;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.view-details-button:hover {
+  color: #2563eb;
+}
+
+/* Suggestion cards styling */
+.suggestion-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e0f2fe;
+}
+
+.suggestion-avatar {
+  background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+  color: #1e40af;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.suggestion-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 2px;
+}
+
+.suggestion-date {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.suggestion-tech {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.suggestion-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 2px;
+}
+
+.suggestion-text {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.4;
+}
+
+/* Grid and layout enhancements */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .actions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-title {
+    font-size: 24px;
+  }
+}
+
+/* Animation for smooth transitions */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

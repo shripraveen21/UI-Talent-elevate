@@ -1,0 +1,119 @@
+<div class="debug-results-container" *ngIf="!loading && result">
+  <!-- Overall Evaluation Section -->
+  <section class="overall-evaluation mb-10 p-8 rounded-xl shadow-lg bg-white border border-gray-200">
+    <h2 class="text-3xl font-bold mb-4 text-blue-900">Overall Evaluation</h2>
+    <div class="flex flex-wrap gap-8 items-center mb-6">
+      <div>
+        <span class="text-xl font-semibold text-gray-700">Score:</span>
+        <span class="text-4xl font-extrabold text-blue-600">{{ result.overall_evaluation?.overall_score | number:'1.2-2' }}/100</span>
+      </div>
+      <div>
+        <span class="text-xl font-semibold text-gray-700">Summary:</span>
+        <span class="text-gray-800 font-medium">{{ result.overall_evaluation?.summary }}</span>
+      </div>
+    </div>
+    <div class="overall-ratings grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div *ngFor="let key of ['correctness', 'completeness', 'quality', 'alternatives']">
+        <div class="rating-card p-4 rounded-lg bg-blue-50 shadow-sm flex flex-col items-center">
+          <span class="font-semibold capitalize text-blue-900" [title]="key | titlecase">{{ key }}</span>
+          <span class="block text-2xl font-bold"
+                [ngClass]="{
+                  'text-green-700': result.overall_evaluation?.overall_ratings[key] >= 8,
+                  'text-yellow-600': result.overall_evaluation?.overall_ratings[key] >= 5 && result.overall_evaluation?.overall_ratings[key] < 8,
+                  'text-red-600': result.overall_evaluation?.overall_ratings[key] < 5
+                }">
+            {{ result.overall_evaluation?.overall_ratings[key] }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bug-wise Results Section -->
+  <section class="bug-wise-results">
+    <h2 class="text-2xl font-bold mb-6 text-blue-900">Bug-wise Results</h2>
+    <div *ngFor="let bug of result.bug_wise_results; let i = index" class="bug-result mb-10 mx-6 p-8 rounded-xl shadow-lg bg-white border border-gray-200">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div>
+          <span class="font-semibold text-blue-700 text-lg">Bug #{{ i + 1 }}:</span>
+          <span class="font-bold text-xl">{{ bug.topic }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="badge px-4 py-2 rounded-full text-white font-semibold text-lg"
+                [ngClass]="{
+                  'bg-green-600': bug.assessment === 'CORRECT',
+                  'bg-yellow-500': bug.assessment === 'PARTIALLY_CORRECT',
+                  'bg-red-600': bug.assessment === 'INCORRECT'
+                }">
+            <ng-container [ngSwitch]="bug.assessment">
+              <span *ngSwitchCase="'CORRECT'">✅</span>
+              <span *ngSwitchCase="'PARTIALLY_CORRECT'">⚠️</span>
+              <span *ngSwitchCase="'INCORRECT'">❌</span>
+              <span *ngSwitchDefault>📋</span>
+            </ng-container>
+            {{ bug.assessment.replace('_', ' ') }}
+          </span>
+        </div>
+      </div>
+      <div class="mb-3 flex gap-8 flex-wrap">
+        <div>
+          <span class="font-semibold text-gray-700">Score:</span>
+          <span class="text-2xl font-bold text-blue-700">{{ bug.score }}/100</span>
+        </div>
+        <div class="ratings grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div *ngFor="let key of ['correctness', 'completeness', 'quality', 'alternatives']">
+            <span class="font-semibold capitalize text-gray-700" [title]="key | titlecase">{{ key }}:</span>
+            <span class="font-bold px-2 py-1 rounded"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': bug.ratings[key] >= 8,
+                    'bg-yellow-100 text-yellow-800': bug.ratings[key] >= 5 && bug.ratings[key] < 8,
+                    'bg-red-100 text-red-800': bug.ratings[key] < 5
+                  }">
+              {{ bug.ratings[key] }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <span class="font-semibold text-gray-700">Summary:</span>
+        <span class="text-gray-900 font-medium">{{ bug.summary }}</span>
+      </div>
+      <!-- Collapsible Sections for Details -->
+      <details class="mb-2" *ngIf="bug.strengths?.length">
+        <summary class="font-semibold text-green-700 cursor-pointer">Strengths</summary>
+        <ul class="list-disc ml-6 mt-2">
+          <li *ngFor="let s of bug.strengths">{{ s }}</li>
+        </ul>
+      </details>
+      <details class="mb-2" *ngIf="bug.areas_for_improvement?.length">
+        <summary class="font-semibold text-yellow-700 cursor-pointer">Areas for Improvement</summary>
+        <ul class="list-disc ml-6 mt-2">
+          <li *ngFor="let a of bug.areas_for_improvement">{{ a }}</li>
+        </ul>
+      </details>
+      <details class="mb-2" *ngIf="bug.next_steps?.length">
+        <summary class="font-semibold text-blue-700 cursor-pointer">Next Steps</summary>
+        <ol class="list-decimal ml-6 mt-2">
+          <li *ngFor="let n of bug.next_steps">{{ n }}</li>
+        </ol>
+      </details>
+      <details class="mb-2" *ngIf="bug.resources?.length">
+        <summary class="font-semibold text-purple-700 cursor-pointer">Resources</summary>
+        <ul class="list-disc ml-6 mt-2">
+          <li *ngFor="let r of bug.resources">
+            <a *ngIf="r.url" [href]="r.url" target="_blank" class="text-blue-600 underline">{{ r.title }}</a>
+            <span *ngIf="!r.url">{{ r.title }}</span>
+          </li>
+        </ul>
+      </details>
+    </div>
+  </section>
+</div>
+
+<!-- Loading/Error States -->
+<div *ngIf="loading" class="loading-state p-8 text-center text-lg text-gray-500">
+  Loading debug results...
+</div>
+<div *ngIf="error" class="error-state p-8 text-center text-lg text-red-600">
+  {{ error }}
+</div>

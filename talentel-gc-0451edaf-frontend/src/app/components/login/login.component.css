@@ -1,0 +1,14 @@
+* {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+}
+
+/* Tailwind-based styling */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #0369a1, #0284c7, #0ea5e9);
+}
+
+/* No additional CSS needed as we're using Tailwind classes */

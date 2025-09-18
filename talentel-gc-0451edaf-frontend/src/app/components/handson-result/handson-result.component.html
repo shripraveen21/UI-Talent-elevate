@@ -1,0 +1,102 @@
+<div class="handson-result-container" *ngIf="!loading && result">
+  <!-- Overall Evaluation Section -->
+  <section class="overall-evaluation mb-10 p-8 rounded-xl shadow-lg bg-white border border-gray-200">
+    <h2 class="text-3xl font-bold mb-4 text-blue-900">Overall Evaluation</h2>
+    <div class="flex flex-wrap gap-8 items-center mb-6">
+      <div>
+        <span class="text-xl font-semibold text-gray-700">Score:</span>
+        <span class="text-4xl font-extrabold text-blue-600">
+          {{ getOverallScore() !== null ? (getOverallScore() | number:'1.2-2') : 'N/A' }}/100
+        </span>
+      </div>
+
+    </div>
+    <div class="overall-ratings grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div *ngFor="let key of ['completeness', 'clarity', 'readiness', 'documentation']">
+        <div class="rating-card p-4 rounded-lg bg-blue-50 shadow-sm flex flex-col items-center">
+          <span class="font-semibold capitalize text-blue-900" [title]="key | titlecase">{{ key }}</span>
+          <span class="block text-2xl font-bold"
+                [ngClass]="getStatusBadgeClass(getRating(key) ?? 0)">
+            {{ getRating(key) !== null ? getRating(key) : 'N/A' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Milestone-wise Results Section -->
+  <section class="milestone-wise-results">
+    <h2 class="text-2xl font-bold mb-6 text-blue-900">Milestone-wise Results</h2>
+    <div *ngFor="let milestone of getMilestones(); let i = index" class="milestone-result mb-10 mx-6 p-8 rounded-xl shadow-lg bg-white border border-gray-200">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+        <div>
+          <span class="font-semibold text-blue-700 text-lg">Milestone #{{ i + 1 }}:</span>
+          <span class="font-bold text-xl">{{ milestone.milestone || 'Unnamed Milestone' }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="badge px-4 py-2 rounded-full text-white font-semibold text-lg"
+                [ngClass]="getStatusBadgeClass((milestone.score ?? 0))">
+            <span>{{ getAssessmentIcon(milestone.assessment || '') }}</span>
+            {{ (milestone.assessment || 'UNKNOWN').replace('_', ' ') }}
+          </span>
+        </div>
+      </div>
+      <div class="mb-3 flex gap-8 flex-wrap">
+        <div>
+          <span class="font-semibold text-gray-700">Score:</span>
+          <span class="text-2xl font-bold text-blue-700">
+            {{ milestone.score !== null && milestone.score !== undefined ? milestone.score : 'N/A' }}/100
+          </span>
+        </div>
+        <div class="ratings grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div *ngFor="let key of ['completeness', 'clarity', 'readiness', 'documentation']">
+            <span class="font-semibold capitalize text-gray-700" [title]="key | titlecase">{{ key }}:</span>
+            <span class="font-bold px-2 py-1 rounded"
+                  [ngClass]="getStatusBadgeClass(getMilestoneRating(milestone, key) ?? 0)">
+              {{ getMilestoneRating(milestone, key) !== null ? getMilestoneRating(milestone, key) : 'N/A' }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <span class="font-semibold text-gray-700">Summary:</span>
+        <span class="text-gray-900 font-medium">
+          {{ milestone.summary || 'No summary provided.' }}
+        </span>
+      </div>
+      <!-- Collapsible Sections for Details -->
+      <details class="mb-2" *ngIf="milestone.strengths && milestone.strengths.length">
+        <summary class="font-semibold text-green-700 cursor-pointer">Strengths</summary>
+        <ul class="list-disc ml-6 mt-2">
+          <li *ngFor="let s of milestone.strengths">{{ s }}</li>
+        </ul>
+      </details>
+      <details class="mb-2" *ngIf="milestone.areas_for_improvement && milestone.areas_for_improvement.length">
+        <summary class="font-semibold text-yellow-700 cursor-pointer">Areas for Improvement</summary>
+        <ul class="list-disc ml-6 mt-2">
+          <li *ngFor="let a of milestone.areas_for_improvement">{{ a }}</li>
+        </ul>
+      </details>
+      <details class="mb-2" *ngIf="milestone.next_steps && milestone.next_steps.length">
+        <summary class="font-semibold text-blue-700 cursor-pointer">Next Steps</summary>
+        <ol class="list-decimal ml-6 mt-2">
+          <li *ngFor="let n of milestone.next_steps">{{ n }}</li>
+        </ol>
+      </details>
+      <!-- If all details are empty, show a message -->
+      <div *ngIf="(!milestone.strengths || !milestone.strengths.length) &&
+                  (!milestone.areas_for_improvement || !milestone.areas_for_improvement.length) &&
+                  (!milestone.next_steps || !milestone.next_steps.length)" class="text-gray-500 text-sm mt-2">
+        No additional details provided for this milestone.
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Loading/Error States -->
+<div *ngIf="loading" class="loading-state p-8 text-center text-lg text-gray-500">
+  Loading handson results...
+</div>
+<div *ngIf="error" class="error-state p-8 text-center text-lg text-red-600">
+  {{ error }}
+</div>

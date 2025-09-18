@@ -1,0 +1,8 @@
+.env
+venv
+__pycache__/
+BugInjectedProject
+GeneratedProject
+GeneratedHandsOn
+temp_repos
+feedback
