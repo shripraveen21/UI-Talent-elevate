@@ -139,66 +139,133 @@ async def debug_gen_ws(websocket: WebSocket, db: Session = Depends(get_db)):
             # 3. Wait for client to send final topic list and feedback
             while True:
                 feedback = await websocket.receive_json()
-                # Handle regenerate action
+                
+                # Handle regenerate action - regenerate BRD without closing connection
                 if feedback.get("action") == "regenerate":
                     logging.info(f"[{unique_id}] Regenerate requested by client.")
-                    # Optionally, you could reset state or send a message back
-                    await websocket.send_json({"type": "status", "content": "Regeneration requested. Please reconfigure your exercise."})
-                    await websocket.close()
-                    return
- 
-                # Handle feedback/approve
-                final_topics = feedback.get("final_topics")
-                user_feedback = feedback.get("feedback", "")
-                logging.info(f"[{unique_id}] Received feedback: {feedback}")
- 
-                if not final_topics:
-                    final_topics = brd_data["topics"] + [item["topic"] for item in brd_data["suggested_topics"]]
-                    logging.info(f"[{unique_id}] No final_topics provided, using all topics: {final_topics}")
- 
-                # 4. Send immediate 'accepted' response and start background task
-                await websocket.send_json({
-                    "type": "accepted",
-                    "content": "Your selection has been accepted. Project generation will proceed in the background."
-                })
-                logging.info(f"[{unique_id}] Accepted response sent to client.")
- 
-                tech_stack_id = db.query(TechStack.id).filter(TechStack.name == tech_stack).scalar()
-                topic_ids = [
-                    tid for (tid,) in db.query(Topic.topic_id).filter(
-                        Topic.name.in_(final_topics),
-                        Topic.tech_stack_id==tech_stack_id
-                    ).all()
-                ]
- 
-                print("dataaa",tech_stack_id,topic_ids)
- 
-                debug_exercise = DebugExercise(
-                    tech_stack_id=tech_stack_id,
-                    topic_ids=topic_ids,
-                    duration=duration,
-                    path_id=unique_id,
-                )
-                db.add(debug_exercise)
-                db.commit()
-                print("idddd",debug_exercise.id)
- 
-                await websocket.send_json({
-                    "type": "final_id",
-                    "debug_exercise":debug_exercise.id
+                    await websocket.send_json({"type": "status", "content": "Regenerating BRD based on your request..."})
+                    
+                    # Regenerate BRD with current parameters
+                    try:
+                        brd_data = await brd_agent.generate_brd(tech_stack, topics)
+                        logging.info(f"[{unique_id}] BRD regenerated successfully.")
+                        
+                        # Send updated BRD back to client
+                        await websocket.send_json({
+                            "type": "brd_review",
+                            "brd": brd_data["brd"],
+                            "initial_topics": brd_data["topics"],
+                            "suggested_topics": brd_data["suggested_topics"]
+                        })
+                        continue  # Continue the feedback loop
+                        
+                    except Exception as regen_error:
+                        logging.error(f"[{unique_id}] Error during regeneration: {regen_error}")
+                        await websocket.send_json({
+                            "type": "error", 
+                            "content": "Failed to regenerate BRD. Please try again."
+                        })
+                        continue  # Continue the feedback loop even on error
+                
+                # Handle feedback action - update BRD based on user feedback
+                elif feedback.get("action") == "feedback":
+                    logging.info(f"[{unique_id}] Feedback received from client.")
+                    user_feedback_text = feedback.get("feedback", "")
+                    
+                    if user_feedback_text:
+                        await websocket.send_json({"type": "status", "content": "Processing your feedback and updating BRD..."})
+                        
+                        try:
+                            # Here you could implement BRD update logic based on feedback
+                            # For now, we'll regenerate with feedback context
+                            brd_data = await brd_agent.generate_brd(tech_stack, topics, user_feedback_text)
+                            logging.info(f"[{unique_id}] BRD updated based on feedback.")
+                            
+                            # Send updated BRD back to client
+                            await websocket.send_json({
+                                "type": "brd_updated",
+                                "brd": brd_data["brd"],
+                                "initial_topics": brd_data["topics"],
+                                "suggested_topics": brd_data["suggested_topics"]
+                            })
+                            continue  # Continue the feedback loop
+                            
+                        except Exception as feedback_error:
+                            logging.error(f"[{unique_id}] Error processing feedback: {feedback_error}")
+                            await websocket.send_json({
+                                "type": "error", 
+                                "content": "Failed to process feedback. Please try again."
+                            })
+                            continue  # Continue the feedback loop even on error
+                    else:
+                        await websocket.send_json({
+                            "type": "error", 
+                            "content": "No feedback provided. Please provide feedback and try again."
+                        })
+                        continue
+
+                # Handle approve action - finalize the workflow
+                elif feedback.get("action") == "approve":
+                    final_topics = feedback.get("final_topics")
+                    user_feedback = feedback.get("feedback", "")
+                    logging.info(f"[{unique_id}] Approve action received: {feedback}")
+
+                    if not final_topics:
+                        final_topics = brd_data["topics"] + [item["topic"] for item in brd_data["suggested_topics"]]
+                        logging.info(f"[{unique_id}] No final_topics provided, using all topics: {final_topics}")
+
+                    # 4. Send immediate 'accepted' response and start background task
+                    await websocket.send_json({
+                        "type": "accepted",
+                        "content": "Your selection has been accepted. Project generation will proceed in the background."
                     })
- 
-                asyncio.create_task(
-                    bug_injection_and_db_save(
-                        db, model_client, unique_id, final_topics, tech_stack,
-                        difficulty, project_dir, duration, user_feedback,test_id
+                    logging.info(f"[{unique_id}] Accepted response sent to client.")
+
+                    tech_stack_id = db.query(TechStack.id).filter(TechStack.name == tech_stack).scalar()
+                    topic_ids = [
+                        tid for (tid,) in db.query(Topic.topic_id).filter(
+                            Topic.name.in_(final_topics),
+                            Topic.tech_stack_id==tech_stack_id
+                        ).all()
+                    ]
+
+                    print("dataaa",tech_stack_id,topic_ids)
+
+                    debug_exercise = DebugExercise(
+                        tech_stack_id=tech_stack_id,
+                        topic_ids=topic_ids,
+                        duration=duration,
+                        path_id=unique_id,
                     )
-                )
- 
-                # After processing, close the socket
-                await websocket.close()
-                logging.info(f"[{unique_id}] WebSocket closed after accept.")
-                return
+                    db.add(debug_exercise)
+                    db.commit()
+                    print("idddd",debug_exercise.id)
+
+                    await websocket.send_json({
+                        "type": "final_id",
+                        "debug_exercise":debug_exercise.id
+                        })
+
+                    asyncio.create_task(
+                        bug_injection_and_db_save(
+                            db, model_client, unique_id, final_topics, tech_stack,
+                            difficulty, project_dir, duration, user_feedback,test_id
+                        )
+                    )
+
+                    # After processing, close the socket only after approve action
+                    await websocket.close()
+                    logging.info(f"[{unique_id}] WebSocket closed after approve action.")
+                    return
+                
+                # Handle unknown actions
+                else:
+                    logging.warning(f"[{unique_id}] Unknown action received: {feedback.get('action')}")
+                    await websocket.send_json({
+                        "type": "error", 
+                        "content": "Unknown action. Please use 'regenerate', 'feedback', or 'approve'."
+                    })
+                    continue
  
         except Exception as e:
             logging.error(f"Error during WebSocket workflow: {e}")
