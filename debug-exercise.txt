@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Exercise Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* gray-50 */
+        }
+        /* Style for code-like text blocks */
+        pre {
+            background-color: #f3f4f6; /* gray-100 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #1f2937; /* gray-800 */
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <main class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Static Header -->
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Debug Exercise Generator</h1>
+            <p class="mt-2 text-gray-600">Welcome back, nirmal! Here's what's happening today.</p>
+        </div>
+        <div class="mt-8 flex items-center space-x-4">
+            <div class="flex-shrink-0 bg-blue-100 p-3 rounded-lg">
+                <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">Debug Exercise Generator</h2>
+                <p class="mt-1 text-sm text-gray-500">Create debugging challenges for technical assessments</p>
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div id="app-content" class="mt-8">
+
+            <!-- STATE 1: CONFIGURATION SCREEN -->
+            <div id="config-screen">
+                <div class="bg-white p-8 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Exercise Configuration</h3>
+                    <p class="text-sm text-gray-500 mb-6">Configure the parameters for your debugging exercise</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="tech-stack" class="block text-sm font-medium text-gray-700">Tech Stack</label>
+                            <select id="tech-stack" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option>Select Tech Stack</option>
+                                <option>React</option>
+                                <option>Angular</option>
+                                <option>Node.js</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="difficulty" class="block text-sm font-medium text-gray-700">Difficulty Level</label>
+                            <select id="difficulty" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option>Select Difficulty</option>
+                                <option>Easy</option>
+                                <option>Intermediate</option>
+                                <option>Hard</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="concepts" class="block text-sm font-medium text-gray-700">Concepts</label>
+                            <input type="text" id="concepts" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Enter concepts (comma-separated)">
+                        </div>
+                        <div>
+                            <label for="duration" class="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+                            <input type="number" id="duration" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Enter duration">
+                        </div>
+                    </div>
+                    <div class="mt-8">
+                        <button id="generate-btn" class="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                           <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.898 20.572L16.5 21.75l-.398-1.178a3.375 3.375 0 00-2.455-2.456L12.5 18l1.178-.398a3.375 3.375 0 002.455-2.456L16.5 14.25l.398 1.178a3.375 3.375 0 002.455 2.456L20.5 18l-1.178.398a3.375 3.375 0 00-2.455 2.456z" />
+                            </svg>
+                            <span>Generate Debug Exercise</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STATE 2: REVIEW SCREEN -->
+            <div id="review-screen" class="hidden space-y-8">
+                 <div class="bg-white p-8 rounded-lg border border-gray-200">
+                    <div class="flex items-center space-x-3 mb-4">
+                         <svg class="h-6 w-6 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-800">Business Requirements Document</h3>
+                    </div>
+                    <p class="text-sm text-gray-500 mb-6">Generated BRD content - Please review and edit as needed.</p>
+                    <pre># Business Requirements Document - Debug Exercise
+
+## Project Overview
+**Title:** React Debugging Challenge
+**Difficulty:** Intermediate
+**Duration:** 122 minutes
+**Concepts:** Core programming principles
+
+## Problem Statement
+Create a debugging exercise that tests the candidate's ability to identify and fix common issues in React applications.
+
+## Requirements
+1.  **Code Base Setup**
+    - Provide a functional but buggy React application.
+    - Include multiple bug types: logical, syntactic, and runtime errors.
+    - Ensure bugs are realistic and commonly encountered.
+2.  **Bug Categories**
+    - State management issues
+    - Asynchronous operation problems
+    - Event Handling bugs
+</pre>
+                </div>
+
+                 <div class="bg-white p-8 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-6">Review and Edit BRD</h3>
+                    <textarea class="w-full h-64 p-4 border border-gray-300 rounded-md font-mono text-sm"># Business Requirements Document - Debug Exercise
+
+## Project Overview
+**Title:** React Debugging Challenge
+**Difficulty:** Intermediate
+**Duration:** 122 minutes
+**Concepts:** Core programming principles
+</textarea>
+                    <div class="mt-6 flex items-center justify-end space-x-4">
+                        <button id="regenerate-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
+                             <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.18-3.185m-3.18-5.835v4.992m0 0h-4.992m4.992 0l-3.181-3.183a8.25 8.25 0 00-11.664 0l-3.18 3.185" />
+                            </svg>
+                            <span>Regenerate BRD</span>
+                        </button>
+                        <button id="approve-btn" class="px-6 py-2 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 flex items-center space-x-2">
+                           <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                            <span>Approve BRD</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- STATE 3: FINAL SCREEN -->
+            <div id="final-screen" class="hidden space-y-8">
+                <div class="bg-green-50 border-l-4 border-green-400 text-green-700 p-4 rounded-md">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                           <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium">Debug Exercise Generated Successfully!</p>
+                            <p class="text-sm">Your debugging exercise is ready to save.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Final BRD -->
+                    <div class="bg-white p-6 rounded-lg border border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Final BRD</h3>
+                        <pre>**Duration:** 122 minutes
+**Difficulty:** Intermediate
+**Concepts:** Core programming principles
+...
+</pre>
+                    </div>
+                    <!-- Project Structure -->
+                     <div class="bg-white p-6 rounded-lg border border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Project Structure</h3>
+                        <pre># Project Structure
+## File Organization
+/debug-exercise-react
+├── src/
+│   ├── components/
+│   │   ├── Header.js (Bug: Memory leak in useEffect)
+...
+</pre>
+                    </div>
+                </div>
+                 <div class="bg-white p-6 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Bug Information</h3>
+                    <pre>
+**Type:** Infinite Loop
+**Description:** useEffect dependency array includes state that gets updated in effect
+**Severity:** High
+**Expected Fix:** Remove or correct dependency array
+
+## Bug #4: Unhandled Promise Rejection
+**Location:** src/utils/api.js:27
+**Type:** Error Handling
+...
+</pre>
+                </div>
+                <div class="pt-6 flex items-center justify-between">
+                    <button id="back-btn" class="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
+                        <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                           <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                        </svg>
+                        <span>Back to Dashboard</span>
+                    </button>
+                    <button id="save-btn" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700">Save Debug Exercise</button>
+                </div>
+            </div>
+
+            <!-- LOADING INDICATOR -->
+            <div id="loading-indicator" class="hidden text-center py-10">
+                 <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-blue-600 bg-blue-100">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating, please wait...
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const screens = {
+                config: document.getElementById('config-screen'),
+                review: document.getElementById('review-screen'),
+                final: document.getElementById('final-screen'),
+                loading: document.getElementById('loading-indicator')
+            };
+
+            const buttons = {
+                generate: document.getElementById('generate-btn'),
+                approve: document.getElementById('approve-btn'),
+                regenerate: document.getElementById('regenerate-btn'),
+                back: document.getElementById('back-btn'),
+                save: document.getElementById('save-btn')
+            };
+
+            let currentState = 'config';
+
+            const render = () => {
+                Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+                if (screens[currentState]) {
+                    screens[currentState].classList.remove('hidden');
+                }
+            };
+
+            const setState = (newState) => {
+                currentState = newState;
+                render();
+            };
+
+            buttons.generate.addEventListener('click', () => {
+                setState('loading');
+                // Simulate generation delay
+                setTimeout(() => {
+                    setState('review');
+                }, 1500);
+            });
+
+            buttons.approve.addEventListener('click', () => {
+                 setState('loading');
+                 setTimeout(() => {
+                    setState('final');
+                }, 1000);
+            });
+
+            buttons.regenerate.addEventListener('click', () => {
+                setState('config');
+            });
+            
+            buttons.back.addEventListener('click', () => {
+                // In a real app, this would navigate. Here, we just reset.
+                setState('config');
+            });
+
+            // Initial render
+            render();
+        });
+    </script>
+
+</body>
+</html>

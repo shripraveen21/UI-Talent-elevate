@@ -5,6 +5,6 @@
  */
 export const environment = {
   production: false,
-  websocketUrl: 'ws://d04a477cefb6.ngrok-free.app',
-  apiUrl: 'https://d04a477cefb6.ngrok-free.app'
+  websocketUrl: 'ws://1988cfd37549.ngrok-free.app',
+  apiUrl: 'https://1988cfd37549.ngrok-free.app'
 };

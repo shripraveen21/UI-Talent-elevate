@@ -311,10 +311,25 @@ export class CreateAssessmentComponent implements OnInit {
         }
       });
     } else if (firstComponent === 'debug') {
-      this.router.navigate(['/debug-gen'])
+      this.router.navigate(['/debug-gen'], {
+        queryParams: {
+          techStack: JSON.stringify({
+            id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+            name: this.selectedTechStack?.name
+          }),
+          concepts: JSON.stringify(this.selectedConcepts)
+        }
+      });
     } else if (firstComponent === 'handsOn') {
-      this.router.navigate(['/handson-gen']) 
-      
+      this.router.navigate(['/handson-gen'], {
+        queryParams: {
+          techStack: JSON.stringify({
+            id: this.selectedTechStack?.id || this.selectedTechStack?.tech_stack_id,
+            name: this.selectedTechStack?.name
+          }),
+          concepts: JSON.stringify(this.selectedConcepts)
+        }
+      });
     }
     // } else if (firstComponent === 'debug') {
     //   this.router.navigate(['/debug-exercise'], {
@@ -355,7 +370,10 @@ export class CreateAssessmentComponent implements OnInit {
         this.toastService.showSuccess('Assessment created and stored successfully!');
         // Clean up session storage
         sessionStorage.removeItem('assessmentDetails');
+        sessionStorage.removeItem('testDetails');
         sessionStorage.removeItem('quiz_id');
+        sessionStorage.removeItem('debug_id');
+        sessionStorage.removeItem('handson_id');
         sessionStorage.removeItem('exercise_id');
         sessionStorage.removeItem('workflowSequence');
         sessionStorage.removeItem('currentWorkflowStep');

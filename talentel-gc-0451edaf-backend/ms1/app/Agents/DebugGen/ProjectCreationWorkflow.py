@@ -52,14 +52,14 @@ Your tasks:
 IMPORTANT:
 - Output ONLY valid JSON. Do NOT include any code block markers (such as ```json), explanations, or extra text.
 - Do NOT split the JSON across multiple messages. The output must be a single, valid JSON object matching this schema:
-{
+{{
     "brd": "BRD text here",
     "topics": ["topic1", "topic2", ...],
     "suggested_topics": [
-        {"topic": "additional1", "reason": "Why it's valuable"},
+        {{"topic": "additional1", "reason": "Why it's valuable"}},
         ...
     ]
-}
+}}
 - If you do not follow this format exactly, your output will be discarded.
 
 You have access to tools for reading and writing files and directories in the project folder: {project_dir}. Use these tools to inspect or update files if needed.
@@ -174,15 +174,15 @@ class CodeAgent:
             IMPORTANT:
             - Output ONLY valid JSON. Do NOT include any code block markers (such as ```json), explanations, or extra text.
             - Do NOT split the JSON across multiple messages. The output must be a single, valid JSON object matching this schema:
-            {
-                "files": {
+            {{
+                "files": {{
                     "src/main.py": "# code here",
                     "src/utils.py": "# code here",
                     "tests/test_main.py": "# code here",
                     "docs/BRD.md": "# BRD text",
                     "docs/README.md": "# README text"
-                }
-            }
+                }}
+            }}
             - If you do not follow this format exactly, your output will be discarded.
 
             You have access to tools for reading, writing, and listing files/directories in {project_dir}. Use these tools to inspect or update files as needed.
