@@ -100,10 +100,15 @@ export class DebugExerciseComponent implements OnInit {
     userFeedback: string = '';
     isProcessing: boolean = false;
     
-    // Enhanced state management following hands-on patterns
+    // Enhanced state management following hands-on patterns with individual button loading states
     regenerationCount: number = 0;
     maxRegenerations: number = 3;
     feedbackError: string | null = null;
+    
+    // Individual loading states for each button to prevent simultaneous loading
+    isRegenerating: boolean = false;
+    isSubmittingFeedback: boolean = false;
+    isApproving: boolean = false;
     
     ws: WebSocket | null = null;
 
@@ -201,7 +206,10 @@ startExercise() {
                     if (data.type === 'error') {
                         this.status = data.content;
                         this.loading = false; // Set loading to false on error
-                        this.isProcessing = false; // Reset processing state
+                        // Reset all individual loading states on error
+                        this.isRegenerating = false;
+                        this.isSubmittingFeedback = false;
+                        this.isApproving = false;
                         // Don't close WebSocket connection on error - allow retry
                     } else if (data.type === 'brd_review') {
                         this.brd = data.brd;
@@ -210,14 +218,19 @@ startExercise() {
                         this.suggestedTopics = data.suggested_topics.map((t: any) => t.topic);
                         this.status = 'Please review the generated BRD and select your final topics to proceed.';
                         this.loading = false; // Set loading to false when BRD is ready
-                        this.isProcessing = false; // Reset processing state
+                        // Reset all individual loading states when BRD is ready
+                        this.isRegenerating = false;
+                        this.isSubmittingFeedback = false;
+                        this.isApproving = false;
                     } else if (data.type === 'brd_updated') {
                         // Handle updated BRD from feedback
                         this.brd = data.brd;
                         this.initialTopics = data.initial_topics || this.initialTopics;
                         this.suggestedTopics = data.suggested_topics ? data.suggested_topics.map((t: any) => t.topic) : this.suggestedTopics;
                         this.status = 'BRD updated based on your feedback. Please review and proceed.';
-                        this.isProcessing = false;
+                        // Reset individual loading states after successful update
+                        this.isRegenerating = false;
+                        this.isSubmittingFeedback = false;
                         this.userFeedback = ''; // Clear feedback after successful update
                     } else if (data.type === 'project_generated') {
                         this.projectInfo = data;
@@ -229,7 +242,10 @@ startExercise() {
                         console.log('[DebugGen] debug_id stored in sessionStorage:', data.debug_exercise);
                         // Close WebSocket connection only after workflow completion
                         this.status = 'Debug exercise generated successfully! Redirecting...';
-                        this.isProcessing = false;
+                        // Reset all individual loading states on completion
+                        this.isRegenerating = false;
+                        this.isSubmittingFeedback = false;
+                        this.isApproving = false;
                         // Close connection and navigate to next step
                         if (this.ws) {
                             this.ws.close();
@@ -299,7 +315,8 @@ startExercise() {
             return;
         }
 
-        this.isProcessing = true;
+        // Set individual loading state for regenerate button only
+        this.isRegenerating = true;
         this.regenerationCount++;
         this.status = `Regenerating BRD completely... (Attempt ${this.regenerationCount}/${this.maxRegenerations})`;
         this.feedbackError = null;
@@ -315,7 +332,7 @@ startExercise() {
         } catch (err) {
             console.error('[DebugGen] Error sending regenerate request:', err);
             this.status = 'Could not send regeneration request. Please retry.';
-            this.isProcessing = false;
+            this.isRegenerating = false; // Reset individual loading state on error
             this.feedbackError = 'Failed to send regeneration request';
         }
     }
@@ -336,7 +353,8 @@ startExercise() {
             return;
         }
 
-        this.isProcessing = true;
+        // Set individual loading state for feedback button only
+        this.isSubmittingFeedback = true;
         this.status = 'Processing your feedback and updating BRD...';
         this.feedbackError = null;
 
@@ -351,7 +369,7 @@ startExercise() {
         } catch (err) {
             console.error('[DebugGen] Error sending feedback:', err);
             this.status = 'Could not send feedback. Please retry.';
-            this.isProcessing = false;
+            this.isSubmittingFeedback = false; // Reset individual loading state on error
             this.feedbackError = 'Failed to send feedback to server';
         }
     }
@@ -361,13 +379,14 @@ startExercise() {
      * This method sends an 'approve' action to the backend to complete the BRD process
      */
     approveBRD(): void {
-        if (this.isProcessing || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        if (this.isApproving || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             console.warn('Cannot approve BRD: WebSocket not ready or already processing');
             this.feedbackError = 'Cannot approve at this time';
             return;
         }
 
-        this.isProcessing = true;
+        // Set individual loading state for approve button only
+        this.isApproving = true;
         this.status = 'Approving BRD and finalizing workflow...';
         this.feedbackError = null;
         
@@ -383,7 +402,7 @@ startExercise() {
             
         } catch (error) {
             console.error('[DebugGen] Error approving BRD:', error);
-            this.isProcessing = false;
+            this.isApproving = false; // Reset individual loading state on error
             this.status = 'Error occurred while approving BRD. Please try again.';
             this.feedbackError = 'Failed to approve BRD';
         }
