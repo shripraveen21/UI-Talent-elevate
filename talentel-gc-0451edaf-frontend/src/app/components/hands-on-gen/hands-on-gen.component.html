@@ -1,97 +1,241 @@
-<main class="container mx-auto max-w-2xl px-4 py-10">
-  <div class="bg-white p-8 rounded-lg border border-gray-200 shadow-soft">
-    <ng-container *ngIf="isLoading">
-      <div class="flex flex-col items-center justify-center py-8">
-        <svg class="animate-spin h-8 w-8 text-primary mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-        </svg>
-        <span class="text-primary font-medium text-lg">Loading...</span>
-      </div>
-    </ng-container>
-    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-      Hands-On Project Setup
-    </h2>
-    <form (ngSubmit)="onSubmit()" #handsonForm="ngForm" class="space-y-6">
-      <!-- Read-only Techstack and Topics display -->
-      <div class="card p-4 mb-6 bg-gray-50 border border-gray-200 rounded-lg">
-        <div class="mb-2">
-          <span class="font-semibold text-gray-700">Tech Stack:</span>
-          <span class="ml-2 text-gray-900">{{ readOnlyTechStack }}</span>
+<main class="container mx-auto max-w-7xl px-4 py-10">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+    Hands-On Project Generator
+  </h2>
+  
+  <!-- Completely separated dual-panel layout following debug component pattern -->
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- LEFT PANEL: Input forms and controls - separate container -->
+    <div class="lg:w-1/3">
+      <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-soft space-y-6">
+        <!-- Tech Stack and Topics Info Card with enhanced styling -->
+        <div class="card p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-blue-300 transition-all duration-300">
+          <h3 class="text-lg font-semibold mb-3 text-gray-800">Project Configuration</h3>
+          <div class="mb-3">
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+              </svg>
+              <span class="font-semibold text-gray-700">Tech Stack:</span>
+            </div>
+            <span class="ml-7 text-gray-900 block mt-1">{{ readOnlyTechStack }}</span>
+          </div>
+          <div>
+            <div class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              <span class="font-semibold text-gray-700">Topics:</span>
+            </div>
+            <span class="ml-7 text-gray-900 block mt-1">
+              <ng-container *ngIf="readOnlyTopics.length; else noTopics">
+                <span *ngFor="let topic of readOnlyTopics; let last = last" class="inline-flex items-center">
+                  {{ topic }}<span *ngIf="!last" class="mx-1">•</span>
+                </span>
+              </ng-container>
+              <ng-template #noTopics>
+                <span class="text-gray-400 italic">None selected</span>
+              </ng-template>
+            </span>
+          </div>
         </div>
-        <div>
-          <span class="font-semibold text-gray-700">Topics:</span>
-          <span class="ml-2 text-gray-900">
-            <ng-container *ngIf="readOnlyTopics.length; else noTopics">
-              <span *ngFor="let topic of readOnlyTopics; let last = last">
-                {{ topic }}<span *ngIf="!last">, </span>
-              </span>
-            </ng-container>
-            <ng-template #noTopics>
-              <span class="text-gray-400">None selected</span>
-            </ng-template>
-          </span>
+        
+        <!-- Project Form with enhanced styling -->
+        <form (ngSubmit)="onSubmit()" #handsonForm="ngForm" class="card p-4 bg-gray-50 border border-gray-200 rounded-lg space-y-4">
+          <div>
+            <app-shared-dropdown
+              [options]="difficultyLevels"
+              [selectedOption]="selectedDifficultyLevel"
+              [label]="'Difficulty Level'"
+              [placeholder]="'Select Difficulty'"
+              [disabled]="false"
+              (selectionChange)="onDifficultyChange($event)">
+            </app-shared-dropdown>
+          </div>
+          <div>
+            <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration (minutes)</label>
+            <div class="relative rounded-md shadow-sm">
+              <input id="duration" type="number" min="1" [(ngModel)]="duration" name="duration" 
+                class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                placeholder="30" />
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="pt-2">
+            <button type="submit" 
+              class="w-full flex items-center justify-center px-6 py-3 bg-gradient-hero text-white text-sm font-semibold rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              [disabled]="isStarting">
+              <svg *ngIf="!isStarting" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <div *ngIf="isStarting" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              {{ isStarting ? 'Starting...' : 'Start Hands-On' }}
+            </button>
+          </div>
+        </form>
+        
+        <!-- Loading State (in left panel) with enhanced styling -->
+        <div *ngIf="isLoading && !srsReview && !finalData" class="bg-white p-6 rounded-lg border border-gray-200 shadow-md">
+          <div class="flex items-center justify-center">
+            <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mr-4"></div>
+            <p class="text-gray-600">Generating hands-on project...</p>
+          </div>
         </div>
       </div>
-      <div>
-        <app-shared-dropdown
-          [options]="difficultyLevels"
-          [selectedOption]="selectedDifficultyLevel"
-          [label]="'Difficulty'"
-          [placeholder]="'Select Difficulty'"
-          [disabled]="false"
-          (selectionChange)="onDifficultyChange($event)">
-        </app-shared-dropdown>
-      </div>
-      <div>
-        <label for="duration" class="label">Duration (minutes)</label>
-        <input id="duration" [(ngModel)]="duration" name="duration" type="number" min="1" required class="input-field" />
-      </div>
-      <div class="text-center">
-        <button type="submit" class="btn-primary w-full">Start Hands-On</button>
-      </div>
-    </form>
+    </div>
+    
+    <!-- RIGHT PANEL: Generated output and results - separate container -->
+    <div class="lg:w-2/3">
+      <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-soft" *ngIf="!isLoading || srsReview || finalData || error">
+      
+        <!-- Status indicator with enhanced feedback -->
+        <div class="mb-4" *ngIf="status">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="font-medium text-gray-700">Status:</span>
+              <span class="ml-2 text-blue-600 animate-pulse">{{ status }}</span>
+            </div>
+          </div>
+        </div>
 
-    <div class="mt-8">
-      <ng-container *ngIf="srsReview">
-        <div class="card p-4 mb-4">
-          <h3 class="text-xl font-semibold mb-2">SRS Review (Attempt {{srsReview.regen_count}}/{{srsReview.max_regen}})
+        <!-- Error display with enhanced styling -->
+        <div *ngIf="feedbackError || error" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div class="flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span class="text-red-700 text-sm font-medium">{{ feedbackError || error }}</span>
+          </div>
+        </div>
+
+        <!-- SRS Review Section with enhanced styling -->
+        <div *ngIf="srsReview" class="flex flex-col h-full">
+          <h3 class="text-xl font-semibold mb-3 text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            SRS Review (Attempt {{srsReview.regen_count}}/{{srsReview.max_regen}})
           </h3>
-          <pre class="bg-gray-50 rounded-md p-3 text-sm mb-4">{{srsReview.content.srs_md}}</pre>
-          <div class="flex gap-4 justify-end">
-            <button class="btn-success" (click)="approve()">Approve</button>
-            <button class="btn-secondary" (click)="suggest()">Suggest Changes</button>
+          <div class="flex-grow mb-6">
+            <div class="bg-gray-50 rounded-md p-6 border border-gray-100 overflow-y-auto h-full min-h-[300px]">
+              <markdown [data]="srsReview.content.srs_md" class="prose prose-gray prose-base max-w-none prose-headings:mb-4 prose-headings:mt-6 prose-p:mb-4 prose-p:leading-relaxed prose-ul:mb-4 prose-ol:mb-4 prose-li:mb-2 prose-blockquote:mb-4 prose-pre:mb-4 prose-hr:my-6"></markdown>
+            </div>
+          </div>
+          
+          <!-- Feedback and Action Buttons with enhanced styling -->
+          <div class="mt-6 space-y-4">
+            <!-- Feedback Section with enhanced styling -->
+            <div class="bg-yellow-50 p-4 rounded-md border border-yellow-200">
+              <h4 class="text-sm font-medium text-yellow-800 mb-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Provide Feedback (Optional)
+              </h4>
+              <textarea 
+                [(ngModel)]="userFeedback" 
+                name="feedback"
+                class="w-full px-3 py-2 text-sm border border-yellow-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 resize-none transition-all duration-200"
+                rows="3"
+                placeholder="Share your thoughts on the SRS or suggest improvements..."
+                [class.border-red-300]="feedbackError && feedbackError.includes('required')"
+                [class.focus:ring-red-500]="feedbackError && feedbackError.includes('required')"
+                [class.focus:border-red-500]="feedbackError && feedbackError.includes('required')">
+              </textarea>
+              <!-- Character count and feedback hint -->
+              <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                <span>{{ (userFeedback || '').length }}/500 characters</span>
+                <span *ngIf="(userFeedback || '').trim().length > 0" class="text-green-600">Ready to submit</span>
+              </div>
+            </div>
+            
+            <!-- Action Buttons with enhanced styling and individual loading states -->
+            <div class="flex gap-3 justify-end">
+              <!-- Approve Button with loading state -->
+              <button 
+                type="button"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                (click)="approve()"
+                [disabled]="isApproving">
+                <span class="flex items-center">
+                  <svg *ngIf="!isApproving" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <div *ngIf="isApproving" class="w-4 h-4 border-2 border-blue-200 border-t-blue-500 rounded-full animate-spin mr-2"></div>
+                  {{ isApproving ? 'Approving...' : 'Approve' }}
+                </span>
+              </button>
+              
+              <!-- Suggest Changes Button with loading state -->
+              <button 
+                type="button"
+                class="px-4 py-2 bg-white border border-yellow-500 text-yellow-600 rounded-md hover:bg-yellow-50 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                (click)="suggest(userFeedback || '')"
+                [disabled]="isSuggesting">
+                <span class="flex items-center">
+                  <svg *ngIf="!isSuggesting" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  <div *ngIf="isSuggesting" class="w-4 h-4 border-2 border-yellow-200 border-t-yellow-500 rounded-full animate-spin mr-2"></div>
+                  {{ isSuggesting ? 'Submitting...' : 'Suggest Changes' }}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
-      </ng-container>
 
-      <ng-container *ngIf="finalData">
-        <div class="card p-4 mb-4">
-          <h3 class="text-xl font-semibold mb-2">SRS Finalized!</h3>
-          <pre class="bg-gray-50 rounded-md p-3 text-sm mb-4">{{finalData | json}}</pre>
-          <!-- If using Angular v15+, ensure JsonPipe is imported in the module or @Component.imports -->
+        <!-- Final Data Section - Hidden since auto-save is now enabled -->
+        <!-- This section is commented out as the flow now automatically saves to database -->
+        <!--
+        <div *ngIf="finalData" class="flex flex-col h-full">
+          <h3 class="text-xl font-semibold mb-3 text-gray-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            SRS Finalized!
+          </h3>
+          <div class="flex-grow mb-6">
+            <pre class="bg-gray-50 rounded-md p-4 text-sm border border-gray-100 overflow-y-auto whitespace-pre-wrap h-full min-h-[300px]">{{finalData | json}}</pre>
+          </div>
           <div class="text-right">
-            <button class="btn-primary" (click)="saveHandson()">Save HandsOn</button>
+            <button 
+              type="button"
+              class="px-6 py-3 bg-gradient-hero text-white text-sm font-semibold rounded-md hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              (click)="saveHandson()"
+              [disabled]="isSaving">
+              <span class="flex items-center">
+                <svg *ngIf="!isSaving" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                </svg>
+                <div *ngIf="isSaving" class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                {{ isSaving ? 'Saving...' : 'Save HandsOn' }}
+              </span>
+            </button>
           </div>
         </div>
-      </ng-container>
+        -->
 
-      <ng-container *ngIf="handsonStored">
-        <div class="card p-4 mb-4">
-          <h3 class="text-xl font-semibold mb-2 text-success">HandsOn Saved!</h3>
+        <!-- Success State with enhanced styling -->
+        <div *ngIf="handsonStored" class="flex flex-col items-center justify-center py-8">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2 text-green-700">HandsOn Saved Successfully!</h3>
+          <p class="text-gray-600 text-center">Your hands-on project has been saved and is ready for use.</p>
         </div>
-      </ng-container>
-
-      <ng-container *ngIf="error">
-        <div class="card p-4 mb-4">
-          <span class="error-text">{{error}}</span>
-        </div>
-      </ng-container>
+      </div>
     </div>
   </div>
 </main>
