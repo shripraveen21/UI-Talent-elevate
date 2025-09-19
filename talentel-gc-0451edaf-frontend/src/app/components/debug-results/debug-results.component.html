@@ -1,185 +1,202 @@
-<main class="container mx-auto max-w-7xl px-4 py-10" *ngIf="!loading && result">
-  <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-    Debug Exercise Results
-  </h2>
+html
+<!-- Main Content -->
+<main class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10" *ngIf="!loading && result">
+  <!-- Page Title -->
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Debug Exercise Results</h1>
+  </div>
 
-  <!-- Overall Evaluation Section -->
-  <section class="bg-white p-6 rounded-lg border border-gray-200 shadow-soft mb-8">
-    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-      Overall Evaluation
-    </h3>
-    <div class="flex flex-wrap gap-8 items-center mb-6">
-      <div class="flex items-center gap-3">
-        <span class="text-lg font-semibold text-gray-700">Score:</span>
-        <span class="text-3xl font-extrabold text-blue-600">{{ result.overall_evaluation?.overall_score | number:'1.2-2' }}/100</span>
+  <!-- Main Results Card -->
+  <div class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900">Debug Assessment Results</h2>
+      <p class="mt-1 text-sm text-gray-500">Detailed analysis of your debugging performance</p>
+    </div>
+
+    <!-- Score Section -->
+    <div class="mt-6 text-center border-b border-gray-200 pb-6">
+      <p class="text-sm font-medium text-gray-500">Overall Score</p>
+      <p class="text-gray-400 text-xs">Your performance summary</p>
+      <!-- Dynamic score color based on percentage -->
+      <p class="text-6xl font-bold mt-2" 
+         [class.text-red-600]="result.overall_evaluation?.overall_score < 60"
+         [class.text-orange-500]="result.overall_evaluation?.overall_score >= 60 && result.overall_evaluation?.overall_score < 80"
+         [class.text-green-600]="result.overall_evaluation?.overall_score >= 80">
+        {{ result.overall_evaluation?.overall_score | number:'1.0-0' }}%
+      </p>
+      <p class="text-lg font-semibold text-gray-500">{{ result.overall_evaluation?.summary }}</p>
+    </div>
+
+    <div class="grid grid-cols-4 divide-x divide-gray-200 text-center">
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ result.overall_evaluation?.overall_ratings?.correctness || 0 }}</p>
+        <p class="text-sm text-gray-500">Correctness</p>
       </div>
-      <div class="flex-1 min-w-0">
-        <span class="text-lg font-semibold text-gray-700">Summary:</span>
-        <p class="text-gray-800 font-medium mt-1">{{ result.overall_evaluation?.summary }}</p>
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ result.overall_evaluation?.overall_ratings?.completeness || 0 }}</p>
+        <p class="text-sm text-gray-500">Completeness</p>
+      </div>
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ result.overall_evaluation?.overall_ratings?.quality || 0 }}</p>
+        <p class="text-sm text-gray-500">Quality</p>
+      </div>
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ result.overall_evaluation?.overall_ratings?.alternatives || 0 }}</p>
+        <p class="text-sm text-gray-500">Alternatives</p>
       </div>
     </div>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div *ngFor="let key of ['correctness', 'completeness', 'quality', 'alternatives']" 
-           class="card p-4 bg-gray-50 border border-gray-200 rounded-lg hover:border-blue-300 transition-all duration-300">
-        <div class="text-center">
-          <span class="font-semibold capitalize text-gray-700 block mb-2" [title]="key | titlecase">{{ key }}</span>
-          <span class="text-2xl font-bold block"
-                [ngClass]="{
-                  'text-green-600': result.overall_evaluation?.overall_ratings[key] >= 8,
-                  'text-yellow-600': result.overall_evaluation?.overall_ratings[key] >= 5 && result.overall_evaluation?.overall_ratings[key] < 8,
-                  'text-red-600': result.overall_evaluation?.overall_ratings[key] < 5
-                }">
-            {{ result.overall_evaluation?.overall_ratings[key] }}
-          </span>
-        </div>
+  </div>
+
+  <!-- Bug Performance Overview -->
+  <div class="mt-8 bg-gradient-to-r from-blue-50 to-blue-50 p-8 rounded-lg border border-blue-200">
+    <div class="flex items-center space-x-3 mb-6">
+      <div class="bg-blue-100 p-1.5 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1  01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Bug Analysis Summary</h3>
+        <p class="text-sm text-gray-500">Overview of your debugging performance across all bugs</p>
       </div>
     </div>
-  </section>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <div class="text-3xl font-bold text-blue-600 mb-2">{{ result.bug_wise_results?.length || 0 }}</div>
+        <div class="text-sm font-medium text-gray-700 mb-1">Total Bugs</div>
+        <div class="text-xs text-gray-500">Debugging challenges</div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <div class="text-3xl font-bold text-green-600 mb-2">{{ getSuccessfulBugs() }}</div>
+        <div class="text-sm font-medium text-gray-700 mb-1">Successfully Fixed</div>
+        <div class="text-xs text-gray-500">Bugs resolved correctly</div>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <div class="text-3xl font-bold text-orange-600 mb-2">{{ getPartialBugs() }}</div>
+        <div class="text-sm font-medium text-gray-700 mb-1">Partially Fixed</div>
+        <div class="text-xs text-gray-500">Bugs needing improvement</div>
+      </div>
+    </div>
+  </div>
 
   <!-- Bug-wise Results Section -->
-  <section class="bg-white p-6 rounded-lg border border-gray-200 shadow-soft">
-    <h3 class="text-xl font-semibold mb-6 text-gray-800 flex items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-      Bug-wise Results
-    </h3>
-    <div class="space-y-6">
-      <div *ngFor="let bug of result.bug_wise_results; let i = index" 
-           class="card p-6 bg-gray-50 border border-gray-200 rounded-lg hover:border-blue-300 transition-all duration-300">
-        <!-- Bug Header -->
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-          <div class="mb-2 md:mb-0">
-            <span class="font-semibold text-blue-700 text-lg">Bug #{{ i + 1 }}:</span>
-            <span class="font-bold text-xl text-gray-900 ml-2">{{ bug.topic }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="badge px-4 py-2 rounded-full text-white font-semibold text-sm"
-                  [ngClass]="{
-                    'bg-green-600': bug.assessment === 'CORRECT',
-                    'bg-yellow-500': bug.assessment === 'PARTIALLY_CORRECT',
-                    'bg-red-600': bug.assessment === 'INCORRECT'
-                  }">
-              <ng-container [ngSwitch]="bug.assessment">
-                <span *ngSwitchCase="'CORRECT'">✅</span>
-                <span *ngSwitchCase="'PARTIALLY_CORRECT'">⚠️</span>
-                <span *ngSwitchCase="'INCORRECT'">❌</span>
-                <span *ngSwitchDefault>📋</span>
-              </ng-container>
-              {{ bug.assessment.replace('_', ' ') }}
+  <div class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex justify-between items-center cursor-pointer" (click)="expandedSections.bugResults = !expandedSections.bugResults">
+      <div class="flex items-center space-x-3">
+        <div class="bg-blue-100 p-1.5 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Detailed Bug Analysis</h3>
+          <p class="text-sm text-gray-500">Individual bug performance and feedback</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.bugResults" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <div *ngIf="expandedSections.bugResults" class="mt-6 space-y-6">
+      <div *ngFor="let bug of result.bug_wise_results; let i = index" class="border border-gray-200 rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 rounded-full" 
+                 [class.bg-green-500]="getBugStatus(bug) === 'success'"
+                 [class.bg-red-500]="getBugStatus(bug) === 'failed'"
+                 [class.bg-yellow-500]="getBugStatus(bug) === 'partial'"></div>
+            <h4 class="text-lg font-semibold text-gray-800">Bug #{{ i + 1 }}: {{ bug.topic }}</h4>
+            <span class="px-2 py-1 text-xs font-medium rounded-full" 
+                  [class.bg-green-100]="getBugStatus(bug) === 'success'"
+                  [class.text-green-800]="getBugStatus(bug) === 'success'"
+                  [class.bg-red-100]="getBugStatus(bug) === 'failed'"
+                  [class.text-red-800]="getBugStatus(bug) === 'failed'"
+                  [class.bg-yellow-100]="getBugStatus(bug) === 'partial'"
+                  [class.text-yellow-800]="getBugStatus(bug) === 'partial'">
+              {{ getBugStatus(bug) | titlecase }}
             </span>
           </div>
-        </div>
-        
-        <!-- Bug Metrics -->
-        <div class="mb-4 flex gap-8 flex-wrap items-center">
-          <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-700">Score:</span>
-            <span class="text-2xl font-bold text-blue-700">{{ bug.score }}/100</span>
+          <div class="text-right">
+            <div class="text-2xl font-bold" 
+                 [class.text-green-600]="bug.assessment?.overall_score >= 70"
+                 [class.text-yellow-600]="bug.assessment?.overall_score >= 50 && bug.assessment?.overall_score < 70"
+                 [class.text-red-600]="bug.assessment?.overall_score < 50">
+              {{ bug.assessment?.overall_score || 0 }}%
+            </div>
+            <div class="text-sm text-gray-500">Overall Score</div>
           </div>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 flex-1">
-            <div *ngFor="let key of ['correctness', 'completeness', 'quality', 'alternatives']" 
-                 class="text-center">
-              <span class="font-semibold capitalize text-gray-700 text-sm block" [title]="key | titlecase">{{ key }}</span>
-              <span class="font-bold px-2 py-1 rounded text-sm"
-                    [ngClass]="{
-                      'bg-green-100 text-green-800': bug.ratings[key] >= 8,
-                      'bg-yellow-100 text-yellow-800': bug.ratings[key] >= 5 && bug.ratings[key] < 8,
-                      'bg-red-100 text-red-800': bug.ratings[key] < 5
-                    }">
-                {{ bug.ratings[key] }}
+        </div>
+        <p class="text-gray-600 mb-4">{{ bug.summary }}</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngIf="bug.strengths && bug.strengths.length > 0">
+            <h5 class="font-medium text-green-700 mb-2">Strengths</h5>
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let strength of bug.strengths"
+                class="text-xs font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-md">
+                {{ strength }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="bug.areas_for_improvement && bug.areas_for_improvement.length > 0">
+            <h5 class="font-medium text-red-700 mb-2">Areas for Improvement</h5>
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let area of bug.areas_for_improvement"
+                class="text-xs font-medium bg-red-100 text-red-800 px-2.5 py-1 rounded-md">
+                {{ area }}
               </span>
             </div>
           </div>
         </div>
-        
-        <!-- Bug Summary -->
-        <div class="mb-4 p-3 bg-white rounded border border-gray-100">
-          <span class="font-semibold text-gray-700">Summary:</span>
-          <p class="text-gray-900 font-medium mt-1">{{ bug.summary }}</p>
+
+        <div *ngIf="bug.next_steps" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h5 class="font-medium text-yellow-800 mb-1">Next Steps</h5>
+          <p class="text-sm text-yellow-700">{{ bug.next_steps }}</p>
         </div>
-        
-        <!-- Collapsible Details -->
-        <div class="space-y-2">
-          <details class="group" *ngIf="bug.strengths?.length">
-            <summary class="font-semibold text-green-700 cursor-pointer hover:text-green-800 transition-colors flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transform group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-              Strengths ({{ bug.strengths.length }})
-            </summary>
-            <ul class="list-disc ml-6 mt-2 space-y-1 text-gray-700">
-              <li *ngFor="let s of bug.strengths">{{ s }}</li>
-            </ul>
-          </details>
-          
-          <details class="group" *ngIf="bug.areas_for_improvement?.length">
-            <summary class="font-semibold text-yellow-700 cursor-pointer hover:text-yellow-800 transition-colors flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transform group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-              Areas for Improvement ({{ bug.areas_for_improvement.length }})
-            </summary>
-            <ul class="list-disc ml-6 mt-2 space-y-1 text-gray-700">
-              <li *ngFor="let a of bug.areas_for_improvement">{{ a }}</li>
-            </ul>
-          </details>
-          
-          <details class="group" *ngIf="bug.next_steps?.length">
-            <summary class="font-semibold text-blue-700 cursor-pointer hover:text-blue-800 transition-colors flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transform group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-              </svg>
-              Next Steps ({{ bug.next_steps.length }})
-            </summary>
-            <ol class="list-decimal ml-6 mt-2 space-y-1 text-gray-700">
-              <li *ngFor="let n of bug.next_steps">{{ n }}</li>
-            </ol>
-          </details>
-          
-          <details class="group" *ngIf="bug.resources?.length">
-            <summary class="font-semibold text-purple-700 cursor-pointer hover:text-purple-800 transition-colors flex items-center">
+
+        <div *ngIf="bug.resources && bug.resources.length > 0" class="mt-4">
+          <details class="group">
+            <summary class="font-medium text-blue-700 cursor-pointer hover:text-blue-800 transition-colors flex items-center">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 transform group-open:rotate-90 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
               </svg>
               Resources ({{ bug.resources.length }})
             </summary>
-            <ul class="list-disc ml-6 mt-2 space-y-1 text-gray-700">
-              <li *ngFor="let r of bug.resources">
-                <a *ngIf="r.url" [href]="r.url" target="_blank" class="text-blue-600 hover:text-blue-800 underline transition-colors">{{ r.title }}</a>
-                <span *ngIf="!r.url">{{ r.title }}</span>
-              </li>
-            </ul>
+            <div class="mt-2 space-y-2">
+              <div *ngFor="let resource of bug.resources" class="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+                <a [href]="resource.url" target="_blank" class="text-blue-700 hover:text-blue-800 hover:underline font-medium flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  {{ resource.title }}
+                </a>
+                <p class="text-gray-600 text-sm mt-1">{{ resource.description }}</p>
+              </div>
+            </div>
           </details>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 </main>
 
-<!-- Loading/Error States -->
-<div *ngIf="loading" class="container mx-auto max-w-7xl px-4 py-10">
-  <div class="bg-white p-8 rounded-lg border border-gray-200 shadow-soft text-center">
-    <div class="flex items-center justify-center mb-4">
-      <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin mr-4"></div>
-      <p class="text-lg text-gray-600">Loading debug results...</p>
-    </div>
+<!-- Loading State -->
+<div *ngIf="loading" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+  <div class="flex items-center justify-center py-8">
+    <span class="text-blue-600 font-semibold text-lg animate-pulse">Loading results...</span>
   </div>
 </div>
 
-<div *ngIf="error" class="container mx-auto max-w-7xl px-4 py-10">
-  <div class="bg-white p-8 rounded-lg border border-red-200 shadow-soft text-center">
-    <div class="flex items-center justify-center mb-4">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-500 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <p class="text-lg text-red-600 font-medium">{{ error }}</p>
-    </div>
+<!-- Error State -->
+<div *ngIf="error" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+  <div class="flex items-center justify-center py-8">
+    <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
   </div>
 </div>

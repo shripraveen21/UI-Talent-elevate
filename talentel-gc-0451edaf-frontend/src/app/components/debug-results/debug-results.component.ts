@@ -844,4 +844,40 @@ export class DebugResultsComponent implements OnInit {
     div.textContent = text;
     return div.innerHTML;
   }
+
+  // Helper methods for bug status and counts
+  getBugStatus(bug: any): string {
+    // Determine bug status based on assessment score
+    if (!bug.assessment?.overall_score) {
+      return 'failed';
+    }
+    
+    const score = bug.assessment.overall_score;
+    if (score >= 70) {
+      return 'success';
+    } else if (score >= 50) {
+      return 'partial';
+    } else {
+      return 'failed';
+    }
+  }
+
+  getSuccessfulBugs(): number {
+    if (!this.result?.bug_wise_results) {
+      return 0;
+    }
+    return this.result.bug_wise_results.filter((bug: any) => this.getBugStatus(bug) === 'success').length;
+  }
+
+  getPartialBugs(): number {
+    if (!this.result?.bug_wise_results) {
+      return 0;
+    }
+    return this.result.bug_wise_results.filter((bug: any) => this.getBugStatus(bug) === 'partial').length;
+  }
+
+  // Expandable sections state
+  expandedSections = {
+    bugResults: false
+  };
 }
