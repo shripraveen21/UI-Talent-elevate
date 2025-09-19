@@ -1,19 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import 'prismjs/themes/prism-tomorrow.css';
 
-body {
+/* Debug Results Component Styles - Aligned with Application Theme */
+:host {
+  display: block;
   font-family: 'Inter', sans-serif;
-  background-color: #f8fafc; /* TalentElevate background */
+  background-color: #f8fafc;
 }
 
-/* Debug Results Component Styles */
-/* Using Tailwind CSS classes with Inter font */
-
+/* Typography and Font Styles */
 .font-inter {
   font-family: 'Inter', sans-serif;
 }
 
 /* Custom animations for loading states */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -27,7 +40,27 @@ body {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Hover effects for interactive elements */
+/* Card hover effects - consistent with other components */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Shadow for containers - consistent with application theme */
+.shadow-soft {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+}
+
+/* Primary color for icons and accents */
+.text-primary {
+  color: #4f46e5;
+}
+
+/* Enhanced hover effects for interactive elements */
 .hover\:bg-blue-700:hover {
   background-color: #1d4ed8;
 }
@@ -44,8 +77,113 @@ body {
   color: #1e40af;
 }
 
+.hover\:text-green-800:hover {
+  color: #166534;
+}
+
+.hover\:text-yellow-800:hover {
+  color: #854d0e;
+}
+
+.hover\:text-purple-800:hover {
+  color: #6b21a8;
+}
+
 .hover\:underline:hover {
   text-decoration: underline;
+}
+
+/* Transition effects for smooth interactions */
+.transition-colors {
+  transition: color 0.2s ease-in-out;
+}
+
+.transition-all {
+  transition: all 0.3s ease;
+}
+
+.transition-transform {
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Details/Summary styling for collapsible sections */
+details summary {
+  list-style: none;
+  outline: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] summary svg {
+  transform: rotate(90deg);
+}
+
+/* Badge styling for assessment status */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Status color classes for consistent theming */
+.status-pass {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-fail {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-partial {
+  background: #fef3c7;
+  color: #854d0e;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .flex-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .gap-8 {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.75rem;
+  }
+  
+  .p-6 {
+    padding: 1rem;
+  }
+  
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
 }
 
 /* PDF Content Formatting Styles */
