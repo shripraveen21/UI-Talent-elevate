@@ -58,3 +58,214 @@
 .shadow-soft {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
 }
+
+/* Markdown container styles - Using ViewEncapsulation.None for proper styling without ::ng-deep */
+/* Updated to match SRS styling with TalentElevate blue theme colors */
+.markdown-container h1,
+.markdown-container h2,
+.markdown-container h3,
+.markdown-container h4 {
+  font-weight: 700;
+  border-bottom: 1px solid #e5e7eb; /* gray-200 */
+  padding-bottom: 0.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  /* Enhanced text wrapping for long titles */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.3;
+  max-width: 100%;
+}
+
+.markdown-container h1 { 
+  font-size: 2.25rem; /* text-4xl - matching SRS */
+  color: #1e40af; /* blue-800 - TalentElevate brand color */
+  /* Responsive font sizing for better mobile display */
+}
+
+.markdown-container h2 { 
+  font-size: 1.875rem; /* text-3xl - matching SRS */
+  color: #1e40af; /* blue-800 - matching SRS */
+}
+
+/* Responsive adjustments for better title display */
+@media (max-width: 1024px) {
+  .markdown-container h1 {
+    font-size: 1.875rem; /* Smaller on tablets */
+  }
+  
+  .markdown-container h2 {
+    font-size: 1.5rem; /* Smaller on tablets */
+  }
+}
+
+@media (max-width: 640px) {
+  .markdown-container h1 {
+    font-size: 1.5rem; /* Even smaller on mobile */
+    line-height: 1.2;
+  }
+  
+  .markdown-container h2 {
+    font-size: 1.25rem; /* Even smaller on mobile */
+    line-height: 1.2;
+  }
+}
+
+.markdown-container h3 { 
+  font-size: 1.5rem; /* text-2xl - matching SRS */
+  color: #2563eb; /* blue-600 - matching SRS */
+}
+
+.markdown-container h4 { 
+  font-size: 1.25rem; /* text-xl - matching SRS */
+  color: #2563eb; /* blue-600 - matching SRS */
+}
+
+.markdown-container p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: #374151; /* gray-700 - matching SRS */
+}
+
+.markdown-container ul,
+.markdown-container ol {
+  margin-left: 1.5rem; /* matching SRS */
+  margin-bottom: 1rem;
+  list-style-position: outside; /* matching SRS */
+}
+
+.markdown-container ul { 
+  list-style-type: disc; /* matching SRS */
+}
+
+.markdown-container ol { 
+  list-style-type: decimal; /* matching SRS */
+}
+
+.markdown-container li {
+  margin-bottom: 0.5rem; /* matching SRS */
+  line-height: 1.5;
+  color: #374151; /* gray-700 - matching SRS */
+}
+
+/* Code blocks and inline code - matching SRS */
+.markdown-container code {
+  background-color: #f3f4f6; /* gray-100 - matching SRS */
+  color: #dc2626; /* red-600 - matching SRS */
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; /* matching SRS */
+  font-size: 0.875rem;
+}
+
+.markdown-container pre {
+  background-color: #f8fafc; /* slate-50 - matching SRS */
+  border: 1px solid #e2e8f0; /* slate-200 - matching SRS */
+  border-radius: 0.5rem; /* matching SRS */
+  padding: 1rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace; /* matching SRS */
+  font-size: 0.875rem;
+}
+
+.markdown-container pre code {
+  background-color: transparent;
+  padding: 0;
+  color: #334155; /* slate-700 - matching SRS */
+}
+
+/* Blockquotes - matching SRS */
+.markdown-container blockquote {
+  border-left: 4px solid #2563eb; /* blue-600 - matching SRS */
+  background-color: #eff6ff; /* blue-50 - matching SRS */
+  padding: 1rem; /* matching SRS */
+  margin: 1rem 0;
+  font-style: italic;
+  color: #1e40af; /* blue-800 - matching SRS */
+  border-radius: 0.25rem;
+}
+
+/* Horizontal rules - matching SRS */
+.markdown-container hr {
+  border: none;
+  border-top: 2px solid #e5e7eb; /* gray-200 - matching SRS */
+  margin: 2rem 0;
+}
+
+.markdown-container table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem; /* matching SRS */
+  border: 1px solid #d1d5db; /* gray-300 - matching SRS */
+}
+
+.markdown-container th,
+.markdown-container td {
+  border: 1px solid #d1d5db; /* gray-300 - matching SRS */
+  padding: 0.75rem; /* matching SRS */
+  text-align: left;
+}
+
+.markdown-container th {
+  background-color: #f3f4f6; /* gray-100 - matching SRS */
+  font-weight: 600;
+  color: #1f2937; /* gray-800 - matching SRS */
+}
+
+.markdown-container td {
+  color: #374151; /* gray-700 - matching SRS */
+}
+
+/* Strong text and emphasis - matching SRS */
+.markdown-container strong {
+  color: #1f2937; /* gray-800 - matching SRS */
+  font-weight: 600;
+}
+
+.markdown-container em {
+  font-style: italic;
+  color: #4b5563; /* gray-600 - matching SRS */
+}
+
+/* Links styling - matching SRS */
+.markdown-container a {
+  color: #2563eb; /* blue-600 - TalentElevate link color */
+  text-decoration: underline;
+  transition: color 0.2s ease-in-out;
+}
+
+.markdown-container a:hover {
+  color: #1d4ed8; /* blue-700 - matching SRS hover */
+}
+
+/* Responsive design for markdown content */
+@media (max-width: 768px) {
+  .markdown-container h1 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .markdown-container h2 {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  
+  .markdown-container h3 {
+    font-size: 1.125rem;
+  }
+  
+  .markdown-container h4 {
+    font-size: 1rem;
+  }
+  
+  .markdown-container table {
+    font-size: 0.875rem;
+  }
+  
+  /* Enhanced container padding for mobile */
+  .markdown-container {
+    padding: 0.75rem;
+  }
+}

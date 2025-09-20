@@ -141,7 +141,10 @@
             BRD
           </h3>
           <div class="flex-grow mb-6">
-            <pre class="bg-gray-50 rounded-md p-4 text-sm border border-gray-100 overflow-y-auto whitespace-pre-wrap h-full min-h-[300px]">{{ brd }}</pre>
+            <!-- Enhanced BRD display with markdown rendering and proper container -->
+            <div class="markdown-container bg-gray-50 rounded-md p-4 text-sm border border-gray-100 overflow-y-auto h-full min-h-[300px]">
+              <markdown [data]="brd"></markdown>
+            </div>
           </div>
           
           <!-- Topics Grid -->
@@ -258,7 +261,10 @@
                 </svg>
                 BRD Summary
               </h3>
-              <pre class="bg-gray-50 rounded-md p-4 text-sm border border-gray-100 overflow-auto max-h-60">{{ brd }}</pre>
+              <!-- Enhanced BRD Summary with markdown rendering -->
+              <div class="markdown-container bg-gray-50 rounded-md p-4 text-sm border border-gray-100 overflow-auto max-h-60">
+                <markdown [data]="brd"></markdown>
+              </div>
             </div>
             
             <!-- Project Info Section -->

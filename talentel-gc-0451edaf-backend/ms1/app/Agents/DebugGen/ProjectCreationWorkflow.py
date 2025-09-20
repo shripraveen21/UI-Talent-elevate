@@ -60,6 +60,7 @@ IMPORTANT:
         ...
     ]
 }}
+- The "brd" field must contain the entire BRD as Markdown-formatted text, ready to be copied into an MD file.
 - If you do not follow this format exactly, your output will be discarded.
 
 You have access to tools for reading and writing files and directories in the project folder: {project_dir}. Use these tools to inspect or update files if needed.

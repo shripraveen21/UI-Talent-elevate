@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -6,12 +6,15 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
 import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
+// Added MarkdownModule for BRD content rendering (BRD contains markdown syntax that needs processing)
+import { MarkdownModule } from 'ngx-markdown';
 
 @Component({
     selector: 'app-debug-exercise',
     templateUrl: './debug-exercise.component.html',
     styleUrls: ['./debug-exercise.component.css'],
-    imports: [FormsModule, CommonModule, SharedDropdownComponent, BackButtonComponent]
+    imports: [FormsModule, CommonModule, SharedDropdownComponent, BackButtonComponent, MarkdownModule], // Added MarkdownModule for BRD rendering
+    encapsulation: ViewEncapsulation.None // Required for proper markdown styling without ::ng-deep
 })
 export class DebugExerciseComponent implements OnInit {
     constructor(

@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { HandsonAgentService, AgentMessage } from '../../services/hands-on.service';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
 import { CommonModule } from '@angular/common';
+// Restored MarkdownModule import for SRS content rendering (SRS contains markdown syntax that needs processing)
 import { MarkdownModule } from 'ngx-markdown';
 import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-handson-workflow',
-  imports: [CommonModule, FormsModule, SharedDropdownComponent, MarkdownModule, BackButtonComponent],
-  templateUrl: './hands-on-gen.component.html'
+  imports: [CommonModule, FormsModule, SharedDropdownComponent, BackButtonComponent, MarkdownModule], // Added MarkdownModule for SRS rendering
+  templateUrl: './hands-on-gen.component.html',
+  styleUrls: ['./hands-on-gen.component.css'], // Enhanced markdown styling following reference document
+  encapsulation: ViewEncapsulation.None // Required for proper markdown styling without ::ng-deep
 })
 export class HandsonWorkflowComponent implements OnInit {
   // Configuration properties
