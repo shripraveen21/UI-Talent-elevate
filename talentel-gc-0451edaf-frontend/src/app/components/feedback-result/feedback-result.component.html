@@ -2,13 +2,17 @@
   <!-- Main Content -->
   <main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
     <!-- Back Button and Page Title -->
-    <div class="flex items-center justify-between mb-6">
-      <app-backbutton
-        [label]="'Return to Previous Page'"
-        [icon]="true"
-        [clickHandler]="returnToDashboard.bind(this)">
-      </app-backbutton>
-      <div class="flex-1 text-center">
+    <div class="relative mb-6">
+      <!-- Back button positioned absolutely to not affect centering -->
+      <div class="absolute left-0 top-0">
+        <app-backbutton
+          [label]="'Return to Previous Page'"
+          [icon]="true"
+          [clickHandler]="returnToDashboard.bind(this)">
+        </app-backbutton>
+      </div>
+      <!-- Title centered independently -->
+      <div class="text-center">
         <h1 class="text-3xl font-bold text-gray-900">Feedback</h1>
       </div>
     </div>

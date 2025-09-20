@@ -6,13 +6,14 @@ import { DebugExerciseAgentService } from '../../services/debug-exercise-agent/d
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-debug-exercise-form',
   templateUrl: './debug-exercise-form.component.html',
   styleUrls: ['./debug-exercise-form.component.css'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedDropdownComponent]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, SharedDropdownComponent, BackButtonComponent]
 })
 export class DebugExerciseFormComponent implements OnInit {
   debugForm: FormGroup;
@@ -529,5 +530,10 @@ export class DebugExerciseFormComponent implements OnInit {
       return 'rd';
     }
     return 'th';
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

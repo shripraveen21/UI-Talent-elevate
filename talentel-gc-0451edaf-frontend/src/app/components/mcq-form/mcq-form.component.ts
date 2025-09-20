@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { QuizParams } from '../../services/mcq-agent/mcq-agent.service';
+import { ReusableButtonComponent } from '../shared/reusable-button/reusable-button.component';
 
 @Component({
   selector: 'app-mcq-form',
   templateUrl: './mcq-form.component.html',
   styleUrls: ['./mcq-form.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, ReusableButtonComponent]
 })
 export class McqFormComponent implements OnInit {
   public params: QuizParams & { concepts: any[] } = {

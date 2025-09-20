@@ -2,13 +2,17 @@
   <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
     <div class="space-y-8">
       <!-- Back Button and Page Title -->
-      <div class="flex items-center justify-between mb-6">
-        <app-backbutton
-          [label]="'Return to Dashboard'"
-          [icon]="true"
-          [clickHandler]="returnToDashboard.bind(this)">
-        </app-backbutton>
-        <div class="flex-1 text-center">
+      <div class="relative mb-6">
+        <!-- Back button positioned absolutely to not affect centering -->
+        <div class="absolute left-0 top-0">
+          <app-backbutton
+            [label]="'Return to Dashboard'"
+            [icon]="true"
+            [clickHandler]="returnToDashboard.bind(this)">
+          </app-backbutton>
+        </div>
+        <!-- Title and subtitle centered independently -->
+        <div class="text-center">
           <h1 class="text-3xl font-bold text-gray-900">Assessment Creation</h1>
           <p class="mt-2 text-lg text-gray-600">Generate and assign learning concepts for your assessment</p>
         </div>
@@ -36,21 +40,26 @@
         </div>
 
         <div class="mt-6">
-          <button (click)="connect()" [disabled]="!params.name || wsConnected"
-            class="px-6 py-3 bg-gradient-hero border border-transparent rounded-md font-semibold text-sm text-white hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            <span>{{ wsConnected ? 'Generating...' : 'Generate Learning Concepts' }}</span>
-          </button>
+          <!-- Using the new reusable button component -->
+          <app-reusable-button
+            text="Generate Learning Concepts"
+            svgIcon="M13 10V3L4 14h7v7l9-11h-7z"
+            width="w-full"
+            height="px-6 py-3"
+            variant="primary"
+            [disabled]="!params.name"
+            [loading]="wsConnected"
+            loadingText="Generating..."
+            (buttonClick)="connect()">
+          </app-reusable-button>
         </div>
       </div>
 
       <!-- Loading State -->
       <div class="text-center py-8" *ngIf="isLoading">
         <div
-          class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-blue-500 bg-blue-100 transition ease-in-out duration-150">
+          class="inline-flex items-center px-4 py-2 font-medium leading-6 text-sm shadow rounded-md text-blue-500 bg-gradient-hero transition ease-in-out duration-150">
+
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none"
             viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>

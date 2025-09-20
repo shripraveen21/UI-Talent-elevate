@@ -5,10 +5,11 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
 import { CommonModule } from '@angular/common';
 import { MarkdownModule } from 'ngx-markdown';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-handson-workflow',
-  imports: [CommonModule, FormsModule, SharedDropdownComponent, MarkdownModule],
+  imports: [CommonModule, FormsModule, SharedDropdownComponent, MarkdownModule, BackButtonComponent],
   templateUrl: './hands-on-gen.component.html'
 })
 export class HandsonWorkflowComponent implements OnInit {
@@ -294,5 +295,10 @@ export class HandsonWorkflowComponent implements OnInit {
         console.error('[HandsOn] Save error:', err);
       });
     }
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

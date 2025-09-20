@@ -1,9 +1,20 @@
 <!-- Main Content -->
 <main class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-  <!-- Page Title -->
-  <div>
-    <h1 class="text-3xl font-bold text-gray-900">Debug Exercise Assessment</h1>
-    <p class="mt-2 text-gray-600">Welcome back! Here's what's happening today.</p>
+  <!-- Back Button and Page Title -->
+  <div class="relative mb-6">
+    <!-- Back button positioned absolutely to not affect centering -->
+    <div class="absolute left-0 top-0">
+      <app-backbutton
+        [label]="'Return to Dashboard'"
+        [icon]="true"
+        [clickHandler]="returnToDashboard.bind(this)">
+      </app-backbutton>
+    </div>
+    <!-- Title and subtitle centered independently -->
+    <div class="text-center">
+      <h1 class="text-3xl font-bold text-gray-900">Debug Exercise Assessment</h1>
+      <p class="mt-2 text-gray-600">Welcome back! Here's what's happening today.</p>
+    </div>
   </div>
 
   <!-- Loading State -->

@@ -4,12 +4,13 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CollaboratorService } from '../../services/collaborator/collaborator.service';
 import { EmployeeService } from '../../services/employee/employee.service';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 
 @Component({
   selector: 'app-manage-collaborator',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, BackButtonComponent],
   templateUrl: './manage-collaborator.component.html'
 })
 export class ManageCollaboratorComponent implements OnInit {
@@ -18,6 +19,9 @@ export class ManageCollaboratorComponent implements OnInit {
   collaboratorForm: FormGroup;
   loadingCollaborators = false;
   errorCollaborators = '';
+  returnToDashboard = () => {
+    window.history.back();
+  };
   success = '';
   showConfirmModal = false;
   pendingDeleteEmail = '';

@@ -119,6 +119,8 @@ fetchPermissions(): void {
         return 'Delivery Manager';
       case 'ProductManager':
         return 'Product Manager';
+      case 'DeliveryLeader':
+        return 'Deliver Leader';
       default:
         return 'User';
     }
@@ -127,12 +129,6 @@ fetchPermissions(): void {
     getRoleColor(): string {
     if (!this.userRole) return 'gray';
     switch (this.userRole) {
-      case 'employee':
-        return 'green';
-      case 'capability_leader':
-        return 'blue';
-      case 'delivery_manager':
-        return 'blue';
       case 'Employee':
         return 'green';
       case 'CapabilityLeader':
@@ -140,6 +136,8 @@ fetchPermissions(): void {
       case 'DeliveryManager':
         return 'blue';
       case 'ProductManager':
+        return 'orange';
+      case 'DeliveryLeader':
         return 'orange';
       default:
         return 'gray';

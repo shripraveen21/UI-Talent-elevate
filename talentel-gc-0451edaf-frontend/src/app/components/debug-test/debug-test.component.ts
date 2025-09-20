@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardService } from '../../services/testAttempt/dashboard.service';
 import { CommonModule } from '@angular/common';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 import * as Prism from 'prismjs';
 import 'prismjs/themes/prism.css';
 
@@ -9,7 +10,7 @@ import 'prismjs/themes/prism.css';
   selector: 'app-debug-test',
   templateUrl: './debug-test.component.html',
   styleUrls: ['./debug-test.component.css'],
-  imports: [CommonModule]
+  imports: [CommonModule, BackButtonComponent]
 })
 export class DebugTestComponent implements OnInit, OnDestroy, AfterViewInit {
   debugTestId!: number;
@@ -260,5 +261,10 @@ export class DebugTestComponent implements OnInit, OnDestroy, AfterViewInit {
         Prism.highlightAll();
       }, 100);
     }
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

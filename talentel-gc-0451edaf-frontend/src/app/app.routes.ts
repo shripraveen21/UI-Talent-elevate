@@ -31,7 +31,7 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent,canActivate: [LoginGuard] },
   { path: 'login', component: LoginComponent ,canActivate: [LoginGuard]},
   { path: 'agent-chat', component: AgentChatComponent },
-   { path: 'dashboard', component: DashboardComponent },
+  //  { path: 'dashboard', component: DashboardComponent },
   { path: 'test/:id', component: TestComponent },
   { path: 'results/:id', component: ResultsComponent },
   { path: "debug-res", component: DebugFeedbackComponent},

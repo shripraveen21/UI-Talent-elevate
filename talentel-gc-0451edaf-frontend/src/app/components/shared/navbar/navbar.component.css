@@ -1,8 +1,9 @@
-/* Custom navbar styles */
+/* Custom navbar styles - Updated for fixed positioning */
 .navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* Removed background and positioning as these are now handled by Tailwind classes */
+  /* background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); */
+  /* padding: 1rem 0; */
+  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
 }
 
 .navbar-content {

@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { EmployeeService } from '../../services/employee/employee.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-profile-page',
@@ -69,5 +70,10 @@ export class ProfilePageComponent implements OnInit {
       default:
         return '📚';
     }
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

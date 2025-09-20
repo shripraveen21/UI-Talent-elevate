@@ -5,6 +5,6 @@
  */
 export const environment = {
   production: false,
-  websocketUrl: 'wss://talentel-gc-0451edaf-ms-1-244053109441.us-west2.run.app',
-  apiUrl: 'https://talentel-gc-0451edaf-ms-1-244053109441.us-west2.run.app'
+  websocketUrl: 'wss://bd7114f0fc8f.ngrok-free.app',
+  apiUrl: 'https://bd7114f0fc8f.ngrok-free.app'
 };

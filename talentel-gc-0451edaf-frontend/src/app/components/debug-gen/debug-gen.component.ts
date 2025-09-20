@@ -5,12 +5,13 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
     selector: 'app-debug-exercise',
     templateUrl: './debug-exercise.component.html',
     styleUrls: ['./debug-exercise.component.css'],
-    imports: [FormsModule, CommonModule, SharedDropdownComponent]
+    imports: [FormsModule, CommonModule, SharedDropdownComponent, BackButtonComponent]
 })
 export class DebugExerciseComponent implements OnInit {
     constructor(
@@ -24,7 +25,9 @@ export class DebugExerciseComponent implements OnInit {
 
     readOnlyTechStack: string = '';
     readOnlyTopics: string[] = [];
-
+    returnToDashboard = () => {
+        window.history.back();
+    };
     ngOnInit() {
         // Fetch tech stack and topics from sessionStorage
         const assessmentDetailsRaw = sessionStorage.getItem('assessmentDetails');

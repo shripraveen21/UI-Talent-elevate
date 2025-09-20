@@ -2,7 +2,7 @@
 <app-navbar></app-navbar>
 
 <!-- Main Content -->
-<main>
+<main [ngClass]="shouldShowNavbar ? 'pt-20 md:pt-24' : 'pt-0'">
   <router-outlet></router-outlet>
 </main>
 

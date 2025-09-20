@@ -6,12 +6,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast/toast.service';
 import { LoginService } from '../../services/login/login.service';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
   styleUrls: ['./test.component.css'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, BackButtonComponent]
 })
 export class TestComponent implements OnInit, OnDestroy {
   @ViewChild('testContainer', { static: true }) testContainer!: ElementRef;
@@ -23,6 +24,7 @@ export class TestComponent implements OnInit, OnDestroy {
   loading = true;
   error = '';
   submitted = false;
+  isTestStarted = false; // Property to track if test has started
 
   // test metadata & data
   testId!: number;
@@ -329,5 +331,10 @@ export class TestComponent implements OnInit, OnDestroy {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

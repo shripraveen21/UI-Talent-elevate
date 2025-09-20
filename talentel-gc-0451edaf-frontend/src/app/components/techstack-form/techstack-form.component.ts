@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
+import { ReusableButtonComponent } from '../shared/reusable-button/reusable-button.component';
 
 // Define skill level types for better type safety
 type Level = 'beginner' | 'intermediate' | 'advanced';
@@ -24,7 +25,7 @@ interface SelectableTopic extends Topic {
   templateUrl: './techstack-form.component.html',
   styleUrls: ['./techstack-form.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ToastComponent, DragDropModule, BackButtonComponent]
+  imports: [CommonModule, FormsModule, ToastComponent, DragDropModule, BackButtonComponent, ReusableButtonComponent]
 })
 export class TechStackFormComponent implements OnInit {
   topicDescription: string = '';

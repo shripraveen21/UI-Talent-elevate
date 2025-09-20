@@ -8,13 +8,14 @@ import { McqAgentService, QuizParams, AgentMessage } from '../../services/mcq-ag
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
 import { LoginService } from '../../services/login/login.service';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-mcq-quiz',
   templateUrl: './mcq-quiz.component.html',
   styleUrls: ['./mcq-quiz.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, McqFormComponent, McqQuestionComponent]
+  imports: [CommonModule, FormsModule, McqFormComponent, McqQuestionComponent, BackButtonComponent]
 })
 export class McqQuizComponent implements OnInit, OnDestroy {
   quizParams?: QuizParams;
@@ -298,5 +299,10 @@ export class McqQuizComponent implements OnInit, OnDestroy {
     
     this.closeRegenerateModal();
     this.regeneratingQuestionIndex = null;
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }

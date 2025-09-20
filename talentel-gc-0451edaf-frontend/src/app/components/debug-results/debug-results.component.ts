@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { MarkdownModule } from 'ngx-markdown';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PdfDownloadModalComponent } from '../shared/pdf-download-modal/pdf-download-modal.component';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import 'prismjs';
@@ -22,7 +23,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'app-debug-results',
   templateUrl: './debug-results.component.html',
   styleUrls: ['./debug-results.component.css'],
-  imports: [CommonModule, MarkdownModule]
+  imports: [CommonModule, MarkdownModule, BackButtonComponent]
 })
 export class DebugResultsComponent implements OnInit {
   userName: string = '';
@@ -30,7 +31,9 @@ export class DebugResultsComponent implements OnInit {
   result: any = null;
   loading = true;
   error = '';
-  
+  returnToDashboard = () => {
+    window.history.back();
+  };
   // PDF Modal state
   showPdfModal = false;
   isGeneratingPdf = false;
@@ -881,4 +884,6 @@ export class DebugResultsComponent implements OnInit {
   expandedSections = {
     bugResults: false
   };
+
+
 }

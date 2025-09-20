@@ -4,6 +4,7 @@ import { TechStackAgentService } from '../../services/techstack-agent/techstack-
 import { ToastService } from '../../services/toast/toast.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 type Level = 'beginner' | 'intermediate' | 'advanced';
 
 interface Topic {
@@ -18,7 +19,7 @@ interface Topic {
   templateUrl: './update-topics.component.html',
   styleUrls: ['./update-topics.component.css'],
   standalone: true,
-  imports: [FormsModule, CommonModule]
+  imports: [FormsModule, CommonModule, BackButtonComponent]
 })
 export class UpdateTopicsComponent implements OnInit {
   techStackId: string = '';
@@ -157,5 +158,10 @@ export class UpdateTopicsComponent implements OnInit {
         this.toastService.showError('Failed to update topics');
       }
     });
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    window.history.back();
   }
 }

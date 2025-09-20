@@ -1,0 +1,74 @@
+/* Reusable Button Component Styles */
+
+/* Custom gradient background for primary variant */
+.bg-gradient-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Enhanced glow effect on hover */
+.hover\:shadow-glow:hover {
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Smooth transitions for all interactive states */
+button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced focus states for accessibility */
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* Disabled state styling */
+button:disabled {
+  transform: none !important;
+  box-shadow: none !important;
+  opacity: 0.6;
+}
+
+/* Loading state specific styling */
+button.loading {
+  cursor: wait;
+}
+
+/* Icon and text spacing adjustments */
+button svg + span {
+  margin-left: 0.5rem;
+}
+
+/* Responsive icon sizing */
+@media (max-width: 640px) {
+  button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+/* Animation for loading spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Variant-specific hover effects */
+.bg-gradient-hero:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+.bg-gray-100:hover:not(:disabled) {
+  background-color: #f3f4f6;
+}
+
+.bg-red-600:hover:not(:disabled) {
+  background-color: #dc2626;
+}

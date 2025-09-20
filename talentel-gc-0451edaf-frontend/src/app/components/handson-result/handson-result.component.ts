@@ -4,13 +4,14 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MarkdownModule } from 'ngx-markdown';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardService } from '../../services/testAttempt/dashboard.service';
+import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
 
 @Component({
   selector: 'app-handson-result',
   templateUrl: './handson-result.component.html',
   styleUrls: ['./handson-result.component.css'],
   standalone: true,
-  imports: [CommonModule, MarkdownModule]
+  imports: [CommonModule, MarkdownModule, BackButtonComponent]
 })
 export class HandsonResultComponent implements OnInit {
   result: any = null;
@@ -157,5 +158,10 @@ export class HandsonResultComponent implements OnInit {
    */
   sanitize(text: string): SafeHtml {
     return this.sanitizer.bypassSecurityTrustHtml(text);
+  }
+
+  // Navigation method for back button
+  returnToDashboard(): void {
+    this.router.navigate(['/dashboard']);
   }
 }
