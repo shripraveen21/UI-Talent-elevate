@@ -64,6 +64,7 @@ def get_assigned_tests(
     assignments = db.query(TestAssign).filter(TestAssign.user_id == employee.user_id).all()
     tests = []
     for assignment in assignments:
+        print(assignment.debug_github_url,"asssing")
 
         # Quiz details
         test = db.query(Test).filter(Test.id == assignment.test_id).first()

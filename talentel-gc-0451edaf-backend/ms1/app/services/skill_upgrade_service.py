@@ -31,7 +31,7 @@ async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: 
             raise Exception(f"No MCQ questions created: {tech_stack.name}")
         # Use agent-based debug exercise generation from DebugGenAuto
         # Use agent-based hands-on generation from HandsONGenAuto
-        handson_result = run_handson_gen_auto(
+        handson_result = await run_handson_gen_auto(
             db=db,
             tech_stack=tech_stack.name if hasattr(tech_stack, "name") else tech_stack,
             topics=[t.name for t in topics if hasattr(t, "name")],
@@ -64,6 +64,8 @@ async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: 
             raise Exception(f"No debug exercises created: {tech_stack.name}")
 
         db.flush()  # Ensures mcq.id and exercise.id are populated
+
+
 
         test = Test(
             created_by=user_id,

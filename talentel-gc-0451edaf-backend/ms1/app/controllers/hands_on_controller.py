@@ -14,6 +14,7 @@ def get_handson_result(handson_id: int, db: Session = Depends(get_db),user=Depen
     """
     import logging
     try:
+        print(handson_id,"handson result")
 
         employee = db.query(Employee).filter(Employee.email == user["sub"]).first()
         if not employee:

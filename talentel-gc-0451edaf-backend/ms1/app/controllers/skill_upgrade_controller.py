@@ -1,3 +1,5 @@
+import asyncio
+
 from ..config.database import get_db
 from ..services.skill_upgrade_service import *
 from ..services.rbac_service import RBACService
@@ -7,7 +9,7 @@ from ..schemas.test_schema import TestOut,SkillUpgradeRequest
 
 router = APIRouter()
 
-@router.post('/skill-upgrade', response_model=TestOut)
+@router.post('/skill-upgrade')
 async def skill_upgrade(
     request: SkillUpgradeRequest,
     db: Session = Depends(get_db),
@@ -22,13 +24,13 @@ async def skill_upgrade(
         if not tech_stack_db:
             raise HTTPException(status_code=404, detail="Tech stack not found")
 
-        test = await create_skill_upgrade_test(
+        test = asyncio.create_task(create_skill_upgrade_test(
             db=db, tech_stack_name=request.tech_stack,
             user_id=user.user_id, level=request.level,
             background_tasks=background_tasks
-        )
+        ))
         # Convert SQLAlchemy model to Pydantic schema
-        return TestOut.from_orm(test)
+        return {"status": "Generating"}
     except HTTPException as e:
         raise e
     except Exception as e:

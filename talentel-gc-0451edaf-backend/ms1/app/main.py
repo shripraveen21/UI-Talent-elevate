@@ -28,16 +28,18 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 scheduler = BackgroundScheduler()
- 
+
+
 def schedule_async_job(coro):
     asyncio.run(coro)
+
 
 @app.on_event("startup")
 def start_scheduler():
     scheduler.add_job(
         lambda: schedule_async_job(evaluate_unevaluated_debug_assignments()),
         trigger="interval",
-        seconds=3600,id="debug_evaluator",
+        seconds=3600, id="debug_evaluator",
     )
     scheduler.add_job(
         lambda: schedule_async_job(evaluate_unevaluated_handson_assignments()),
@@ -45,20 +47,23 @@ def start_scheduler():
         seconds=3600, id="handson_evaluator",
     )
     scheduler.start()
- 
+
+
 @app.on_event("shutdown")
 def stop_scheduler():
     scheduler.shutdown()
- 
+
+
 # CORS configuration to allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200","*"],  
+    allow_origins=["http://localhost:4200", "*"],
 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 def get_db():
     db = SessionLocal()
@@ -67,22 +72,29 @@ def get_db():
     finally:
         db.close()
 
+
 app.include_router(auth_router)
 app.include_router(rbac_router)
 
 from .controllers.debug_test_controller import router as debug_test_router
+
 app.include_router(debug_test_router)
 from .AgentEndpoints.DebugGenWS import router as debug_gen_router
-# from .controllers.debug_feedback_controller import router as debug_res_router
+from .controllers.feedback_controller import router as res_router
 
 from .AgentEndpoints.HandsONGen import router as handson_router
 
 from .controllers.employee_dashboard_controller import router as employee_dashboard_router
+
+
+from .controllers.hands_on_controller import router as handson_router_feedback
+
+
 app.include_router(employee_dashboard_router)
 app.include_router(tech_stack_router)
 app.include_router(topic_router)
 app.include_router(handson_router)
-# app.include_router(debug_res_router)
+app.include_router(res_router)
 app.include_router(collaborators_router)
 app.include_router(test_router)
 app.include_router(agent_chat_router)
@@ -94,10 +106,13 @@ app.include_router(employee_router)
 app.include_router(test_assign_router)
 app.include_router(skill_upgrade_router)
 app.include_router(debug_gen_router)
+app.include_router(handson_router_feedback)
 
 from .controllers.feedback_pdf_controller import router as feedback_pdf_router
+
 app.include_router(feedback_pdf_router)
 app.include_router(github_router)
 
 from .controllers.database_admin_controller import router as database_admin_router
+
 app.include_router(database_admin_router)

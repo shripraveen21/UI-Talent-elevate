@@ -310,7 +310,7 @@
         </svg>
       </div>
     </div>
-    <div *ngIf="expandedSections.resources" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div *ngIf="expandedSections.resources && !employeeLogin" class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div *ngFor="let res of getRecommendedResources()"
         class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-colors">
         <div class="flex items-center space-x-4">

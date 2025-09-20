@@ -18,6 +18,9 @@ export class HandsonResultComponent implements OnInit {
   error = '';
   handsonId!: number;
 
+  // For expanding/collapsing milestone details
+  expandedSections = true;
+
   constructor(
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
@@ -28,6 +31,7 @@ export class HandsonResultComponent implements OnInit {
   ngOnInit(): void {
     this.handsonId = Number(this.route.snapshot.paramMap.get('id'));
     const token = localStorage.getItem('token');
+    console.log("result handson started")
     if (token && this.handsonId) {
       this.dashboardService.getHandsonResult(this.handsonId, token).subscribe({
         next: (data) => {
@@ -49,6 +53,27 @@ export class HandsonResultComponent implements OnInit {
       this.error = 'Handson or authentication info missing';
       this.loading = false;
     }
+  }
+
+  /**
+   * Returns the total number of milestones.
+   */
+  getMilestoneCount(): number {
+    return this.getMilestones().length;
+  }
+
+  /**
+   * Returns the number of milestones with assessment === 'CORRECT'.
+   */
+  getCorrectMilestoneCount(): number {
+    return this.getMilestones().filter((m: any) => m.assessment === 'CORRECT').length;
+  }
+
+  /**
+   * Returns the number of milestones with assessment === 'PARTIALLY_CORRECT'.
+   */
+  getPartialMilestoneCount(): number {
+    return this.getMilestones().filter((m: any) => m.assessment === 'PARTIALLY_CORRECT').length;
   }
 
   /**

@@ -26,6 +26,84 @@ export class DashboardComponent implements OnInit {
     private toastService: ToastService
   ) {}
 
+
+  async markDebugCompleted(test: any): Promise<void> {
+    try {
+      test.debugCompleted = true;
+
+      // Call evaluation endpoint
+      const test_id = test.test_id;
+      if (!test_id) {
+        this.toastService?.showError?.('Debug ID not found.');
+        return;
+      }
+
+      // Call the service method (to be implemented in DashboardService)
+      await this.dashboardService.evaluateDebugTest(test_id).toPromise();
+
+      test.debugSubmitted = true;
+
+      console.log(JSON.stringify({
+        level: 'INFO',
+        message: 'Debug test marked as completed and submitted for evaluation',
+        testId: test_id,
+        githubUrl: test.debugGithubUrl || test.debug_url,
+        timestamp: new Date().toISOString()
+      }));
+
+      this.toastService?.showSuccess?.('Submitted for evaluation');
+
+    } catch (error: any) {
+      console.error(JSON.stringify({
+        level: 'ERROR',
+        message: 'Failed to submit Debug test for evaluation',
+        error: error?.message || error,
+        testId: test.test_id,
+        timestamp: new Date().toISOString()
+      }));
+      this.toastService?.showError?.('Error submitting Debug test for evaluation.');
+    }
+  }
+
+ 
+  async markHandsonCompleted(test: any): Promise<void> {
+    try {
+      test.handsonCompleted = true;
+
+      // Call evaluation endpoint
+      const test_id = test.test_id;
+      if (!test_id) {
+        this.toastService?.showError?.('Handson ID not found.');
+        return;
+      }
+
+      // Call the service method (to be implemented in DashboardService)
+      await this.dashboardService.evaluateHandsonTest(test_id).toPromise();
+
+      test.handsonSubmitted = true;
+
+      console.log(JSON.stringify({
+        level: 'INFO',
+        message: 'Handson test marked as completed and submitted for evaluation',
+        testId: test_id,
+        githubUrl: test.handsonGithubUrl || test.handson_url,
+        timestamp: new Date().toISOString()
+      }));
+
+      this.toastService?.showSuccess?.('Submitted for evaluation');
+
+    } catch (error: any) {
+      console.error(JSON.stringify({
+        level: 'ERROR',
+        message: 'Failed to submit Handson test for evaluation',
+        error: error?.message || error,
+        testId: test.test_id,
+        timestamp: new Date().toISOString()
+      }));
+      this.toastService?.showError?.('Error submitting Handson test for evaluation.');
+    }
+  }
+
 ngOnInit(): void {
     const token = localStorage.getItem('token');
     const userInfo = localStorage.getItem('user'); // Optional: store user info at login
@@ -68,7 +146,6 @@ ngOnInit(): void {
   }
 
   dueDateOver(test:any) : Boolean {
-    console.log(new Date(test.due_date),"due date",new Date())
     return new Date() > new Date(test.due_date);
   }
 

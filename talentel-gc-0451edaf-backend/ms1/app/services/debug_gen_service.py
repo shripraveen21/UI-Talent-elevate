@@ -50,13 +50,13 @@ async def save_handson_results(path_id, user_id, results):
         if not handson_exercise:
             raise Exception(f"No hands-on exercise found for path_id {path_id}")
 
-        overall_eval = results.get("overall_evaluation")
-        print(f"overall_evaluation: {overall_eval}")
-
-        if isinstance(overall_eval, dict):
-            overall_score = overall_eval.get("overall_score")
-        else:
-            overall_score = getattr(overall_eval, "overall_score", None)
+        overall_score = results.get("overall_score")
+        # print(f"overall_evaluation: {overall_eval}")
+        #
+        # if isinstance(overall_eval, dict):
+        #     overall_score = overall_eval.get("overall_score")
+        # else:
+        #     overall_score = getattr(overall_eval, "overall_score", None)
         print(f"overall_score: {overall_score}")
 
         # Correct model for result

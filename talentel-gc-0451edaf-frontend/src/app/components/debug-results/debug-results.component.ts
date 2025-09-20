@@ -9,6 +9,7 @@ import { PdfDownloadModalComponent } from '../shared/pdf-download-modal/pdf-down
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import 'prismjs';
+import Prism from 'prismjs'
 import 'prismjs/components/prism-typescript';
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-python';

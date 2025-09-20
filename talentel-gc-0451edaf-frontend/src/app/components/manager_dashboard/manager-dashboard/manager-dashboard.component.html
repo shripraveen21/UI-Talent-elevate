@@ -36,8 +36,8 @@
             (click)="selectTest(test.id)">
             <div class="flex justify-between items-start">
               <h3 class="font-semibold text-gray-800">{{ test.test_name || 'Test #' + test.id }}</h3>
-              <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">{{
-                test.difficulty || 'Intermediate' }}</span>
+              <!-- <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">{{
+                test.test_name || 'basic' }}</span> -->
             </div>
             <div class="flex items-center space-x-4 text-sm text-gray-500">
               <span>Type: {{ getTestType(test) }}</span>

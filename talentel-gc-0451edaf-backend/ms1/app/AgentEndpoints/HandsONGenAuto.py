@@ -13,7 +13,7 @@ from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
 
 router = APIRouter()
 
-def run_handson_gen_auto(
+async def run_handson_gen_auto(
     db: Session,
     tech_stack: str,
     topics: list,
@@ -35,71 +35,26 @@ def run_handson_gen_auto(
 
         # SRS Generation (no feedback loop)
         requirements_agent = RequirementsAgent(model_client, project_dir, FileSystemTool)
-        srs_md = requirements_agent.generate_srs_sync(tech_stack, topics) if hasattr(requirements_agent, "generate_srs_sync") else requirements_agent.generate_srs(tech_stack, topics)
-        if hasattr(srs_md, "__await__"):
-            import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    import nest_asyncio
-                    nest_asyncio.apply()
-                    srs_md = loop.run_until_complete(srs_md)
-                else:
-                    srs_md = loop.run_until_complete(srs_md)
-            except Exception:
-                srs_md = asyncio.run(srs_md)
+        srs_md = await requirements_agent.generate_srs(tech_stack, topics)
 
         # Assignment
         assignment_agent = AssignmentAgent(model_client, project_dir, FileSystemTool)
-        assignment_md = assignment_agent.generate_assignment_sync("Project", srs_md) if hasattr(assignment_agent, "generate_assignment_sync") else assignment_agent.generate_assignment("Project", srs_md)
-        if hasattr(assignment_md, "__await__"):
-            import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    import nest_asyncio
-                    nest_asyncio.apply()
-                    assignment_md = loop.run_until_complete(assignment_md)
-                else:
-                    assignment_md = loop.run_until_complete(assignment_md)
-            except Exception:
-                assignment_md = asyncio.run(assignment_md)
+        assignment_md = await assignment_agent.generate_assignment(f"Skill Upgrade {tech_stack}", srs_md)
+
         assignment_path = Path(project_dir) / "ASSIGNMENT.md"
         FileSystemTool.write_file(assignment_path, assignment_md)
 
         # README
         readme_agent = ReadmeAgent(model_client, project_dir, FileSystemTool)
-        readme_md = readme_agent.generate_readme_sync(srs_md) if hasattr(readme_agent, "generate_readme_sync") else readme_agent.generate_readme(srs_md)
-        if hasattr(readme_md, "__await__"):
-            import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    import nest_asyncio
-                    nest_asyncio.apply()
-                    readme_md = loop.run_until_complete(readme_md)
-                else:
-                    readme_md = loop.run_until_complete(readme_md)
-            except Exception:
-                readme_md = asyncio.run(readme_md)
+        readme_md = await readme_agent.generate_readme(srs_md)
+
         readme_path = Path(project_dir) / "README.md"
         FileSystemTool.write_file(readme_path, readme_md)
 
         # Boilerplate
         boilerplate_agent = BoilerplateAgent(model_client, project_dir, FileSystemTool, tech_stack)
-        files = boilerplate_agent.generate_boilerplate_sync(srs_md) if hasattr(boilerplate_agent, "generate_boilerplate_sync") else boilerplate_agent.generate_boilerplate(srs_md)
-        if hasattr(files, "__await__"):
-            import asyncio
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    import nest_asyncio
-                    nest_asyncio.apply()
-                    files = loop.run_until_complete(files)
-                else:
-                    files = loop.run_until_complete(files)
-            except Exception:
-                files = asyncio.run(files)
+        files = await boilerplate_agent.generate_boilerplate(srs_md)
+
         for filename, code in files.items():
             file_path = Path(project_dir) / filename
             FileSystemTool.write_file(file_path, code)

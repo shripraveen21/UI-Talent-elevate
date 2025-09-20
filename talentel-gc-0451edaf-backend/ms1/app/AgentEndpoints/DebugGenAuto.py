@@ -63,12 +63,6 @@ async def run_debug_gen_auto(
         final_topics = brd_data["topics"] + [item["topic"] for item in brd_data["suggested_topics"]]
         brd_text = brd_data["brd"]
 
-        # 3. Regenerate BRD if user_feedback is provided (optional, usually empty)
-        if user_feedback:
-            brd_data = await brd_agent.generate_brd(tech_stack, final_topics, feedback=user_feedback)
-            brd_text = brd_data["brd"]
-            logging.info(f"[{unique_id}] BRD regenerated with feedback.")
-
         # 4. Generate project structure
         structure_agent = StructureAgent(model_client, project_dir)
         structure, rationale = await structure_agent.generate_structure(brd_text, final_topics)

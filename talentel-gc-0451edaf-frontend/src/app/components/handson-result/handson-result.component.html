@@ -1,102 +1,186 @@
-<div class="handson-result-container" *ngIf="!loading && result">
-  <!-- Overall Evaluation Section -->
-  <section class="overall-evaluation mb-10 p-8 rounded-xl shadow-lg bg-white border border-gray-200">
-    <h2 class="text-3xl font-bold mb-4 text-blue-900">Overall Evaluation</h2>
-    <div class="flex flex-wrap gap-8 items-center mb-6">
-      <div>
-        <span class="text-xl font-semibold text-gray-700">Score:</span>
-        <span class="text-4xl font-extrabold text-blue-600">
-          {{ getOverallScore() !== null ? (getOverallScore() | number:'1.2-2') : 'N/A' }}/100
-        </span>
-      </div>
+<!-- Main Content -->
+<main class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10 handson-result-container"
+  *ngIf="!loading && result">
+  <!-- Page Title -->
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Handson Exercise Results</h1>
+  </div>
 
+  <!-- Overall Evaluation Card -->
+  <div class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+    <div>
+      <h2 class="text-xl font-semibold text-gray-900">Handson Assessment Results</h2>
+      <p class="mt-1 text-sm text-gray-500">Detailed analysis of your handson performance</p>
     </div>
-    <div class="overall-ratings grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div *ngFor="let key of ['completeness', 'clarity', 'readiness', 'documentation']">
-        <div class="rating-card p-4 rounded-lg bg-blue-50 shadow-sm flex flex-col items-center">
-          <span class="font-semibold capitalize text-blue-900" [title]="key | titlecase">{{ key }}</span>
-          <span class="block text-2xl font-bold"
-                [ngClass]="getStatusBadgeClass(getRating(key) ?? 0)">
-            {{ getRating(key) !== null ? getRating(key) : 'N/A' }}
-          </span>
-        </div>
+
+    <!-- Score Section -->
+    <div class="mt-6 text-center border-b border-gray-200 pb-6">
+      <p class="text-sm font-medium text-gray-500">Overall Score</p>
+      <p class="text-gray-400 text-xs">Your performance summary</p>
+      <p class="text-6xl font-bold mt-2"
+        [class.text-red-600]="(getOverallScore() ?? 0) < 60"
+        [class.text-orange-500]="(getOverallScore() ?? 0) >= 60 && (getOverallScore() ?? 0) < 80"
+        [class.text-green-600]="(getOverallScore() ?? 0) >= 80">
+        <ng-container *ngIf="getOverallScore() !== null; else noScore">
+          {{ getOverallScore() | number:'1.0-0' }}%
+        </ng-container>
+        <ng-template #noScore>N/A</ng-template>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-4 divide-x divide-gray-200 text-center">
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ getRating('completeness') ?? 0 }}</p>
+        <p class="text-sm text-gray-500">Completeness</p>
+      </div>
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ getRating('clarity') ?? 0 }}</p>
+        <p class="text-sm text-gray-500">Clarity</p>
+      </div>
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ getRating('readiness') ?? 0 }}</p>
+        <p class="text-sm text-gray-500">Readiness</p>
+      </div>
+      <div class="py-4">
+        <p class="text-2xl font-bold text-blue-600">{{ getRating('documentation') ?? 0 }}</p>
+        <p class="text-sm text-gray-500">Documentation</p>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- Milestone-wise Results Section -->
-  <section class="milestone-wise-results">
-    <h2 class="text-2xl font-bold mb-6 text-blue-900">Milestone-wise Results</h2>
-    <div *ngFor="let milestone of getMilestones(); let i = index" class="milestone-result mb-10 mx-6 p-8 rounded-xl shadow-lg bg-white border border-gray-200">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-        <div>
-          <span class="font-semibold text-blue-700 text-lg">Milestone #{{ i + 1 }}:</span>
-          <span class="font-bold text-xl">{{ milestone.milestone || 'Unnamed Milestone' }}</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="badge px-4 py-2 rounded-full text-white font-semibold text-lg"
-                [ngClass]="getStatusBadgeClass((milestone.score ?? 0))">
-            <span>{{ getAssessmentIcon(milestone.assessment || '') }}</span>
-            {{ (milestone.assessment || 'UNKNOWN').replace('_', ' ') }}
-          </span>
-        </div>
+  <div class="mt-8 bg-gradient-to-r from-blue-50 to-blue-50 p-8 rounded-lg border border-blue-200">
+    <div class="flex items-center space-x-3 mb-6">
+      <div class="bg-blue-100 p-1.5 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+          <path
+            d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1  01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+        </svg>
       </div>
-      <div class="mb-3 flex gap-8 flex-wrap">
-        <div>
-          <span class="font-semibold text-gray-700">Score:</span>
-          <span class="text-2xl font-bold text-blue-700">
-            {{ milestone.score !== null && milestone.score !== undefined ? milestone.score : 'N/A' }}/100
-          </span>
-        </div>
-        <div class="ratings grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div *ngFor="let key of ['completeness', 'clarity', 'readiness', 'documentation']">
-            <span class="font-semibold capitalize text-gray-700" [title]="key | titlecase">{{ key }}:</span>
-            <span class="font-bold px-2 py-1 rounded"
-                  [ngClass]="getStatusBadgeClass(getMilestoneRating(milestone, key) ?? 0)">
-              {{ getMilestoneRating(milestone, key) !== null ? getMilestoneRating(milestone, key) : 'N/A' }}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div class="mb-3">
-        <span class="font-semibold text-gray-700">Summary:</span>
-        <span class="text-gray-900 font-medium">
-          {{ milestone.summary || 'No summary provided.' }}
-        </span>
-      </div>
-      <!-- Collapsible Sections for Details -->
-      <details class="mb-2" *ngIf="milestone.strengths && milestone.strengths.length">
-        <summary class="font-semibold text-green-700 cursor-pointer">Strengths</summary>
-        <ul class="list-disc ml-6 mt-2">
-          <li *ngFor="let s of milestone.strengths">{{ s }}</li>
-        </ul>
-      </details>
-      <details class="mb-2" *ngIf="milestone.areas_for_improvement && milestone.areas_for_improvement.length">
-        <summary class="font-semibold text-yellow-700 cursor-pointer">Areas for Improvement</summary>
-        <ul class="list-disc ml-6 mt-2">
-          <li *ngFor="let a of milestone.areas_for_improvement">{{ a }}</li>
-        </ul>
-      </details>
-      <details class="mb-2" *ngIf="milestone.next_steps && milestone.next_steps.length">
-        <summary class="font-semibold text-blue-700 cursor-pointer">Next Steps</summary>
-        <ol class="list-decimal ml-6 mt-2">
-          <li *ngFor="let n of milestone.next_steps">{{ n }}</li>
-        </ol>
-      </details>
-      <!-- If all details are empty, show a message -->
-      <div *ngIf="(!milestone.strengths || !milestone.strengths.length) &&
-                  (!milestone.areas_for_improvement || !milestone.areas_for_improvement.length) &&
-                  (!milestone.next_steps || !milestone.next_steps.length)" class="text-gray-500 text-sm mt-2">
-        No additional details provided for this milestone.
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900">Milestone Analysis Summary</h3>
+        <p class="text-sm text-gray-500">Overview of your handson performance across all milestones</p>
       </div>
     </div>
-  </section>
-</div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <div class="text-3xl font-bold text-blue-600 mb-2">{{ getMilestoneCount() }}</div>
+        <div class="text-sm font-medium text-gray-700 mb-1">Total Milestones</div>
+        <div class="text-xs text-gray-500">Handson challenges</div>
+      </div>
+      <div class="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <div class="text-3xl font-bold text-green-600 mb-2">
+          {{ getCorrectMilestoneCount() }}
+        </div>
+        <div class="text-sm font-medium text-gray-700 mb-1">Successfully Completed</div>
+        <div class="text-xs text-gray-500">Milestones completed correctly</div>
+      </div>
+      <div class="bg-white p-6 rounded-lg border border-gray-200 text-center">
+        <div class="text-3xl font-bold text-orange-600 mb-2">
+          {{ getPartialMilestoneCount() }}
+        </div>
+        <div class="text-sm font-medium text-gray-700 mb-1">Partially Completed</div>
+        <div class="text-xs text-gray-500">Milestones needing improvement</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone-wise Detailed Results -->
+  <div class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex justify-between items-center cursor-pointer" (click)="expandedSections = !expandedSections">
+      <div class="flex items-center space-x-3">
+        <div class="bg-blue-100 p-1.5 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Detailed Milestone Analysis</h3>
+          <p class="text-sm text-gray-500">Individual milestone performance and feedback</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections"
+          class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <div *ngIf="expandedSections" class="mt-6 space-y-6">
+      <div *ngFor="let milestone of getMilestones(); let i = index" class="border border-gray-200 rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 rounded-full" [class.bg-green-500]="milestone.assessment === 'CORRECT'"
+              [class.bg-red-500]="milestone.assessment === 'INCORRECT'"
+              [class.bg-yellow-500]="milestone.assessment === 'PARTIALLY_CORRECT'"></div>
+            <h4 class="text-lg font-semibold text-gray-800">Milestone #{{ i + 1 }}: {{ milestone.milestone || 'Unnamed
+              Milestone' }}</h4>
+            <span class="px-2 py-1 text-xs font-medium rounded-full"
+              [class.bg-green-100]="milestone.assessment === 'CORRECT'"
+              [class.text-green-800]="milestone.assessment === 'CORRECT'"
+              [class.bg-red-100]="milestone.assessment === 'INCORRECT'"
+              [class.text-red-800]="milestone.assessment === 'INCORRECT'"
+              [class.bg-yellow-100]="milestone.assessment === 'PARTIALLY_CORRECT'"
+              [class.text-yellow-800]="milestone.assessment === 'PARTIALLY_CORRECT'">
+              {{ milestone.assessment.replace('_', ' ') | titlecase }}
+            </span>
+          </div>
+          <div class="text-right">
+            <div class="text-2xl font-bold" [class.text-green-600]="milestone.score >= 70"
+              [class.text-yellow-600]="milestone.score >= 50 && milestone.score < 70"
+              [class.text-red-600]="milestone.score < 50">
+              {{ milestone.score !== null && milestone.score !== undefined ? milestone.score : 0 }}%
+            </div>
+            <div class="text-sm text-gray-500">Overall Score</div>
+          </div>
+        </div>
+        <p class="text-gray-600 mb-4">{{ milestone.summary || 'No summary provided.' }}</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div *ngIf="milestone.strengths && milestone.strengths.length > 0">
+            <h5 class="font-medium text-green-700 mb-2">Strengths</h5>
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let s of milestone.strengths"
+                class="text-xs font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-md">
+                {{ s }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="milestone.areas_for_improvement && milestone.areas_for_improvement.length > 0">
+            <h5 class="font-medium text-red-700 mb-2">Areas for Improvement</h5>
+            <div class="flex flex-wrap gap-2">
+              <span *ngFor="let a of milestone.areas_for_improvement"
+                class="text-xs font-medium bg-red-100 text-red-800 px-2.5 py-1 rounded-md">
+                {{ a }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="milestone.next_steps && milestone.next_steps.length > 0"
+          class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h5 class="font-medium text-yellow-800 mb-1">Next Steps</h5>
+          <ol class="text-sm text-yellow-700 list-decimal ml-6 mt-2">
+            <li *ngFor="let n of milestone.next_steps">{{ n }}</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
 
 <!-- Loading/Error States -->
-<div *ngIf="loading" class="loading-state p-8 text-center text-lg text-gray-500">
-  Loading handson results...
+<div *ngIf="loading" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+  <div class="flex items-center justify-center py-8">
+    <span class="text-blue-600 font-semibold text-lg animate-pulse">Loading handson results...</span>
+  </div>
 </div>
-<div *ngIf="error" class="error-state p-8 text-center text-lg text-red-600">
-  {{ error }}
+<div *ngIf="error" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+  <div class="flex items-center justify-center py-8">
+    <span class="text-red-500 font-semibold text-lg">{{ error }}</span>
+  </div>
 </div>

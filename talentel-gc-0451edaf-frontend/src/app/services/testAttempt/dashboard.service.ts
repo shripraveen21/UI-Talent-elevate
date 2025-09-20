@@ -71,4 +71,51 @@ export class DashboardService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<any>(`${this.apiUrl}/handson-result/${handsonId}`, { headers });
   }
+
+  evaluateDebugTest(debugId: number | string): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    console.log(JSON.stringify({
+      level: 'INFO',
+      message: 'Submitting debug test for evaluation',
+      debugId,
+      timestamp: new Date().toISOString()
+    }));
+    return this.http.post<any>(`${this.apiUrl}/evaluate/debug/${debugId}`, {}, { headers }).pipe(
+      catchError((error) => {
+        console.error(JSON.stringify({
+          level: 'ERROR',
+          message: 'Error submitting debug test for evaluation',
+          debugId,
+          error: error?.message || error,
+          timestamp: new Date().toISOString()
+        }));
+        return throwError(() => error);
+      })
+    );
+  }
+
+
+  evaluateHandsonTest(handsonId: number | string): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    console.log(JSON.stringify({
+      level: 'INFO',
+      message: 'Submitting handson test for evaluation',
+      handsonId,
+      timestamp: new Date().toISOString()
+    }));
+    return this.http.post<any>(`${this.apiUrl}/evaluate/handson/${handsonId}`, {}, { headers }).pipe(
+      catchError((error) => {
+        console.error(JSON.stringify({
+          level: 'ERROR',
+          message: 'Error submitting handson test for evaluation',
+          handsonId,
+          error: error?.message || error,
+          timestamp: new Date().toISOString()
+        }));
+        return throwError(() => error);
+      })
+    );
+  }
 }
