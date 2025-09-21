@@ -18,6 +18,7 @@ import { ManageCollaboratorComponent } from './components/collaborator/manage-co
 import { CollabGuard } from './guards/collab.guard';
 import { TechStackFormComponent } from './components/techstack-form/techstack-form.component';
 import { CollabTopicsComponent } from './components/collab-topics/collabtopics.component';
+import { CollabTechStacksComponent } from './components/collab-tech-stacks/collab-tech-stacks.component';
 import { ProfilePageComponent } from './components/profile-page/profile-page.component';
 import { DebugExerciseComponent } from './components/debug-gen/debug-gen.component';
 import { HandsonWorkflowComponent } from './components/hands-on-gen/hands-on-gen.component';
@@ -75,7 +76,13 @@ export const routes: Routes = [
     path: 'add-techstack', component: TechStackFormComponent, canActivate: [CollabGuard], data: { permission: 'topics' }
   },
   {
-    path: 'collab-topics',
+    path: 'collab-tech-stacks',
+    component: CollabTechStacksComponent,
+    canActivate: [CollabGuard],
+    data: { permission: 'topics' }
+  },
+  {
+    path: 'collab-topics/:techStackId',
     component: CollabTopicsComponent,
     canActivate: [CollabGuard],
     data: { permission: 'topics' }

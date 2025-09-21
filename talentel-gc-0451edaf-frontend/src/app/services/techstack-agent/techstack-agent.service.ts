@@ -108,6 +108,26 @@ export class TechStackAgentService {
       }
     );
   }
+
+  // Get all tech stacks assigned to a collaborator
+  getTechStacksByCollaborator(collaboratorId: number): Observable<any[]> {
+    return this.http.get<any[]>(
+      environment.apiUrl + `/tech-stacks/by-collaborator/${collaboratorId}`,
+      {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      }
+    );
+  }
+
+  // Get a single tech stack by its ID
+  getTechStackById(techStackId: number): Observable<any> {
+    return this.http.get<any>(
+      environment.apiUrl + `/tech-stacks/id/${techStackId}`,
+      {
+        headers: { 'ngrok-skip-browser-warning': 'true' }
+      }
+    );
+  }
   getTokenPayload(): any {
   const token = sessionStorage.getItem('token') || localStorage.getItem('token');
   if (!token) return null;
@@ -132,6 +152,19 @@ getTopicsByLeader(leaderId: number): Observable<any[]> {
   const token = sessionStorage.getItem('token') || localStorage.getItem('token');
   return this.http.get<any[]>(
     environment.apiUrl + `/topics/by-leader-with-stack/${leaderId}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
+      }
+    }
+  );
+}
+
+getTopicsByCollaborator(collaboratorId: number): Observable<any[]> {
+  const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+  return this.http.get<any[]>(
+    environment.apiUrl + `/topics/by-collaborator/${collaboratorId}`,
     {
       headers: {
         'Authorization': `Bearer ${token}`,

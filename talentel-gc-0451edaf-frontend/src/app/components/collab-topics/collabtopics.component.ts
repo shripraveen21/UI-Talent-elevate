@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TechStackAgentService, Topic } from '../../services/techstack-agent/techstack-agent.service';
 import { ToastService } from '../../services/toast/toast.service';
 import { ToastComponent } from '../shared/toast/toast.component';
@@ -23,6 +24,12 @@ interface SelectableTopic extends Topic {
   imports: [CommonModule, FormsModule, ToastComponent]
 })
 export class CollabTopicsComponent implements OnInit {
+  public reviewText: string = '';
+
+  public submitReview(): void {
+    // TODO: Implement review submission logic
+    console.log('Review submitted:', this.reviewText);
+  }
   topics: SelectableTopic[] = [];
   toasts$: Observable<Toast[]>;
   userRole: string = '';
@@ -35,7 +42,8 @@ export class CollabTopicsComponent implements OnInit {
   constructor(
     private agent: TechStackAgentService,
     private toastService: ToastService,
-    private suggestionService: YourSuggestionService
+    private suggestionService: YourSuggestionService,
+    private router: Router
   ) {
     this.toasts$ = this.toastService.toasts$;
   }
@@ -60,42 +68,60 @@ export class CollabTopicsComponent implements OnInit {
     this.userName = userName;
     this.userRole = this.agent.getUserRole() || '';
 
-    // Collaborator: Get assigned CL's ID and topics
-    if (this.userId) {
-      this.agent.getCapabilityLeaderId().subscribe({
-        next: (clId: number | null) => {
-          this.clId = clId;
-          if (!clId) {
-            this.topics = [];
-            return;
-          }
-          this.agent.getTopicsByLeader(clId).subscribe({
-            next: (topicsWithStack: any[]) => {
-              if (!topicsWithStack || topicsWithStack.length === 0) {
-                this.topics = [];
-              } else {
-                this.topics = topicsWithStack.map(t => ({
-                  id: t.topic_id,
-                  name: t.topic_name,
-                  level: t.difficulty,
-                  selected: false,
-                  techStackName: t.tech_stack_name,
-                  techStackId: t.tech_stack_id
-                }));
-                this.techStackId = topicsWithStack[0]?.tech_stack_id || null;
-              }
+    // Get techStackId from route param
+    let techStackId: number | null = null;
+    if ((window as any).ng && (window as any).ng.router) {
+      // Angular 17+ standalone router
+      techStackId = Number((window as any).ng.router.currentRoute?.params?.techStackId);
+    }
+    // Fallback for classic router
+    if (!techStackId && typeof window !== 'undefined') {
+      const urlParts = window.location.pathname.split('/');
+      const idx = urlParts.indexOf('collab-topics');
+      if (idx !== -1 && urlParts.length > idx + 1) {
+        techStackId = Number(urlParts[idx + 1]);
+      }
+    }
+
+    this.techStackId = techStackId;
+
+    // Fetch capability leader id (clId) from tech stack details
+    if (this.techStackId) {
+        this.agent.getTechStackById(this.techStackId).subscribe({
+            next: (ts: any) => {
+                console.log('TechStack response:', ts);
+                this.clId = ts.created_by;
             },
             error: () => {
-              this.topics = [];
+                this.clId = null;
             }
-          });
-        },
-        error: () => {
-          this.topics = [];
-        }
-      });
+        });
+    }
+
+    // Collaborator: Get topics for selected tech stack only
+    if (this.userId && this.techStackId) {
+        this.agent.getTopicsByCollaborator(this.userId).subscribe({
+            next: (topics: any[]) => {
+                // Filter topics for this techStackId only
+                const filtered = topics.filter(t => t.tech_stack_id === this.techStackId);
+                if (!filtered || filtered.length === 0) {
+                    this.topics = [];
+                } else {
+                    this.topics = filtered.map(t => ({
+                        id: t.topic_id,
+                        name: t.name,
+                        level: t.difficulty,
+                        selected: false,
+                        techStackId: t.tech_stack_id
+                    }));
+                }
+            },
+            error: () => {
+                this.topics = [];
+            }
+        });
     } else {
-      this.topics = [];
+        this.topics = [];
     }
   }
 
@@ -105,6 +131,12 @@ export class CollabTopicsComponent implements OnInit {
 
   // Review box submission
   raiseReview() {
+    console.log('raiseReview values:', {
+      userId: this.userId,
+      clId: this.clId,
+      techStackId: this.techStackId,
+      reviewMessage: this.reviewMessage
+    });
     if (!this.reviewMessage.trim()) {
       this.toastService.showWarning('Please enter a message before raising a review.');
       return;
@@ -123,6 +155,7 @@ export class CollabTopicsComponent implements OnInit {
       next: () => {
         this.toastService.showSuccess('Suggestion sent successfully!');
         this.reviewMessage = '';
+        this.router.navigate(['/collab-tech-stacks']);
       },
       error: () => {
         this.toastService.showError('Failed to send suggestion. Please try again.');

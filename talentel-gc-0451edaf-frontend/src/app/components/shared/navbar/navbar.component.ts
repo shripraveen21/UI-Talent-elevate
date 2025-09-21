@@ -216,7 +216,7 @@ fetchPermissions(): void {
         this.techStackAgent.getTopicsByLeader(clId).subscribe({
           next: (topics: any[]) => {
             if (topics && topics.length > 0) {
-              this.router.navigate(['/collab-topics']);
+              this.router.navigate(['/collab-tech-stacks']);
             } else {
               this.router.navigate(['/add-techstack']);
             }

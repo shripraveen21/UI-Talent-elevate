@@ -70,7 +70,7 @@ class TechStack(Base):
     name = Column(String(200), unique=True, nullable=False)
     created_by = Column(Integer, ForeignKey('employees.user_id'))
     created_at = Column(DateTime, default=func.now())
- 
+
     employee_skills = relationship('EmployeeSkill', back_populates='tech_stack')
     collaborators = relationship('Collaborator', back_populates='tech_stack')
  
@@ -140,15 +140,17 @@ class Collaborator(Base):
     __tablename__ = 'collaborators'
     id = Column(Integer, primary_key=True)
     cl_id = Column(Integer, ForeignKey('employees.user_id'))
-    tech_stack_id = Column(Integer, ForeignKey('tech_stack.id'), nullable=False)
+    tech_stack_id = Column(Integer, ForeignKey('tech_stack.id', ondelete='CASCADE'), nullable=False)
+
     collaborator_id = Column(Integer, ForeignKey('employees.user_id'), nullable=False)
     topics = Column(Boolean, default=False)
     test_create = Column(Boolean, default=False)
     test_assign = Column(Boolean, default=False)
- 
+
     owner = relationship('Employee', foreign_keys=[cl_id], back_populates='collaborations')
     collaborator = relationship('Employee', foreign_keys=[collaborator_id], back_populates='collaborated_with')
-    tech_stack = relationship('TechStack', back_populates='collaborators')
+    tech_stack = relationship('TechStack', back_populates='collaborators', foreign_keys=[tech_stack_id])
+
 
 class TestAssign(Base):
     __tablename__ = 'test_assign'

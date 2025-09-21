@@ -44,12 +44,15 @@ def get_user_permissions(
     if not user:
         raise HTTPException(status_code=404, detail="Employee not found")
 
-    collab = db.query(Collaborator).filter(Collaborator.collaborator_id == user.user_id).first()
-    if collab:
+    # Aggregate permissions across all Collaborator records for this user
+    collab_records = db.query(Collaborator).filter(Collaborator.collaborator_id == user.user_id).all()
+    if collab_records:
         permissions["isCollaborator"] = True
-        permissions["test_assign"] = getattr(collab, "test_assign", False)
-        permissions["test_create"] = getattr(collab, "test_create", False)
-        permissions["topics"] = getattr(collab, "topics", False)
+        # If any record has topics=True, grant topics permission
+        permissions["topics"] = any(getattr(c, "topics", False) for c in collab_records)
+        # For test_assign and test_create, you may want similar aggregation or keep as is
+        permissions["test_assign"] = any(getattr(c, "test_assign", False) for c in collab_records)
+        permissions["test_create"] = any(getattr(c, "test_create", False) for c in collab_records)
         # Add more permissions as needed
 
     return permissions

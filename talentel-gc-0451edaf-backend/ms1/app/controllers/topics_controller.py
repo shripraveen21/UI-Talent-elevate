@@ -17,6 +17,7 @@ from ..Agents.TopicsFromPD import ProjectTechStackTopicAgent
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from ..services.rbac_service import RBACService
+from ..models.models import Collaborator
 
 router = APIRouter(tags=["topics"])
 bearer_scheme = HTTPBearer()
@@ -115,6 +116,81 @@ def get_topics_by_leader(
     topics = db.query(Topic).filter(Topic.tech_stack_id.in_(tech_stack_ids)).all()
     return topics
 
+@router.get("/topics/by-collaborator/{collaborator_id}", response_model=List[TopicOut])
+def get_topics_by_collaborator(
+    collaborator_id: int,
+    db: Session = Depends(get_db),
+    tech_stack_id: int = None
+):
+    # Get all collaborator records for this collaborator_id
+    query = db.query(Collaborator).filter(Collaborator.collaborator_id == collaborator_id)
+    if tech_stack_id:
+        query = query.filter(Collaborator.tech_stack_id == tech_stack_id)
+    collabs = query.all()
+    if not collabs:
+        return []
+    # If tech_stack_id is provided, return topics for that stack only
+    if tech_stack_id:
+        topics = db.query(Topic).filter(Topic.tech_stack_id == tech_stack_id).all()
+        return topics
+    # Otherwise, return topics for all assigned tech stacks
+    topics = []
+    for collab in collabs:
+        if collab.tech_stack_id:
+            topics += db.query(Topic).filter(Topic.tech_stack_id == collab.tech_stack_id).all()
+    return topics
+
+@router.get("/tech-stacks/by-collaborator/{collaborator_id}", response_model=List[Dict[str, Any]])
+def get_tech_stacks_by_collaborator(
+    collaborator_id: int,
+    db: Session = Depends(get_db)
+):
+    # Get all tech_stack_ids for this collaborator where topics permission is True
+    collabs = db.query(Collaborator).filter(
+        Collaborator.collaborator_id == collaborator_id,
+        Collaborator.topics == True
+    ).all()
+    tech_stack_ids = [c.tech_stack_id for c in collabs if c.tech_stack_id]
+    if not tech_stack_ids:
+        return []
+    tech_stacks = db.query(TechStack).filter(TechStack.id.in_(tech_stack_ids)).all()
+    result = []
+    for ts in tech_stacks:
+        # Get capability leader name from Employee table
+        leader = db.query(Employee).filter(Employee.user_id == ts.created_by).first()
+        leader_name = leader.name if leader else None
+        print(f"TechStack id={ts.id}, created_by={ts.created_by}, leader_name={leader_name}")
+        result.append({
+            "id": ts.id,
+            "name": ts.name,
+            "created_by": ts.created_by,
+            "created_at": ts.created_at,
+            "capability_leader_name": leader_name
+        })
+    return result
+
+@router.get("/tech-stacks/id/{tech_stack_id}")
+def get_tech_stack_by_id(
+    tech_stack_id: int,
+    db: Session = Depends(get_db)
+):
+    try:
+        ts = db.query(TechStack).filter(TechStack.id == tech_stack_id).first()
+        print("DEBUG: TechStack object:", ts)
+        if not ts:
+            return {}
+        # Convert created_at to string if it's a datetime
+        created_at = str(ts.created_at) if hasattr(ts.created_at, "isoformat") else ts.created_at
+        return {
+            "id": ts.id,
+            "name": ts.name,
+            "created_by": ts.created_by,
+            "created_at": created_at
+        }
+    except Exception as e:
+        print("ERROR in get_tech_stack_by_id:", e)
+        return {"error": str(e)}
+
 @router.post("/suggestion", response_model=SuggestionOut)
 def create_suggestion(suggestion: SuggestionCreate, db: Session = Depends(get_db)):
     db_suggestion = Suggestion(
@@ -159,6 +235,7 @@ def delete_suggestion(suggestion_id: int, db: Session = Depends(get_db)):
     db.delete(suggestion)
     db.commit()
     return {"detail": "Suggestion deleted"}
+
 
 class PD(BaseModel):
     tech_stack: str

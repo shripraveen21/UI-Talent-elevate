@@ -146,4 +146,8 @@ export class DeliveryManagerDashboardComponent implements OnInit {
   navigateToFeedback(): void {
     this.router.navigate(['/feedback']);
   }
+
+  navigateToTopicRequest(): void {
+    this.router.navigate(['/request']);
+  }
 }

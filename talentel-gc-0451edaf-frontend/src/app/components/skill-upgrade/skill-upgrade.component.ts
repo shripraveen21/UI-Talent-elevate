@@ -7,12 +7,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
 import { BackButtonComponent } from '../shared/backbutton/backbutton.component';
+import { ReusableButtonComponent } from '../shared/reusable-button/reusable-button.component';
 import type { DropdownOption } from '../shared/shared-dropdown/shared-dropdown.component';
 
 @Component({
   selector: 'app-skill-upgrade',
   templateUrl: './skill-upgrade.component.html',
-  imports: [CommonModule, FormsModule, SharedDropdownComponent, BackButtonComponent]
+  imports: [CommonModule, FormsModule, SharedDropdownComponent, BackButtonComponent, ReusableButtonComponent]
 })
 export class SkillUpgradeComponent implements OnInit {
   techStacks: any[] = [];
@@ -77,6 +78,10 @@ export class SkillUpgradeComponent implements OnInit {
 
   returnToDashboard(): void {
     this.router.navigate(['/employee-dashboard']);
+  }
+
+  navigateToTopicRequest(): void {
+    this.router.navigate(['/request']);
   }
 
   onTechStackSelection(option: DropdownOption) {
