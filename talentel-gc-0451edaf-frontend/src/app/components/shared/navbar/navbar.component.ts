@@ -163,15 +163,23 @@ fetchPermissions(): void {
   }
 
   signOut(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    sessionStorage.removeItem('auth_token');
-    sessionStorage.removeItem('user');
+    // Clear ALL localStorage and sessionStorage data
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Reset component state
     this.isAuthenticated = false;
     this.user = null;
     this.userInfo = null;
     this.userRole = null;
     this.shouldShowNavbar = false;
+    this.isUserCollaborator = false;
+    this.canAssignTest = false;
+    this.canCreateTest = false;
+    this.canAccessTopics = false;
+    this.showCollabMenu = false;
+    
+    // Navigate to home
     this.router.navigate(['/home']);
   }
 
