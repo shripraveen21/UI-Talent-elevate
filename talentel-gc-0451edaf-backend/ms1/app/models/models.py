@@ -72,6 +72,7 @@ class TechStack(Base):
     created_at = Column(DateTime, default=func.now())
  
     employee_skills = relationship('EmployeeSkill', back_populates='tech_stack')
+    collaborators = relationship('Collaborator', back_populates='tech_stack')
  
 class Topic(Base):
     __tablename__ = 'topics'
@@ -139,6 +140,7 @@ class Collaborator(Base):
     __tablename__ = 'collaborators'
     id = Column(Integer, primary_key=True)
     cl_id = Column(Integer, ForeignKey('employees.user_id'))
+    tech_stack_id = Column(Integer, ForeignKey('tech_stack.id'), nullable=False)
     collaborator_id = Column(Integer, ForeignKey('employees.user_id'), nullable=False)
     topics = Column(Boolean, default=False)
     test_create = Column(Boolean, default=False)
@@ -146,7 +148,7 @@ class Collaborator(Base):
  
     owner = relationship('Employee', foreign_keys=[cl_id], back_populates='collaborations')
     collaborator = relationship('Employee', foreign_keys=[collaborator_id], back_populates='collaborated_with')
-
+    tech_stack = relationship('TechStack', back_populates='collaborators')
 
 class TestAssign(Base):
     __tablename__ = 'test_assign'
@@ -176,6 +178,7 @@ class QuizResult(Base):
     submitted_at = Column(DateTime, default=func.now())
     answers = Column(JSON, nullable=False)
     feedback_data = Column(JSON, nullable=True)
+    is_submitted = Column(Boolean, default=False)
     __table_args__ = (
         CheckConstraint('score >= 0 AND score <= 100', name='valid_score'),  # Added CheckConstraint
     )
@@ -187,6 +190,7 @@ class DebugResult(Base):
     debug_id = Column(Integer, ForeignKey('debug_exercises.id', ondelete='CASCADE'), nullable=False)
     score = Column(Integer, nullable=False)
     feedback_data = Column(JSON, nullable=True)
+    is_submitted = Column(Boolean, default=False) 
     __table_args__ = (
         CheckConstraint('score >= 0 AND score <= 100', name='valid_score'),  # Added CheckConstraint
     )
@@ -198,6 +202,7 @@ class HandsOnResult(Base):  # Added HandsOnResult table
     handson_id = Column(Integer, ForeignKey('hands_on.id', ondelete='CASCADE'), nullable=False)
     score = Column(Integer, nullable=False)
     feedback_data = Column(JSON, nullable=True)
+    is_submitted = Column(Boolean, default=False)
     __table_args__ = (
         CheckConstraint('score >= 0 AND score <= 100', name='valid_score'),  # Added CheckConstraint
     )

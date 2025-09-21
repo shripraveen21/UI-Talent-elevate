@@ -1,0 +1,11 @@
+<form (ngSubmit)="onSubmit()">
+  <div>
+    <label for="techStack">Tech Stack Name:</label>
+    <input id="techStack" name="techStack" [(ngModel)]="techStack" required />
+  </div>
+  <div>
+    <label for="details">Details:</label>
+    <textarea id="details" name="details" [(ngModel)]="details" required></textarea>
+  </div>
+  <button type="submit">Submit Request</button>
+</form>

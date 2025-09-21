@@ -26,4 +26,10 @@ export class SkillUpgradeService {
     const payload = { tech_stack: techStack, level: level };
     return this.http.post(`${this.baseUrl}/skill-upgrade`, payload, { headers });
   }
+
+  completeSkillUpgrade(token: string, testId: number): Observable<any> {
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    // Backend expects test_id as query param, not in body
+    return this.http.post(`${this.baseUrl}/skill-upgrade/complete?test_id=${testId}`, null, { headers });
+  }
 }

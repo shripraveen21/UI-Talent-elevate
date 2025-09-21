@@ -73,7 +73,7 @@ async def mcq_review(websocket: WebSocket):
         Duration: {duration} minutes
         Experience Level: {experience_level}
         """
-        quiz = await quiz_system.generate_initial_quiz(quiz_params)
+        quiz = await quiz_system.generate_initial_quiz(quiz_params, )
         feedback = await quiz_system.get_feedback(quiz)
         refined_quiz = await quiz_system.refine_quiz(quiz, feedback)
 

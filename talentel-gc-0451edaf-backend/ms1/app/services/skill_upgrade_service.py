@@ -65,11 +65,12 @@ async def create_skill_upgrade_test(db: Session, tech_stack_name: str, user_id: 
 
         db.flush()  # Ensures mcq.id and exercise.id are populated
 
-
+        unique_suffix = datetime.now().strftime("%Y%m%d%H%M%S%f")
+        test_name = f'Skill Upgrade Test {user_id}: {tech_stack.name}: level {level}: {unique_suffix}'
 
         test = Test(
             created_by=user_id,
-            test_name=f'Skill Upgrade Test {user_id}: {tech_stack.name}: level {level}',
+            test_name=test_name,
             quiz_id=mcq.id,
             debug_test_id=exercise.id,
             handson_id=hands_on_id,

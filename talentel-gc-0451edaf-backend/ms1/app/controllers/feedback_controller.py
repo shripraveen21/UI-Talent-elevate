@@ -139,17 +139,20 @@ async def evaluate_handson_feedback(
         ).first()
         if not handson_test:
             raise HTTPException(404, detail="HandsOn exercise not found")
-
+        print(handson_test,"test han",)
+        print("iddds",handson_id,user.user_id)
         handson_res = db.query(HandsOnResult).filter(
             HandsOnResult.handson_id == handson_id,
             HandsOnResult.user_id == user.user_id
         ).first()
         if handson_res:
             raise HTTPException(404, detail="HandsOn Result already exists")
+        print(handson_res,"res hand")
 
         test = db.query(Test.id).filter(
             Test.handson_id == handson_id,
         ).first()
+        print(test)
         if not test:
             raise HTTPException(404, detail="Test not found")
 

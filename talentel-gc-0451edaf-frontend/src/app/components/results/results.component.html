@@ -1,7 +1,7 @@
 <!-- Main Content -->
 <main class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
   <!-- Page Title -->
-  <div >
+  <div>
 
     <h1 class="text-3xl font-bold text-gray-900">MCQ Assessment Results</h1>
   </div>
@@ -22,14 +22,26 @@
 
   <!-- Pending State -->
   <div *ngIf="!employeeLogin" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
-         <app-backbutton
-          [label]="'Return to Dashboard'"
-          [icon]="true"
-          [clickHandler]="returnToDashboard.bind(this)">
-        </app-backbutton>
+    <app-backbutton [label]="'Return to Dashboard'" [icon]="true" [clickHandler]="returnToDashboard.bind(this)">
+    </app-backbutton>
     <div class="text-center py-8">
       <h2 class="text-2xl font-bold text-gray-800 mb-2">Test submitted successfully.</h2>
       <p class="text-gray-600">Your results are being processed. Please wait for feedback.</p>
+    </div>
+  </div>
+
+  <!-- Feedback Not Generated State -->
+  <div *ngIf="!feedback && employeeLogin" class="mt-8 bg-yellow-50 p-8 rounded-lg border border-yellow-200">
+    <app-backbutton [label]="'Return to Dashboard'" [icon]="true" [clickHandler]="returnToDashboard.bind(this)">
+    </app-backbutton>
+    <div class="flex items-center justify-center py-8">
+      <svg class="h-8 w-8 text-yellow-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M13 16h-1v-4h-1m1-4h.01M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="text-yellow-700 font-semibold text-lg">Feedback is not yet generated. Please wait while feedback is
+        being generated.</span>
     </div>
   </div>
 
@@ -118,9 +130,11 @@
     </div>
   </div>
 
-    <!-- Topic Performance Overview -->
-  <div *ngIf="feedback && getAnalysis().length > 0 && employeeLogin" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
-    <div class="flex justify-between items-center cursor-pointer" (click)="expandedSections.topicPerformance = !expandedSections.topicPerformance">
+  <!-- Topic Performance Overview -->
+  <div *ngIf="feedback && getAnalysis().length > 0 && employeeLogin"
+    class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex justify-between items-center cursor-pointer"
+      (click)="expandedSections.topicPerformance = !expandedSections.topicPerformance">
       <div class="flex items-center space-x-3">
         <div class="bg-blue-100 p-1.5 rounded-full">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
@@ -136,9 +150,10 @@
         <!-- <span class="text-sm text-blue-600 font-medium">
           {{ expandedSections.resources ? 'Collapse' : 'Expand' }}
         </span> -->
-        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 9l-7 7-7-7" /> 
+        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources"
+          class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
       <!-- <span class="text-sm text-blue-600 font-medium">{{ expandedSections.topicPerformance ? 'Collapse' : 'Expand' }}</span> -->
@@ -200,11 +215,13 @@
   </div>
 
   <!-- Strengths Section -->
-    <div *ngIf="feedback && employeeLogin" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
-    <div class="flex justify-between items-center cursor-pointer" (click)="expandedSections.strengths = !expandedSections.strengths">
+  <div *ngIf="feedback && employeeLogin" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex justify-between items-center cursor-pointer"
+      (click)="expandedSections.strengths = !expandedSections.strengths">
       <div class="flex items-center space-x-3">
         <div class="bg-green-100 p-1.5 rounded-full">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-600" viewBox="0 0 20 20"
+            fill="currentColor">
             <path fill-rule="evenodd"
               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
               clip-rule="evenodd" />
@@ -220,15 +237,17 @@
         <!-- <span class="text-sm text-blue-600 font-medium">
           {{ expandedSections.resources ? 'Collapse' : 'Expand' }}
         </span> -->
-        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 9l-7 7-7-7" /> 
+        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources"
+          class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
       <!-- <span class="text-sm text-blue-600 font-medium">{{ expandedSections.strengths ? 'Collapse' : 'Expand' }}</span> -->
     </div>
 
-    <div *ngIf="expandedSections.strengths" class="mt-6 bg-green-50/70 p-6 rounded-lg border border-green-200 space-y-5">
+    <div *ngIf="expandedSections.strengths"
+      class="mt-6 bg-green-50/70 p-6 rounded-lg border border-green-200 space-y-5">
       <div *ngFor="let strength of getStrengths()">
         <h4 class="font-semibold text-gray-800">{{ strength.topic }}</h4>
         <p class="mt-1 text-sm text-gray-600">{{ strength.remarks || 'Demonstrates good understanding of this topic.' }}
@@ -244,8 +263,10 @@
   </div>
 
   <!-- Areas for Improvement Section -->
-  <div *ngIf="feedback && getWeaknesses().length > 0 && employeeLogin" class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
-    <div class="flex justify-between items-center cursor-pointer" (click)="expandedSections.weaknesses = !expandedSections.weaknesses">
+  <div *ngIf="feedback && getWeaknesses().length > 0 && employeeLogin"
+    class="mt-8 bg-white p-6 rounded-lg border border-gray-200">
+    <div class="flex justify-between items-center cursor-pointer"
+      (click)="expandedSections.weaknesses = !expandedSections.weaknesses">
       <div class="flex items-center space-x-3">
         <div class="bg-red-100 p-1.5 rounded-full">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
@@ -263,9 +284,10 @@
         <!-- <span class="text-sm text-blue-600 font-medium">
           {{ expandedSections.resources ? 'Collapse' : 'Expand' }}
         </span> -->
-        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 9l-7 7-7-7" /> 
+        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources"
+          class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
       <!-- <span class="text-sm text-blue-600 font-medium">{{ expandedSections.weaknesses ? 'Collapse' : 'Expand' }}</span> -->
@@ -274,7 +296,8 @@
     <div *ngIf="expandedSections.weaknesses" class="mt-6 bg-red-50/70 p-6 rounded-lg border border-red-200 space-y-5">
       <div *ngFor="let weakness of getWeaknesses()">
         <h4 class="font-semibold text-gray-800">{{ weakness.topic }}</h4>
-        <p class="mt-1 text-sm text-gray-600">{{ weakness.areas_of_improvement || 'Focus on improving your understanding of this topic.' }}</p>
+        <p class="mt-1 text-sm text-gray-600">{{ weakness.areas_of_improvement || 'Focus on improving your understanding
+          of this topic.' }}</p>
         <div class="mt-3 flex flex-wrap gap-2">
           <span *ngFor="let concept of weakness.concepts_weak"
             class="text-xs font-medium bg-white border border-gray-200 text-gray-700 px-2.5 py-1 rounded-md">
@@ -285,8 +308,9 @@
     </div>
   </div>
 
-    <!-- Recommended Resources Section -->
-  <div *ngIf="getRecommendedResources().length > 0 && employeeLogin" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+  <!-- Recommended Resources Section -->
+  <div *ngIf="getRecommendedResources().length > 0 && employeeLogin"
+    class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
     <div class="flex items-center justify-between mb-6 cursor-pointer" (click)="toggleSection('resources')">
       <div class="flex items-center space-x-3">
         <div class="bg-blue-100 p-1.5 rounded-full">
@@ -304,9 +328,10 @@
         <!-- <span class="text-sm text-blue-600 font-medium">
           {{ expandedSections.resources ? 'Collapse' : 'Expand' }}
         </span> -->
-        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources" class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M19 9l-7 7-7-7" /> 
+        <svg xmlns="http://www.w3.org/2000/svg" [class.rotate-180]="expandedSections.resources"
+          class="h-5 w-5 text-gray-500 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </div>
     </div>
@@ -345,8 +370,8 @@
   </div> -->
 </main>
 
-  <!-- Recommended Resources Section -->
-    <!-- <div *ngIf="getRecommendedResources().length > 0" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
+<!-- Recommended Resources Section -->
+<!-- <div *ngIf="getRecommendedResources().length > 0" class="mt-8 bg-white p-8 rounded-lg border border-gray-200">
     <div class="flex items-center justify-between mb-6 cursor-pointer" (click)="toggleSection('resources')">
       <div class="flex items-center space-x-3">
         <div class="bg-blue-100 p-1.5 rounded-full">
@@ -393,7 +418,7 @@
     </div>
   </div>
   <!-- Footer Buttons -->
-  <!-- <div *ngIf="feedback" class="mt-8 flex justify-center items-center space-x-4">
+<!-- <div *ngIf="feedback" class="mt-8 flex justify-center items-center space-x-4">
     <button class="px-6 py-2.5 bg-gradient-hero text-white font-semibold rounded-lg hover:shadow-glow hover:-translate-y-1 hover:scale-105 transition-all duration-200 transform">Back to
       Dashboard</button>
     <button

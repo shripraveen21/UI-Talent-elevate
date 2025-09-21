@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TechStackAgentService } from '../../services/techstack-agent/techstack-agent.service';
 import { SkillUpgradeService } from '../../services/skill-upgrade.service';
 import { Router } from '@angular/router';
+import { ToastService } from '../../services/toast/toast.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SharedDropdownComponent } from '../shared/shared-dropdown/shared-dropdown.component';
@@ -34,7 +35,8 @@ export class SkillUpgradeComponent implements OnInit {
   constructor(
     private techStackAgentService: TechStackAgentService,
     private skillUpgradeService: SkillUpgradeService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -131,6 +133,9 @@ export class SkillUpgradeComponent implements OnInit {
         this.testResult = result;
         this.error = '';
         this.loading = false;
+        // Show toast and redirect to dashboard
+        this.toastService.showSuccess("You will receive an email when your skill upgrade test is ready");
+        this.router.navigate(['/employee-dashboard']);
       },
       error: (err) => {
         console.error('Error creating test:', err);

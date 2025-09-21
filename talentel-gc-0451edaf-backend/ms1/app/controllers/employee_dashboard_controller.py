@@ -6,7 +6,7 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from ..models.models import (
-    StatusType, TestAssign, Test, Employee, Quiz, QuizResult, DebugExercise, DebugResult
+    StatusType, TestAssign, Test, Employee, Quiz, QuizResult, DebugExercise, DebugResult,HandsOnResult
 )
 from ..services.rbac_service import RBACService
 from ..config.database import get_db
@@ -40,6 +40,9 @@ class AssingedTest(BaseModel):
     quiz_name: Optional[str] = None
     quiz_duration: Optional[str] = None
     quiz_attempted: Optional[bool] = None
+    debug_test_id: Optional[int] = None
+    handson_id: Optional[int] = None
+    created_by : Optional[int] = None
 
 class TestStartOut(BaseModel):
     test_id: int
@@ -58,6 +61,7 @@ def get_assigned_tests(
     db: Session = Depends(get_db),
     user=Depends(RBACService.get_current_user)
 ):
+    print("assigned tests")
     employee = db.query(Employee).filter(Employee.email == user["sub"]).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
@@ -86,6 +90,7 @@ def get_assigned_tests(
             attempted = result is not None
             quiz_attempted = attempted
 
+        print("test",test)
         tests.append(
             AssingedTest(
                 test_id=assignment.test_id,
@@ -94,11 +99,14 @@ def get_assigned_tests(
                 debug_url = assignment.debug_github_url or "",
                 handson_url = assignment.handson_github_url or "",
                 attempted=attempted,
+                created_by = test.created_by,
 
                 quiz_id=quiz_id,
                 quiz_name=quiz_name,
                 quiz_duration=quiz_duration_str,
                 quiz_attempted=quiz_attempted,
+                debug_test_id=getattr(test, "debug_test_id", None),
+                handson_id=getattr(test, "handson_id", None),
             )
         )
     return tests
@@ -290,6 +298,37 @@ def get_score(
  
 # --- Feedback Agent Integration ---
 from ..utils.email import send_feedback_email
+
+@router.get("/test-submit-status/{test_id}")
+def get_test_submit_status(
+    test_id: int,
+    db: Session = Depends(get_db),
+    user=Depends(RBACService.get_current_user)
+):
+    
+    employee = db.query(Employee).filter(Employee.email == user["sub"]).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+
+    result = db.query(QuizResult).filter(
+        QuizResult.user_id == employee.user_id,
+        QuizResult.quiz_id == test_id
+    ).first()
+    quiz_isSubmitted = result.is_submitted if result else False
+
+    result = db.query(DebugResult).filter(
+        DebugResult.user_id == employee.user_id,
+        DebugResult.debug_id == test_id
+    ).first()
+    debug_isSubmitted = result.is_submitted if result else False
+
+    result = db.query(HandsOnResult).filter(
+        HandsOnResult.user_id == employee.user_id,
+        HandsOnResult.handson_id == test_id
+    ).first()
+    handson_isSubmitted = result.is_submitted if result else False
+
+    return {"debug_isSubmitted":debug_isSubmitted,"handson_isSubmitted":handson_isSubmitted,"quiz_isSubmitted":quiz_isSubmitted}
 
 @router.get("/feedback/{result_id}")
 async def get_feedback_for_result(

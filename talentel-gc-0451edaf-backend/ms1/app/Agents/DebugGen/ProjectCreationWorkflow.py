@@ -42,32 +42,33 @@ class BRDAgent:
             name="brd_agent",
             model_client=model_client,
             system_message=f"""
-You are a senior business analyst and software architect.
+            You are a senior business analyst and software architect.
 
-Your tasks:
-1. Given a technology stack and initial topics, create a comprehensive Business Requirements Document (BRD) for a realistic mini-project.
-2. Suggest additional topics/features that would make the project robust, practical, and educational. For each suggestion, explain briefly why it adds value.
-3. Include in the BRD: project overview, user stories, acceptance criteria, assumptions, limitations, and a summary of why the suggested topics were added.
+            Your tasks:
+            1. Given a technology stack and initial topics, create a comprehensive, detailed Business Requirements Document (BRD) for a realistic mini-project.
+            2. Select and include only the BRD sections that are relevant for this project. Common sections are: executive summary, project objectives, project scope, business requirements, key stakeholders, project constraints, cost-benefit analysis. You may add or omit sections as appropriate.
+            3. For each section, provide detailed, multi-paragraph content (not just a sentence or bullet). Use Markdown formatting: headings, lists, tables, etc., for clarity and completeness.
+            4. At the end of the BRD, include a brief rationale for each section included (as a bulleted list).
+            5. Suggest additional topics/features that would make the project robust, practical, and educational. For each suggestion, explain briefly why it adds value.
 
-IMPORTANT:
-- Output ONLY valid JSON. Do NOT include any code block markers (such as ```json), explanations, or extra text.
-- Do NOT split the JSON across multiple messages. The output must be a single, valid JSON object matching this schema:
-{{
-    "brd": "BRD text here",
-    "topics": ["topic1", "topic2", ...],
-    "suggested_topics": [
-        {{"topic": "additional1", "reason": "Why it's valuable"}},
-        ...
-    ]
-}}
-- The "brd" field must contain the entire BRD as Markdown-formatted text, ready to be copied into an MD file.
-- If you do not follow this format exactly, your output will be discarded.
+            IMPORTANT:
+            - Output ONLY valid JSON. Do NOT include any code block markers (such as ```json), explanations, or extra text.
+            - Do NOT split the JSON across multiple messages. The output must be a single, valid JSON object matching this schema:
 
-You have access to tools for reading and writing files and directories in the project folder: {project_dir}. Use these tools to inspect or update files if needed.
-Do not include explanations, markdown, or extra text.
+            {{
+            "brd": "# Executive Summary\n...markdown...\n\n## Project Objectives\n- ...\n\n## Business Requirements\n| Requirement | Acceptance Criteria | Priority |\n|---|---|---|\n| ... | ... | ... |\n...",
+              "topics": ["topic1", "topic2", ...],
+              "suggested_topics": [
+                {{"topic": "additional1", "reason": "Why it's valuable"}},
+                ...
+              ]
+            }}
 
-End with TERMINATE.
-"""
+            - The "brd" field must be a single Markdown-formatted string, ready to be saved as a .md file.
+            - If you do not follow this format exactly, your output will be discarded.
+
+            End with TERMINATE.
+            """
         )
 
     async def generate_brd(self, tech_stack, topics, feedback=None):

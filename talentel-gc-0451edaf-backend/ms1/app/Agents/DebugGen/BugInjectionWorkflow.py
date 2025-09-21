@@ -176,21 +176,20 @@ def restore_skeletons(project_dir, original_structure):
 # --- Helper Functions for Topic-Aware Bug Selection ---
 def map_location_to_topic(candidates):
     """Builds a (file, location) -> topic map from candidates."""
-    return {(c['file'], c['location']): c['topic'] for c in candidates}
+    return {(c['file'], c['location']): c['topics'] for c in candidates}
 
 def add_topics_to_bugs(bug_plans, candidates):
     """Adds topic info to each bug in bug_plans using candidates."""
     loc2topic = map_location_to_topic(candidates)
     for bug in bug_plans:
-        bug['topic'] = loc2topic.get((bug['file'], bug['location']))
+        bug['topics'] = loc2topic.get((bug['file'], bug['location']))
     return bug_plans
 
 def group_bugs_by_topic(bug_plans):
     """Returns a dict: topic -> list of bugs."""
     grouped = {}
     for bug in bug_plans:
-        topic = bug.get('topic')
-        if topic:
+        for topic in bug.get('topics', []):
             grouped.setdefault(topic, []).append(bug)
     return grouped
 
@@ -216,7 +215,7 @@ Your tasks:
         {{
             "file": "src/utils.py",
             "location": "function filter_items",
-            "topic": "Loops",
+            "topics": "...",
             "rationale": "Loop logic can be easily misunderstood."
         }},
         ...
@@ -267,7 +266,7 @@ Your tasks:
 2. **When designing the buggy code, make only the minimal change required to introduce the bug.**
 3. **Preserve all original formatting, comments, and unrelated code. Do not remove or alter any code outside the specific bug location.**
 4. **Do not change the function or class signature, return type, or docstring unless the bug specifically requires it.**
-5. Specify bug type, code change, educational value, and a hint for learners.
+5. Specify bug type, code change, educational value, the relevant topics (as a list), and a hint for learners.
 6. Only use the provided candidate locations. Do NOT invent new files or functions.
 7. Only design bugs that are appropriate for the "{difficulty}" level. Do not create bugs that are too easy or too hard for this level.
 8. Output ONLY valid JSON in the following format (do NOT output a raw list):
@@ -277,6 +276,7 @@ Your tasks:
             "file": "src/utils.py",
             "location": "function filter_items",
             "type": "Misplaced Break",
+            "topics": "...",
             "description": "...",
             "original_code": "...",
             "buggy_code": "...",
@@ -326,7 +326,9 @@ class BugSelectionAgent:
             model_client=model_client,
             system_message="""
 You are a senior educator. Given grouped bugs by topic, select the most educational and representative bugs for each topic.
-You may select more than one per topic if they cover different concepts or error types.
+-You may select more than one per topic if they cover different concepts or error types.
+- Select at most 2 bugs per topic.
+- If there are many topics (more than 4), select only 1 bug per topic, or none if no suitable bug exists.
 Output ONLY valid JSON in this format:
 {
     "selected_bugs": [
@@ -338,13 +340,14 @@ End with TERMINATE.
 """
         )
 
-    async def select_bugs(self, grouped_bugs):
+    async def select_bugs(self, grouped_bugs, topics):
         termination = TextMentionTermination("TERMINATE")
         team = RoundRobinGroupChat([self.agent], termination_condition=termination)
         task = f"""
 Here are bugs grouped by topic:
 {json.dumps(grouped_bugs, indent=2)}
 Select the most educational bugs per topic (may be more than one per topic).
+Topics: {', '.join(topics)}
 """
         result = await team.run(task=task)
         json_content = ""
@@ -389,6 +392,7 @@ Your tasks:
             "location": "function filter_items",
             "type": "Misplaced Break",
             "description": "...",
+            "topics": "...",
             "original_code": "...",
             "buggy_code": "...",
             "hint": "..."
@@ -503,7 +507,8 @@ def apply_bugs_and_write_manifests(bugged_dir, bugs):
             "file": bug["file"],
             "location": bug["location"],
             "type": bug["type"],
-            "description": bug["description"]
+            "description": bug["description"],
+            "topics": bug.get("topics")
         }
         bug_hints[bug_name] = {
             "detail": bug["description"],
@@ -544,7 +549,7 @@ async def bug_injection_workflow(model_client, unique_id, topics, difficulty):
 
         # 4. Agent-based selection of bugs to inject
         bug_selector = BugSelectionAgent(model_client)
-        bugs_to_inject = await bug_selector.select_bugs(grouped_bugs)
+        bugs_to_inject = await bug_selector.select_bugs(grouped_bugs, topics)
         print("Selected bugs to inject:", json.dumps(bugs_to_inject, indent=2))
 
         # 5. Inject bugs and write manifests

@@ -129,7 +129,7 @@
               <!-- Quiz Section -->
               <div class="flex items-center justify-between">
                 <span class="font-semibold text-blue-700">Quiz</span>
-                <div>
+                <div class="flex items-center gap-2">
                   <button *ngIf="!test.attempted" (click)="startTest(test)"
                     class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 transition-colors shadow">
                     Start Test
@@ -137,6 +137,12 @@
                   <span *ngIf="test.attempted" class="text-green-600 text-sm font-semibold">
                     Attempted
                   </span>
+                  <!-- See Quiz Results Button, only if created by current user -->
+                  <button *ngIf="test.created_by == userId && test.quiz_isSubmitted"
+                    (click)="navigateToQuizResults(test.quiz_id)"
+                    class="px-3 py-1.5 bg-purple-600 text-white text-sm font-semibold rounded-md hover:bg-purple-700 transition-colors shadow">
+                    See Quiz Results
+                  </button>
                 </div>
               </div>
 
@@ -151,7 +157,7 @@
                   <span *ngIf="!getGithubUrl(test, 'Debug')" class="text-gray-400 text-sm">
                     No Debug URL
                   </span>
-                  <ng-container *ngIf="!test.debugSubmitted; else debugSubmittedBlock">
+                  <ng-container *ngIf="checkTestCompleteStatus(test.test_id, 'Quiz'); else debugSubmittedBlock">
                     <button (click)="markDebugCompleted(test)"
                       class="px-3 py-1.5 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 transition-colors shadow">
                       Submit for evaluation
@@ -162,6 +168,12 @@
                       Submitted for evaluation
                     </span>
                   </ng-template>
+                  <!-- See Debug Results Button, only if created by current user -->
+                  <button *ngIf="test.created_by == userId && test.debug_isSubmitted"
+                    (click)="navigateToDebugResults(test.debug_test_id)"
+                    class="px-3 py-1.5 bg-purple-600 text-white text-sm font-semibold rounded-md hover:bg-purple-700 transition-colors shadow">
+                    See Debug Results
+                  </button>
                 </div>
               </div>
 
@@ -176,23 +188,30 @@
                   <span *ngIf="!getGithubUrl(test, 'Handson')" class="text-gray-400 text-sm">
                     No Handson URL
                   </span>
-                  <ng-container *ngIf="!test.handsonSubmitted; else handsonSubmittedBlock">
+                  <ng-container *ngIf="checkTestCompleteStatus(test.test_id, 'Handson'); else handsonSubmittedBlock">
                     <button (click)="markHandsonCompleted(test)"
                       class="px-3 py-1.5 bg-green-600 text-white text-sm font-semibold rounded-md hover:bg-green-700 transition-colors shadow">
                       Submit for evaluation
                     </button>
                   </ng-container>
                   <ng-template #handsonSubmittedBlock>
-                    <span class="px-3 py-1.5 bg-blue-100 text-blue-800 text-sm font-semibold rounded-md">
-                      Submitted for evaluation
-                    </span>
+                    <button *ngIf="test.created_by == userId && test.handson_isSubmitted"
+                      (click)="navigateToHandsOnResults(test.handson_id)"
+                      class="px-3 py-1.5 bg-blue-100 text-blue-800 text-sm font-semibold rounded-md">
+                      See Handson Results
+                    </button>
                   </ng-template>
                 </div>
               </div>
+
+              <!-- Skill Upgrade Completion Button -->
+              <div *ngIf="(test.test_name?.toLowerCase().includes('skill upgrade') || test.description?.toLowerCase().includes('skill upgrade'))" class="flex items-center justify-end mt-4">
+                <button (click)="markSkillUpgradeComplete(test)"
+                  class="px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-md hover:bg-purple-700 transition-colors shadow">
+                  Mark as Complete
+                </button>
+              </div>
             </div>
-
-
-
           </div>
         </div>
 

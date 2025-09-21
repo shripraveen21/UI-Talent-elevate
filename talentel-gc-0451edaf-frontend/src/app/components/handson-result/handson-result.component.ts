@@ -34,7 +34,7 @@ export class HandsonResultComponent implements OnInit {
     const token = localStorage.getItem('token');
     console.log("result handson started")
     if (token && this.handsonId) {
-      this.dashboardService.getHandsonResult(this.handsonId, token).subscribe({
+      this.dashboardService.getHandsonResult(this.handsonId).subscribe({
         next: (data) => {
           if (data.pending) {
             this.result = null;
@@ -152,12 +152,18 @@ export class HandsonResultComponent implements OnInit {
     }
   }
 
-  /**
-   * Sanitizes HTML text for safe rendering.
-   * @param text Input HTML string
-   */
-  sanitize(text: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(text);
+
+
+  isFeedbackGeneratingError(error: string): boolean {
+    if (!error) return false;
+    const lower = error.toLowerCase();
+    return (
+      lower.includes('failed') ||
+      lower.includes('feedback is not yet generated') ||
+      lower.includes('db not ready') ||
+      lower.includes('pending') ||
+      lower.includes('feedback generation in progress')
+    );
   }
 
   // Navigation method for back button

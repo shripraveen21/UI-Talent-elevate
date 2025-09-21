@@ -24,6 +24,7 @@ import { HandsonWorkflowComponent } from './components/hands-on-gen/hands-on-gen
 import { DebugFeedbackComponent } from './components/debug-feedback/debug-feedback.component';
 import { UpdateTopicsComponent } from './components/update-topics/update-topics.component';
 import { Roles } from './models/enums/roles.enum';
+import { TopicRequest } from './components/topics-request/topics-request.component';
 
 
 export const routes: Routes = [
@@ -35,6 +36,7 @@ export const routes: Routes = [
   { path: 'test/:id', component: TestComponent },
   { path: 'results/:id', component: ResultsComponent },
   { path: "debug-res", component: DebugFeedbackComponent},
+  { path: "request", component: TopicRequest},
 
   {path:'directory',component:ManagerDashboardComponent,canActivate: [CollabGuard], data: { permission: 'test_assign' }},
   { path: 'employee-dashboard', component: EmployeeDashboardComponent, canActivate: [authGuard], data: { roles: ['Employee'] } },

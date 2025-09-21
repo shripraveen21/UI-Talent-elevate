@@ -1,5 +1,10 @@
+import os
 from typing import List, Dict, Any
+
+from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.params import Body
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from ..schemas.schemas import SuggestionCreate, SuggestionOut, SuggestionForLeaderOut
 from ..schemas.topic_schema import TopicCreate, TopicOut
@@ -7,6 +12,7 @@ from ..services.topics_service import create_topic, get_all_topics, get_topic_by
 from ..services.tech_stack_service import save_selected_topics
 from ..models.models import RoleEnum, Employee, Collaborator, Topic, TechStack, Suggestion
 from ..config.database import get_db
+from ..Agents.TopicsFromPD import ProjectTechStackTopicAgent
 
 
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -154,3 +160,27 @@ def delete_suggestion(suggestion_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Suggestion deleted"}
 
+class PD(BaseModel):
+    tech_stack: str
+    description: str
+
+@router.post("/topics-from-desc")
+async def get_topics_from_desc(body: PD = Body(), db: Session = Depends(get_db)):
+    try:
+        desc = body.description
+        tech_stack = body.tech_stack
+        model_client = AzureOpenAIChatCompletionClient(
+            azure_deployment="gpt-4.1",
+            model="gpt-4.1",
+            api_version="2024-06-01",
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        )
+
+        agent = ProjectTechStackTopicAgent(model_client=model_client)
+        topics = await agent.generate_topics(tech_stack, desc)
+        return topics
+
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Something went wrong")

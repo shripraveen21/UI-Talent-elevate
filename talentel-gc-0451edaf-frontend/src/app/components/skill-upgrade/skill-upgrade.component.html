@@ -87,17 +87,7 @@
         </div>
       </div>
 
-      <!-- Test Result Section -->
-      <div class="bg-white p-8 rounded-lg border border-gray-200" *ngIf="testResult || loading">
-        <h2 class="text-xl font-semibold text-center">Test Generation Result</h2>
-        <p class="text-sm text-gray-500 text-center">Your skill upgrade test status</p>
 
-        <div *ngIf="testResult" class="text-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <h3 class="text-lg font-medium text-gray-600 mb-2">Generating Test...</h3>
-          <p class="text-gray-500">Please wait while we create your skill upgrade test. You will receive an email when it's ready.</p>
-        </div>
-      </div>
 
       <!-- Empty State -->
       <div class="bg-white p-8 rounded-lg border border-gray-200" *ngIf="!testResult && !loading">

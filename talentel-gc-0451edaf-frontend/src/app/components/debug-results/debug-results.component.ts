@@ -886,4 +886,16 @@ export class DebugResultsComponent implements OnInit {
   };
 
 
+  isFeedbackGeneratingError(error: string | null | undefined): boolean {
+    if (!error) return false;
+    const msg = error.toLowerCase();
+    return (
+      msg.includes('failed') ||
+      msg.includes('to') ||
+      msg.includes('load') ||
+      msg.includes('debug') ||
+      msg.includes('pending') ||
+      msg.includes('processing')
+    );
+  }
 }

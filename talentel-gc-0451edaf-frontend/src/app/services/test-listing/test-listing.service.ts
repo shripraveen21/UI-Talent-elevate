@@ -46,4 +46,10 @@ export class TestListingService {
   getTestsCreatedBySelf(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}createdBySelf`);
   }
+
+  // Get submission status for quiz, debug, and handson for a test
+  getTestSubmitStatus(testId: number): Observable<{quiz_isSubmitted: boolean, debug_isSubmitted: boolean, handson_isSubmitted: boolean}> {
+    const url = environment.apiUrl + '/employee-dashboard/test-submit-status/' + testId;
+    return this.http.get<{quiz_isSubmitted: boolean, debug_isSubmitted: boolean, handson_isSubmitted: boolean}>(url);
+  }
 }

@@ -21,6 +21,39 @@ export class DashboardService {
         })
       );
   }
+
+  // Get quiz result for a test
+  getQuizResult(testId: number): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    return this.getTestResults(testId, token);
+  }
+
+  // Get debug result for a test (requires debugTestId)
+  getDebugResult(test: any): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const debugTestId = test.debug_test_id;
+    if (!debugTestId) {
+      return throwError(() => new Error('Debug test ID not found'));
+    }
+    return this.getDebugResults(debugTestId, token);
+  }
+
+  // Get handson result for a test (requires handsonId)
+  getHandsonResult(test: any): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const handsonId = test.handson_id;
+    if (!handsonId) {
+      return throwError(() => new Error('Handson ID not found'));
+    }
+    return this.http.get<any>(`${this.apiUrl}/handson-result/${handsonId}`, { headers: new HttpHeaders().set('Authorization', `Bearer ${token}`) });
+  }
+
+  // Add skill to employee_skills table
+  addSkillToEmployee(payload: { employee_id: number, tech_stack_id: number, level: string }): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<any>(`${this.apiUrl}/employee-skills/add`, payload, { headers });
+  }
   getTestDetails(testId: number, token: string): Observable<any> {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<any>(`${this.apiUrl}/employee-dashboard/start-test/${testId}`, { headers });
@@ -67,10 +100,7 @@ export class DashboardService {
     return this.http.get<any>(`${this.apiUrl}/debug-test/score/${debugTestId}`, { headers });
   }
 
-  getHandsonResult(handsonId: number, token: string): Observable<any> {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    return this.http.get<any>(`${this.apiUrl}/handson-result/${handsonId}`, { headers });
-  }
+  // (Removed duplicate getHandsonResult)
 
   evaluateDebugTest(debugId: number | string): Observable<any> {
     const token = localStorage.getItem('token') || '';
@@ -118,4 +148,28 @@ export class DashboardService {
       })
     );
   }
+
+    markHandsonCompleted(handsonId: number | string): Observable<any> {
+    const token = localStorage.getItem('token') || '';
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    console.log(JSON.stringify({
+      level: 'INFO',
+      message: 'Marking handson as completed',
+      handsonId,
+      timestamp: new Date().toISOString()
+    }));
+    return this.http.put<any>(`${this.apiUrl}/handson-result/${handsonId}/complete`, {}, { headers }).pipe(
+      catchError((error) => {
+        console.error(JSON.stringify({
+          level: 'ERROR',
+          message: 'Error marking handson as completed',
+          handsonId,
+          error: error?.message || error,
+          timestamp: new Date().toISOString()
+        }));
+        return throwError(() => error);
+      })
+    );
+  }
+
 }

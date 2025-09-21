@@ -13,9 +13,9 @@ async def save_debug_results(path_id, user_id, results):
         overall_eval = results.get("overall_evaluation")
         print(f"overall_evaluation: {overall_eval}")
         if isinstance(overall_eval, dict):
-            overall_score = overall_eval.get("overall_score")
+            overall_score = overall_eval.get("percent_fixed")
         else:
-            overall_score = getattr(overall_eval, "overall_score", None)
+            overall_score = getattr(overall_eval, "percent_fixed", None)
         print(f"overall_score: {overall_score}")
 
         debug_result = DebugResult(

@@ -14,7 +14,7 @@ from .DebugGen.FSTool import FileSystemTool
 
 load_dotenv()
 
-# --- Safe JSON parsing ---
+# --- Utility: Robust JSON Parsing ---
 def safe_parse_agent_response(response):
     lines = response.splitlines()
     json_lines = []
@@ -32,116 +32,79 @@ def safe_parse_agent_response(response):
     if response.endswith("```"):
         response = response[:-3]
     response = response.strip()
-    matches = re.findall(r'(\{.*\}|\[.*\])', response, re.DOTALL)
-    if not matches:
+    # Try parsing as array
+    try:
+        return json.loads(response)
+    except json.JSONDecodeError:
+        # Try splitting multiple objects
+        objects = re.findall(r'(\{.*?\})(?=\s*\{|\s*$)', response, re.DOTALL)
+        if objects:
+            return [json.loads(obj) for obj in objects]
         print("Raw agent response for debugging:\n", response)
         raise ValueError("No valid JSON found in response.")
-    json_str = max(matches, key=len)
-    try:
-        return json.loads(json_str)
-    except Exception as e:
-        print("Failed to parse extracted JSON:", json_str)
-        raise
 
-# --- Agents ---
-class RequirementsExtractionAgent:
-    def __init__(self, model_client, read_file_tool, srs_path):
+def read_file_text(path):
+    with open(path, 'r', encoding='utf-8') as f:
+        return f.read()
+
+# --- Unified Agent: Requirement Extraction + Assignment Parsing ---
+class MilestoneAnalysisAgent:
+    def __init__(self, model_client, codebase_dir, readme_path):
         self.agent = AssistantAgent(
-            name="requirements_extractor",
+            name="milestone_analyzer",
             model_client=model_client,
             system_message=f"""
-You are a requirements extraction agent.
-You have access to FileSystemTool for all file operations.
-Your job is to read the provided SRS.md and extract a list of milestones.
-For each milestone, include:
-- Milestone name
-- Functional requirements
-- Acceptance criteria
-- Relevant risks
+You are a milestone analysis agent for software engineering assignments.
 
-Use FileSystemTool.read_file(path) to read the SRS file.
+Instructions:
+- You will receive the full SRS markdown text, the codebase directory path, and the README.md path.
+- Parse the SRS markdown to identify all milestones (e.g., '### Milestone X: ...').
+- For each milestone, extract:
+    - Milestone name
+    - Functional requirements
+    - Acceptance criteria
+    - Relevant risks
+- For each milestone, analyze the codebase and documentation:
+    - List relevant code files
+    - Extract docstrings from those files
+    - Summarize related sections from README.md and SRS.md
+
 Output ONLY valid JSON in this format:
 [
   {{
     "milestone": "Milestone Name",
     "requirements": [...],
     "acceptance_criteria": [...],
-    "risks": [...]
-  }},
-  ...
-]
-Do not include explanations, markdown, or extra text.
-
-End your response with TERMINATE.
-""",
-            tools=[read_file_tool]
-        )
-        self.srs_path = srs_path
-
-    async def extract(self):
-        termination = TextMentionTermination("TERMINATE")
-        team = RoundRobinGroupChat([self.agent], termination_condition=termination)
-        task = f"Use FileSystemTool.read_file to read '{self.srs_path}' and extract all milestones and requirements as described."
-        result = await team.run(task=task)
-        json_content = ""
-        for message in result.messages:
-            if isinstance(message, TextMessage) and message.source == "requirements_extractor":
-                content = message.content.replace("TERMINATE", "").strip()
-                if content.startswith("```json") and content.endswith("```"):
-                    content = content[7:-3].strip()
-                elif content.startswith("```") and content.endswith("```"):
-                    content = content[3:-3].strip()
-                json_content += content
-        return safe_parse_agent_response(json_content)
-
-class AssignmentParsingAgent:
-    def __init__(self, model_client, read_file_tool, codebase_dir, readme_path, srs_path):
-        self.agent = AssistantAgent(
-            name="assignment_parser",
-            model_client=model_client,
-            system_message=f"""
-You are an assignment parsing agent.
-You have access to FileSystemTool for all file operations.
-For each milestone, use FileSystemTool.read_file and FileSystemTool.list_dir to:
-- Find relevant code files
-- Extract docstrings
-- Read documentation sections
-
-Output ONLY valid JSON in this format:
-{{
-  "milestone_name": {{
+    "risks": [...],
     "files": [...],
     "docstrings": ["..."],
     "readme_section": "...",
     "srs_section": "..."
   }},
   ...
-}}
+]
 Do not include explanations, markdown, or extra text.
 
 End your response with TERMINATE.
-""",
-            tools=[read_file_tool]
+"""
+            ,
+            tools=[FileSystemTool]
         )
         self.codebase_dir = codebase_dir
         self.readme_path = readme_path
-        self.srs_path = srs_path
 
-    async def parse(self, milestones):
+    async def analyze(self, srs_text):
         termination = TextMentionTermination("TERMINATE")
         team = RoundRobinGroupChat([self.agent], termination_condition=termination)
-        task = f"""
-Given the codebase at '{self.codebase_dir}', README.md at '{self.readme_path}', and SRS.md at '{self.srs_path}', for each milestone, list:
-- Relevant code files
-- Presence and quality of docstrings
-- Related documentation sections
-
-Milestones: {json.dumps(milestones)}
-"""
+        task = (
+            f"Given the following SRS markdown:\n\n{srs_text}\n\n"
+            f"and the codebase at '{self.codebase_dir}' and README.md at '{self.readme_path}', "
+            "extract all milestones and for each, analyze the codebase and documentation as described."
+        )
         result = await team.run(task=task)
         json_content = ""
         for message in result.messages:
-            if isinstance(message, TextMessage) and message.source == "assignment_parser":
+            if isinstance(message, TextMessage) and message.source == "milestone_analyzer":
                 content = message.content.replace("TERMINATE", "").strip()
                 if content.startswith("```json") and content.endswith("```"):
                     content = content[7:-3].strip()
@@ -150,14 +113,15 @@ Milestones: {json.dumps(milestones)}
                 json_content += content
         return safe_parse_agent_response(json_content)
 
+# --- Evaluation Agent ---
 class MilestoneEvaluationAgent:
-    def __init__(self, model_client, read_file_tool):
+    def __init__(self, model_client):
         self.agent = AssistantAgent(
             name="milestone_evaluator",
             model_client=model_client,
             system_message="""
 You are a milestone evaluation agent.
-You have access to FileSystemTool for all file operations.
+
 For each milestone, you will receive:
 - Extracted requirements and acceptance criteria
 - Assignment content: code files, docstrings, documentation
@@ -166,7 +130,7 @@ Evaluate the milestone for:
 - Completeness (all required files and docs present)
 - Clarity (docstrings and documentation quality)
 - Readiness (structure and modularity)
-- Documentation (README.md and SRS.md coverage)
+- Documentation (coverage and usefulness)
 
 STRICT SCORING INSTRUCTIONS:
 - For each criterion (completeness, clarity, readiness, documentation), assign:
@@ -174,7 +138,6 @@ STRICT SCORING INSTRUCTIONS:
     - 0 if any required element is missing.
     - Around 5 if partially met (some requirements/criteria present, but not all).
 - Do NOT give scores above 0 if milestone files, code, or documentation are missing.
-- Do try to spread out the score as possible within the range according to the evaluation
 - Be critical: If in doubt, score lower.
 
 For each, rate 0-10 and provide a brief justification.
@@ -198,28 +161,19 @@ Output ONLY valid JSON in this format:
 Do not include explanations, markdown, or extra text.
 
 End your response with TERMINATE.
-""",
-            tools=[read_file_tool]
+"""
         )
 
-    async def evaluate(self, milestone, assignment_content):
+    async def evaluate(self, milestone):
         termination = TextMentionTermination("TERMINATE")
         team = RoundRobinGroupChat([self.agent], termination_condition=termination)
-        task = f"""
-        Milestone: {milestone['milestone']}
-        Requirements: {json.dumps(milestone['requirements'])}
-        Acceptance Criteria: {json.dumps(milestone['acceptance_criteria'])}
-        Assignment Content: {json.dumps(assignment_content)}
-
-        For scoring:
-        - For completeness, check if EVERY requirement and acceptance criterion is satisfied in the assignment content.
-        - If ANY are missing, score 0 for completeness.
-        - Only score 10 if ALL are present and correct.
-        - Be strict and do NOT give partial credit unless justified.
-
-        Evaluate as described above.
-        """
-
+        task = (
+            f"Milestone: {milestone['milestone']}\n"
+            f"Requirements: {json.dumps(milestone['requirements'])}\n"
+            f"Acceptance Criteria: {json.dumps(milestone['acceptance_criteria'])}\n"
+            f"Assignment Content: {json.dumps({k: milestone[k] for k in ['files','docstrings','readme_section','srs_section']})}\n"
+            "Evaluate as described above."
+        )
         result = await team.run(task=task)
         json_content = ""
         for message in result.messages:
@@ -232,21 +186,7 @@ End your response with TERMINATE.
                 json_content += content
         return safe_parse_agent_response(json_content)
 
-# --- Aggregation ---
-def aggregate_evaluations(milestone_evaluations):
-    overall_score = round(sum([m["score"] for m in milestone_evaluations]) / len(milestone_evaluations), 2)
-    overall_ratings = {
-        "completeness": round(sum([m["ratings"]["completeness"] for m in milestone_evaluations]) / len(milestone_evaluations), 2),
-        "clarity": round(sum([m["ratings"]["clarity"] for m in milestone_evaluations]) / len(milestone_evaluations), 2),
-        "readiness": round(sum([m["ratings"]["readiness"] for m in milestone_evaluations]) / len(milestone_evaluations), 2),
-        "documentation": round(sum([m["ratings"]["documentation"] for m in milestone_evaluations]) / len(milestone_evaluations), 2)
-    }
-    return {
-        "overall_score": overall_score,
-        "overall_ratings": overall_ratings,
-        "milestone_evaluations": milestone_evaluations
-    }
-
+# --- Verification Agent ---
 class MilestoneVerificationAgent:
     def __init__(self, model_client):
         self.agent = AssistantAgent(
@@ -278,19 +218,17 @@ End your response with TERMINATE.
 """
         )
 
-    async def verify(self, milestone, assignment_content, evaluation):
+    async def verify(self, milestone, evaluation):
         termination = TextMentionTermination("TERMINATE")
         team = RoundRobinGroupChat([self.agent], termination_condition=termination)
-        task = f"""
-Milestone: {milestone['milestone']}
-Requirements: {json.dumps(milestone['requirements'])}
-Acceptance Criteria: {json.dumps(milestone['acceptance_criteria'])}
-Assignment Content: {json.dumps(assignment_content)}
-Initial Evaluation: {json.dumps(evaluation)}
-
-Check if the evaluation strictly follows the rubric and is justified.
-If not, suggest corrections.
-"""
+        task = (
+            f"Milestone: {milestone['milestone']}\n"
+            f"Requirements: {json.dumps(milestone['requirements'])}\n"
+            f"Acceptance Criteria: {json.dumps(milestone['acceptance_criteria'])}\n"
+            f"Assignment Content: {json.dumps({k: milestone[k] for k in ['files','docstrings','readme_section','srs_section']})}\n"
+            f"Initial Evaluation: {json.dumps(evaluation)}\n"
+            "Check if the evaluation strictly follows the rubric and is justified. If not, suggest corrections."
+        )
         result = await team.run(task=task)
         json_content = ""
         for message in result.messages:
@@ -303,49 +241,61 @@ If not, suggest corrections.
                 json_content += content
         return safe_parse_agent_response(json_content)
 
-# --- Main Workflow (with verification) ---
+# --- Aggregation ---
+def aggregate_evaluations(milestone_evaluations):
+    if not milestone_evaluations:
+        return {"overall_score": 0, "overall_ratings": {}, "milestone_evaluations": []}
+    # Defensive: skip non-dict entries
+    milestone_evaluations = [m for m in milestone_evaluations if isinstance(m, dict)]
+    if not milestone_evaluations:
+        return {"overall_score": 0, "overall_ratings": {}, "milestone_evaluations": []}
+    overall_score = round(sum([m["score"] for m in milestone_evaluations]) / len(milestone_evaluations), 2)
+    keys = milestone_evaluations[0]["ratings"].keys()
+    overall_ratings = {
+        k: round(sum([m["ratings"][k] for m in milestone_evaluations]) / len(milestone_evaluations), 2)
+        for k in keys
+    }
+    return {
+        "overall_score": overall_score,
+        "overall_ratings": overall_ratings,
+        "milestone_evaluations": milestone_evaluations
+    }
 
+# --- Main Workflow ---
 async def agentic_assignment_evaluation_workflow(
     srs_path,
     readme_path,
     codebase_dir,
     model_client
 ):
-    file_tool = FileSystemTool
+    # 1. Read SRS text once
+    srs_text = read_file_text(srs_path)
+    analysis_agent = MilestoneAnalysisAgent(model_client, codebase_dir, readme_path)
+    milestones = await analysis_agent.analyze(srs_text)
 
-    # 1. Extract milestones from SRS.md
-    requirements_agent = RequirementsExtractionAgent(model_client, file_tool, srs_path)
-    milestones = await requirements_agent.extract()
-
-    # 2. Parse assignment codebase and docs
-    parsing_agent = AssignmentParsingAgent(model_client, file_tool, codebase_dir, readme_path, srs_path)
-    assignment_content = await parsing_agent.parse(milestones)
-
-    # 3. Evaluate and verify each milestone
-    evaluation_agent = MilestoneEvaluationAgent(model_client, file_tool)
+    # 2. Evaluate and verify each milestone in parallel
+    evaluation_agent = MilestoneEvaluationAgent(model_client)
     verification_agent = MilestoneVerificationAgent(model_client)
-    milestone_evaluations = []
 
-    for milestone in milestones:
-        milestone_name = milestone["milestone"]
-        assignment_info = assignment_content.get(milestone_name, {})
-        eval_result = await evaluation_agent.evaluate(milestone, assignment_info)
-        verify_result = await verification_agent.verify(milestone, assignment_info, eval_result)
-
-        # Use corrected evaluation if needed
+    async def eval_and_verify(milestone):
+        eval_result = await evaluation_agent.evaluate(milestone)
+        verify_result = await verification_agent.verify(milestone, eval_result)
         if verify_result.get("verdict") == "REVISE" and "corrected_evaluation" in verify_result:
-            print(f"Verifier revised evaluation for '{milestone_name}': {verify_result.get('comments', [])}")
-            milestone_evaluations.append(verify_result["corrected_evaluation"])
+            print(f"Verifier revised evaluation for '{milestone['milestone']}': {verify_result.get('comments', [])}")
+            return verify_result["corrected_evaluation"]
         else:
-            milestone_evaluations.append(eval_result)
+            return eval_result
 
-    # 4. Aggregate and report
+    milestone_evaluations = await asyncio.gather(
+        *(eval_and_verify(milestone) for milestone in milestones)
+    )
+
+    # 3. Aggregate and report
     report = aggregate_evaluations(milestone_evaluations)
     print(json.dumps(report, indent=2))
     return report
 
 # --- Usage Example ---
-
 if __name__ == "__main__":
     model_client = AzureOpenAIChatCompletionClient(
         azure_deployment="gpt-4.1",
@@ -358,8 +308,8 @@ if __name__ == "__main__":
     project_path = os.getenv("PROJECT_PATH", "GeneratedHandsON")
     user_path = os.getenv("USER_PATH", "UserST")
     asyncio.run(agentic_assignment_evaluation_workflow(
-        srs_path=f"{project_path}/3c9da814-2b9d-44f3-9aad-d4f5c3628591/SRS.md",
-        readme_path=f"{project_path}/3c9da814-2b9d-44f3-9aad-d4f5c3628591/README.md",
+        srs_path=f"{project_path}/3c9da814-2b9d-44f3-9aad-d4f5c3628591/project/SRS.md",
+        readme_path=f"{project_path}/3c9da814-2b9d-44f3-9aad-d4f5c3628591/project/README.md",
         codebase_dir=f"{user_path}/3c9da814-2b9d-44f3-9aad-d4f5c3628591/project",
         model_client=model_client
     ))
