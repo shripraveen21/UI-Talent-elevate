@@ -88,24 +88,26 @@
       <form [formGroup]="collaboratorForm" (ngSubmit)="submitForm()" class="space-y-4">
         <div>
           <label class="block text-gray-600 mb-1">Search and Select Employee</label>
-          <input type="text"
-            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Type employee name or email..." [(ngModel)]="searchQuery" (input)="onSearchChange()"
-            [ngModelOptions]="{standalone: true}">
-          
-          <!-- Search Results Dropdown -->
-          <div *ngIf="searchQuery && filteredEmployees.length > 0" 
-               class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto mt-1">
-            <div *ngFor="let emp of filteredEmployees" 
-                 class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
-                 (click)="selectEmployeeFromSearch(emp)">
-              <div class="flex items-center">
-                <div class="flex-grow">
-                  <p class="font-semibold text-gray-900">{{ emp.name }}</p>
-                  <p class="text-sm text-gray-500">{{ emp.email }}</p>
-                  <div class="flex items-center space-x-2 mt-1">
-                    <span class="text-xs text-gray-600">{{ emp.role }}</span>
-                    <span class="text-xs text-white bg-blue-600 font-semibold px-2 py-0.5 rounded-full">{{ emp.band }}</span>
+          <div class="relative">
+            <input type="text"
+              class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Type employee name or email..." [(ngModel)]="searchQuery" (input)="onSearchChange()"
+              [ngModelOptions]="{standalone: true}">
+            
+            <!-- Search Results Dropdown -->
+            <div *ngIf="searchQuery && filteredEmployees.length > 0" 
+                 class="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto mt-1 left-0 right-0">
+              <div *ngFor="let emp of filteredEmployees" 
+                   class="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                   (click)="selectEmployeeFromSearch(emp)">
+                <div class="flex items-center">
+                  <div class="flex-grow">
+                    <p class="font-semibold text-gray-900">{{ emp.name }}</p>
+                    <p class="text-sm text-gray-500">{{ emp.email }}</p>
+                    <div class="flex items-center space-x-2 mt-1">
+                      <span class="text-xs text-gray-600">{{ emp.role }}</span>
+                      <span class="text-xs text-white bg-blue-600 font-semibold px-2 py-0.5 rounded-full">{{ emp.band }}</span>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -1,0 +1,121 @@
+/* Manage Collaborator Component Styles */
+:host {
+  display: block;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Ensure the form container has relative positioning for dropdown positioning */
+.bg-white.rounded-lg.border.border-gray-200.shadow.p-8 {
+  position: relative;
+  overflow: visible;
+}
+
+/* Search input container positioning */
+.relative {
+  position: relative;
+  width: 100%;
+}
+
+/* Search dropdown positioning and styling */
+.absolute.z-10 {
+  position: absolute !important;
+  z-index: 1000 !important;
+  max-width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Ensure dropdown doesn't overflow container */
+.max-h-60.overflow-y-auto {
+  max-height: 15rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Custom scrollbar for webkit browsers */
+.max-h-60.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.max-h-60.overflow-y-auto::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.max-h-60.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.max-h-60.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Dropdown item hover effects */
+.hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Selected employee card styling */
+.bg-blue-50 {
+  background-color: #eff6ff;
+  border-color: #dbeafe;
+}
+
+/* Toast positioning */
+.fixed.top-6.right-6 {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 50;
+  max-width: 350px;
+  word-wrap: break-word;
+}
+
+/* Modal backdrop */
+.fixed.inset-0.bg-black.bg-opacity-40 {
+  backdrop-filter: blur(2px);
+}
+
+/* Table responsive styling */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  table {
+    font-size: 0.875rem;
+  }
+  
+  .py-2.px-4 {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Form button styling */
+.bg-gradient-hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-hero:hover {
+  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
+
+/* Animation for dropdown appearance */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.absolute.z-10.w-full.bg-white {
+  animation: fadeIn 0.2s ease-out;
+}
