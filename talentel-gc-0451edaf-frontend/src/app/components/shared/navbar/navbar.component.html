@@ -3,11 +3,9 @@
     <div class="flex justify-between items-center">
       <!-- Left Section: Logo and Role Badge -->
       <div class="flex items-center space-x-2 sm:space-x-4">
-        <img src="Preview.png" alt="App Logo" class="h-6 sm:h-8 w-auto mr-1 sm:mr-2" style="object-fit:contain;" />
-        <a (click)="navigateToHome()"
-          class="text-lg sm:text-xl lg:text-2xl font-bold text-blue-600 cursor-pointer hover:opacity-80 transition-opacity">
-          <span class="hidden sm:inline">Talent Elevate</span>
-          <span class="sm:hidden">TE</span>
+        <a (click)="navigateToHome()" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
+          <!-- <img src="Favicon.png" alt="TE Favicon" class="h-8 sm:h-12 w-auto mr-2 sm:mr-3" style="object-fit:contain;" /> -->
+          <img src="cube.png" alt="Talent Elevate Logo" class="h-6 sm:h-8 lg:h-10 w-auto" style="object-fit:contain;" />
         </a>
         <span
           class="text-white text-xs font-bold px-2 sm:px-3 py-1 rounded-full"
@@ -24,14 +22,16 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
           </svg>
-          <span class="text-xs sm:text-sm font-medium hidden sm:inline">{{ userInfo?.name || user?.name || 'User' }}</span>
+          <span class="text-xs sm:text-sm font-medium hidden sm:inline">{{ userInfo?.name || user?.name || 'User'
+            }}</span>
         </a>
 
         <!-- Collab Button with Relative Positioning -->
         <div class="relative">
           <button *ngIf="isUserCollaborator" (click)="toggleCollabMenu()"
             class="flex items-center space-x-1 sm:space-x-2 px-2 sm:px-4 py-1 sm:py-2 bg-gray-100 rounded hover:bg-indigo-100 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
             <span class="text-xs sm:text-sm font-medium hidden sm:inline">Collab</span>
@@ -40,9 +40,12 @@
           <!-- Collab Dropdown -->
           <div *ngIf="showCollabMenu"
             class="absolute left-0 top-full mt-2 w-40 sm:w-48 bg-white border border-gray-200 rounded shadow-lg z-50">
-            <button *ngIf="canAccessTopics" (click)="navigateToTopics()" class="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-xs sm:text-sm">Topics</button>
-            <button *ngIf="canCreateTest" (click)="navigateToTests()" class="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-xs sm:text-sm">Tests</button>
-            <button *ngIf="canAssignTest" (click)="navigateToAssignTest()" class="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-xs sm:text-sm">Assign-Test</button>
+            <button *ngIf="canAccessTopics" (click)="navigateToTopics()"
+              class="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-xs sm:text-sm">Topics</button>
+            <button *ngIf="canCreateTest" (click)="navigateToTests()"
+              class="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-xs sm:text-sm">Tests</button>
+            <button *ngIf="canAssignTest" (click)="navigateToAssignTest()"
+              class="block w-full text-left px-3 sm:px-4 py-2 hover:bg-gray-100 text-xs sm:text-sm">Assign-Test</button>
           </div>
         </div>
 
@@ -70,8 +73,8 @@
 
         <!-- Sign Out Button -->
         <a (click)="signOut()" class="flex items-center space-x-1 sm:space-x-2 hover:text-blue-600 cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-            stroke-width="2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 sm:h-5 w-4 sm:w-5" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
